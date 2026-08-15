@@ -1,4 +1,4 @@
-const CACHE_NAME = 'htm-beta-0.027-20260815-r1';
+const CACHE_NAME = 'htm-beta-0.028-20260815-r3';
 const CORE = [
   './',
   './index.html',
