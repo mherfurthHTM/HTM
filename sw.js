@@ -1,4 +1,4 @@
-const CACHE_NAME = 'htm-v19-20260815';
+const CACHE_NAME = 'htm-v20-20260815';
 const CORE = [
   './',
   './index.html',
