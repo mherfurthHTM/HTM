@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>HTM</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--amber:#a16207}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:860px;margin:auto;padding:16px 14px 42px}h1{font-size:25px;margin:5px 0 16px}h2{font-size:18px;margin:0 0 12px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,select,button{font:inherit}input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff}button{border:0;border-radius:12px;padding:13px 11px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:var(--green);color:#fff}.danger{background:var(--red);color:#fff}.secondary{background:#e8eefc;color:#183b8c}.mutedbtn{background:#ececec;color:#222}.big{font-size:17px;padding:18px 12px}
+.grid2,.grid3{display:grid;gap:10px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}
+.stat{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fafafa}.stat b{display:block;font-size:20px;margin-top:4px}.small{font-size:12px;color:var(--muted)}.status{font-weight:700;margin:6px 0 14px}.positive{color:var(--green)}.negative{color:var(--red)}.warning{color:var(--amber)}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}.tab{background:#fff;border:1px solid var(--border);padding:10px 4px;font-size:12px}.tab.active{background:#111827;color:#fff}.view{display:none}.view.active{display:block}
+.entry{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:8px}.entry:last-child{border-bottom:0}.mini{padding:7px 9px;border-radius:8px;font-size:12px}.notice{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:11px;font-size:13px}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 6px;text-align:left;border-bottom:1px solid var(--border)}th{color:var(--muted);font-weight:600}
+.workday-label{display:flex;align-items:center;gap:8px;color:var(--text);margin:0}.workday-label input{width:auto;margin:0}.cal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.cal-head button{padding:8px 10px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cal-week{font-size:11px;color:var(--muted);text-align:center;padding:4px 0;font-weight:700}.cal-day{min-height:62px;border:1px solid var(--border);background:#fff;border-radius:10px;padding:6px;font-weight:600;position:relative;text-align:left}.cal-day.other{opacity:.35}.cal-day.free{background:#f8fafc}.cal-day.selected{outline:2px solid var(--blue);background:#eff6ff}.cal-day.has-absence{background:#ecfdf5;border-color:#86efac}.cal-day.has-work{border-color:#93c5fd}.badge{display:block;margin-top:4px;font-size:9px;color:#166534;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.workbadge{display:block;margin-top:4px;font-size:9px;color:#1d4ed8}.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:11px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;border:1px solid #bbb}.dot.reg{background:#fff}.dot.free{background:#f8fafc}.dot.abs{background:#ecfdf5;border-color:#86efac}
+
+.admin-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:10px}
+.admin-entry{border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;background:#fafafa}
+.admin-entry h3{font-size:14px;margin:0 0 10px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.log-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
+.log-item:last-child{border-bottom:0}
+.locked{max-width:420px}
+
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.menu-wrap{position:relative}
+.menu-btn{background:#111827;color:#fff;border-radius:10px;padding:10px 12px;font-size:18px;line-height:1}
+.dropdown{display:none;position:absolute;top:46px;left:0;min-width:210px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.14);z-index:50;overflow:hidden}
+.dropdown.open{display:block}
+.dropdown button{width:100%;text-align:left;background:#fff;border-radius:0;padding:12px 14px;font-weight:600;border-bottom:1px solid var(--border)}
+.dropdown button:last-child{border-bottom:0}
+.dropdown button:hover{background:#f3f4f6}
+.version-badge{font-size:12px;color:var(--muted);font-weight:600}
+
+
+.qr-card{border:1px solid var(--border);border-radius:14px;padding:13px;margin-top:14px;background:#fafafa}
+.qr-reader{display:none;margin-top:12px}
+.qr-reader.open{display:block}
+.qr-video{width:100%;max-height:330px;background:#111;border-radius:12px;object-fit:cover}
+.qr-status{font-size:13px;margin-top:9px;color:var(--muted)}
+.qr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.qr-code-card{border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;background:#fff}
+.qr-code-card img{width:150px;max-width:100%;height:auto;image-rendering:auto}
+.qr-code-card b{display:block;margin-top:6px}
+
+@media(max-width:600px){.grid3{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}.cal-day{min-height:55px;padding:5px;font-size:12px}.grid2{grid-template-columns:1fr}.admin-row{grid-template-columns:1fr}.qr-grid{grid-template-columns:1fr}}
+
+.lang-menu{display:none;background:#f8fafc;border-top:1px solid var(--border)}
+.lang-menu.open{display:block}
+.lang-menu button{padding-left:28px;font-size:13px}
+.lang-current{float:right;color:var(--muted);font-weight:500}
+.qr-action-panel{display:none;margin-top:12px;border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+.qr-action-panel.open{display:block}
+.qr-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+@media(max-width:600px){.qr-action-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topbar">
+  <div class="menu-wrap">
+    <button id="mainMenuBtn" class="menu-btn" aria-label="Menü öffnen">☰</button>
+    <div id="mainDropdown" class="dropdown">
+      <button data-menu-target="stamp">Stempeln</button>
+      <button data-menu-target="calendarView">Kalender</button>
+      <button data-menu-target="overview">Übersicht</button>
+      <button data-menu-target="settingsView">Einstellungen</button>
+      <button data-menu-target="admin">Adminbereich</button>
+      
+<button id="languageMenuBtn">Sprache <span id="currentLanguageLabel" class="lang-current">Deutsch</span></button>
+<div id="languageMenu" class="lang-menu">
+  <button data-lang="de">Deutsch</button>
+  <button data-lang="en">English</button>
+  <button data-lang="it">Italiano</button>
+  <button data-lang="fr">Français</button>
+  <button data-lang="gsw">Schwiizerdütsch</button>
+</div>
+<button id="showVersionBtn">Version anzeigen</button>
+
+    </div>
+  </div>
+  <div style="flex:1">
+    <h1 style="margin:0">HTM</h1>
+    <div class="version-badge">Testversion v14</div>
+  </div>
+</div>
+
+<div class="card"><label for="name">Name</label><input id="name" placeholder="Vor- und Nachname"><div class="small" style="margin-top:8px">Testversion: Zeiten werden nur über die Stempelbuttons erfasst.</div></div>
+
+<div class="tabs">
+<button class="tab active" data-view="stamp">Stempeln</button><button class="tab" data-view="calendarView">Kalender</button><button class="tab" data-view="absence">Abwesenheit</button><button class="tab" data-view="overview">Übersicht</button><button class="tab" data-view="data">Daten</button><button class="tab" data-view="admin">Admin</button>
+</div>
+
+<section id="stamp" class="view active"><div class="card">
+<h2>Heute</h2><div id="todayDate" class="small"></div><div id="todayStatus" class="status"></div>
+<div class="grid2"><button id="comeBtn" class="primary big">KOMMEN</button><button id="pauseStartBtn" class="secondary big">PAUSE STARTEN</button><button id="pauseEndBtn" class="secondary big">PAUSE BEENDEN</button><button id="goBtn" class="danger big">GEHEN</button></div>
+
+<div class="qr-card">
+  <b>Optional per QR-Code stempeln</b>
+  <div class="small" style="margin-top:4px">Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.</div>
+  <button id="openQrScanner" class="secondary" style="width:100%;margin-top:10px">📷 QR-Code scannen</button>
+  <div id="qrReader" class="qr-reader">
+    <video id="qrVideo" class="qr-video" playsinline muted></video>
+    <div id="qrStatus" class="qr-status">Kamera wird vorbereitet …</div>
+    <button id="closeQrScanner" class="mutedbtn" style="width:100%;margin-top:10px">Kamera schliessen</button>
+  </div>
+  <div id="qrActionPanel" class="qr-action-panel">
+    <b>Was möchtest du buchen?</b>
+    <div class="small" id="qrActionHint" style="margin-top:4px">Wähle die gewünschte Aktion.</div>
+    <div class="qr-action-grid">
+      <button id="qrComeBtn" class="primary">KOMMEN</button>
+      <button id="qrPauseStartBtn" class="secondary">PAUSE STARTEN</button>
+      <button id="qrPauseEndBtn" class="secondary">PAUSE BEENDEN</button>
+      <button id="qrGoBtn" class="danger">GEHEN</button>
+    </div>
+    <button id="qrCancelAction" class="mutedbtn" style="width:100%;margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<div id="sessions" style="margin-top:14px"></div>
+<div class="grid3" style="margin-top:12px"><div class="stat"><span class="small">Arbeitszeit</span><b id="todayWork">0:00</b></div><div class="stat"><span class="small">Pause</span><b id="todayPause">0:00</b></div><div class="stat"><span class="small">Soll</span><b id="todayTarget">0:00</b></div></div>
+<div class="stat" style="margin-top:10px"><span class="small">Differenz zum Soll</span><b id="todayDiff">0:00</b></div>
+</div></section>
+
+<section id="calendarView" class="view">
+<div class="card"><h2>Ferien- und Abwesenheitskalender</h2><div class="cal-head"><button id="prevMonth" class="mutedbtn">‹</button><b id="calendarTitle"></b><button id="nextMonth" class="mutedbtn">›</button></div><div class="calendar" id="calendar"></div><div class="legend"><span><i class="dot reg"></i>regulärer Arbeitstag</span><span><i class="dot free"></i>planmässig frei</span><span><i class="dot abs"></i>Abwesenheit</span></div><div class="small" style="margin-top:9px">An Montag, Dienstag oder am Wochenende kann trotz „planmässig frei“ ganz normal gestempelt werden. Die Arbeitszeit zählt dann als Zusatzarbeit / Überzeit.</div></div>
+<div class="card"><h2>Auswahl bearbeiten</h2><div class="grid2"><div><label for="calFrom">Von</label><input id="calFrom" type="date"></div><div><label for="calTo">Bis</label><input id="calTo" type="date"></div></div><div style="margin-top:10px"><label for="calType">Art</label><select id="calType"><option value="Ferien">Ferien / Urlaub</option><option value="Krank">Krankheit</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option></select></div><div id="calendarEditInfo" class="small" style="margin-top:9px"></div><div class="grid2" style="margin-top:12px"><button id="saveCalendarEntry" class="secondary">Speichern / ändern</button><button id="deleteCalendarEntry" class="danger">Auswahl löschen</button></div><button id="clearCalendarSelection" class="mutedbtn" style="width:100%;margin-top:10px">Auswahl zurücksetzen</button><div class="small" style="margin-top:9px">Ferien und bezahlte Abwesenheiten werden nur an regulären Arbeitstagen angerechnet. Bereits eingetragene Ferien können hier geändert oder gelöscht werden.</div></div>
+</section>
+
+<section id="absence" class="view"><div class="card"><h2>Weitere Abwesenheit / Überstundenabbau</h2><div class="grid2"><div><label for="absenceFrom">Von</label><input id="absenceFrom" type="date"></div><div><label for="absenceTo">Bis</label><input id="absenceTo" type="date"></div></div><div style="margin-top:10px"><label for="absenceType">Art</label><select id="absenceType"><option value="Krank">Krankheit</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option><option value="Ueberstundenabbau">Überstundenabbau</option></select></div><div id="hoursBox" style="display:none;margin-top:10px"><label for="absenceHours">Überstundenabbau in Stunden pro Tag</label><input id="absenceHours" type="number" min="0.25" max="16" step="0.25" value="8.5"></div><button id="saveAbsence" class="secondary" style="width:100%;margin-top:12px">Abwesenheit speichern</button><div class="small" style="margin-top:10px">Einträge werden nur an regulären Arbeitstagen angelegt. Überstundenabbau reduziert das Überstundenkonto.</div></div><div class="card"><h2>Gespeicherte Abwesenheiten</h2><div id="absenceList"></div></div></section>
+
+<section id="overview" class="view"><div class="card"><h2>Aktueller Monat</h2><div class="grid3"><div class="stat"><span class="small">Arbeitszeit</span><b id="monthWorked">0:00</b></div><div class="stat"><span class="small">Sollzeit bis heute</span><b id="monthTarget">0:00</b></div><div class="stat"><span class="small">Monatssaldo</span><b id="monthBalance">0:00</b></div></div><div class="grid3" style="margin-top:10px"><div class="stat"><span class="small">Ferientage geplant</span><b id="vacDays">0</b></div><div class="stat"><span class="small">Krankheitstage</span><b id="sickDays">0</b></div><div class="stat"><span class="small">Überstundenkonto</span><b id="overtimeTotal">0:00</b></div></div></div><div class="card"><h2>Tagesübersicht</h2><div class="scroll"><table><thead><tr><th>Datum</th><th>Status</th><th>Ist</th><th>Soll</th><th>Saldo</th></tr></thead><tbody id="dayTable"></tbody></table></div></div></section>
+
+<section id="data" class="view"><div class="card"><h2>Daten</h2><button id="exportBtn" class="secondary" style="width:100%;margin-bottom:10px">CSV exportieren</button><button id="resetBtn" class="mutedbtn" style="width:100%">Testdaten komplett löschen</button><div class="notice" style="margin-top:12px">Testversion: Die Daten werden nur auf diesem Gerät im Browser gespeichert. Browserdaten löschen bedeutet Datenverlust. Für einen späteren Einsatz mit mehreren Personen brauchen wir eine zentrale Datenbank und persönliche Benutzerkonten mit Rollen. Der Test-Admin-PIN ist bewusst nur eine Übergangslösung.</div></div></section>
+
+
+<section id="settingsView" class="view">
+  <div class="card">
+    <h2>Einstellungen</h2>
+    <div class="small" style="margin-bottom:12px">Hier werden Arbeitsmodell und Sollzeit festgelegt.</div>
+    <div class="grid3">
+      <label class="stat"><input class="workdayBox" type="checkbox" value="1"> Montag</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="2"> Dienstag</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="3"> Mittwoch</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="4"> Donnerstag</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="5"> Freitag</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="6"> Samstag</label>
+      <label class="stat"><input class="workdayBox" type="checkbox" value="0"> Sonntag</label>
+    </div>
+    <div style="margin-top:12px">
+      <label for="dailyTargetHours">Sollzeit je regulärem Arbeitstag</label>
+      <input id="dailyTargetHours" type="number" min="0.25" max="16" step="0.25" value="8.5">
+    </div>
+    <div id="weekModelText" class="small" style="margin-top:8px">Zusätzliche Einsätze an freien Tagen sind weiterhin möglich und werden als Pluszeit gezählt.</div>
+  </div>
+
+  <div class="card">
+    <h2>Test-QR-Code</h2>
+    <div class="small">Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.</div>
+    <div class="qr-code-card" style="margin-top:12px">
+      <img src="qr/stempeln.png" alt="QR-Code Arbeitszeit stempeln">
+      <b>Arbeitszeit stempeln</b>
+      <span class="small">AZ:STEMPELN</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>App-Version</h2>
+    <div class="stat">
+      <span class="small">Aktuelle Testversion</span>
+      <b>v14</b>
+    </div>
+    <div class="small" style="margin-top:8px">Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.</div>
+  </div>
+</section>
+
+<section id="admin" class="view">
+  <div class="card locked" id="adminLoginCard">
+    <h2>Adminbereich</h2>
+    <label for="adminPin">Admin-PIN</label>
+    <input id="adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN eingeben">
+    <button id="adminLoginBtn" class="secondary" style="width:100%;margin-top:10px">Adminbereich öffnen</button>
+    <div class="notice" style="margin-top:12px">Testversion: Der PIN schützt nur vor versehentlicher Bedienung. Für mehrere Mitarbeitende braucht es später persönliche Logins und echte Benutzerrollen.</div>
+  </div>
+
+  <div id="adminPanel" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div><h2 style="margin-bottom:4px">Zeitkorrekturen</h2><div class="small">Nur im Adminbereich möglich</div></div>
+        <button id="adminLogoutBtn" class="mutedbtn mini">Sperren</button>
+      </div>
+
+      <div style="margin-top:14px">
+        <label for="adminDate">Datum auswählen</label>
+        <input id="adminDate" type="date">
+      </div>
+
+      <div style="margin-top:10px">
+        <label for="adminReason">Grund der Korrektur</label>
+        <input id="adminReason" placeholder="z. B. versehentlich falsch gestempelt">
+      </div>
+
+      <div id="adminEntries" style="margin-top:14px"></div>
+
+      <div class="admin-entry">
+        <h3>Fehlenden Arbeitsblock ergänzen</h3>
+        <div class="grid2">
+          <div><label for="newBlockIn">Kommen</label><input id="newBlockIn" type="time"></div>
+          <div><label for="newBlockOut">Gehen</label><input id="newBlockOut" type="time"></div>
+        </div>
+        <button id="addWorkBlock" class="secondary" style="width:100%;margin-top:10px">Arbeitsblock hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Änderungsprotokoll</h2>
+      <div id="correctionLog"></div>
+    </div>
+  </div>
+</section>
+
+</div>
+<script>
+const KEY="arbeitszeit_test_v1", DEFAULT_WORKDAYS=[3,4,5], DEFAULT_TARGET=510, ADMIN_PIN="0000";
+const empty=()=>({name:"",days:{},absences:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de"}});
+let state=load(), calendarCursor=new Date(), calendarPickStart=null;
+
+const UI_TRANSLATIONS={"en":{"Arbeitszeiterfassung":"Time Tracking","Stempeln":"Clock","Kalender":"Calendar","Übersicht":"Overview","Einstellungen":"Settings","Adminbereich":"Admin area","Version anzeigen":"Show version","Sprache":"Language","Abwesenheit":"Absence","Daten":"Data","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Test version: Times are recorded only with the clock buttons.","Heute":"Today","KOMMEN":"CLOCK IN","PAUSE STARTEN":"START BREAK","PAUSE BEENDEN":"END BREAK","GEHEN":"CLOCK OUT","Optional per QR-Code stempeln":"Optional QR clocking","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"The normal clock buttons remain available. After scanning, choose what you want to record.","📷 QR-Code scannen":"📷 Scan QR code","Kamera wird vorbereitet …":"Preparing camera …","Kamera schliessen":"Close camera","Was möchtest du buchen?":"What would you like to record?","Wähle die gewünschte Aktion.":"Choose the desired action.","Abbrechen":"Cancel","Arbeitszeit":"Working time","Pause":"Break","Soll":"Target","Differenz zum Soll":"Difference to target","Ferien- und Abwesenheitskalender":"Vacation and absence calendar","regulärer Arbeitstag":"regular workday","planmässig frei":"scheduled day off","Auswahl bearbeiten":"Edit selection","Von":"From","Bis":"To","Art":"Type","Ferien / Urlaub":"Vacation","Krankheit":"Sick leave","Hochzeit":"Wedding","Todesfall / Trauerfall":"Bereavement","Arzt / medizinische Abwesenheit":"Doctor / medical absence","Militär / Zivilschutz":"Military / civil protection","Sonstige bezahlte Abwesenheit":"Other paid absence","Speichern / ändern":"Save / edit","Auswahl löschen":"Delete selection","Auswahl zurücksetzen":"Reset selection","Weitere Abwesenheit / Überstundenabbau":"Other absence / overtime reduction","Überstundenabbau":"Overtime reduction","Überstundenabbau in Stunden pro Tag":"Overtime reduction in hours per day","Abwesenheit speichern":"Save absence","Gespeicherte Abwesenheiten":"Saved absences","Aktueller Monat":"Current month","Sollzeit bis heute":"Target hours to date","Monatssaldo":"Monthly balance","Ferientage geplant":"Vacation days planned","Krankheitstage":"Sick days","Überstundenkonto":"Overtime balance","Tagesübersicht":"Daily overview","Datum":"Date","Status":"Status","Ist":"Actual","Saldo":"Balance","CSV exportieren":"Export CSV","Testdaten komplett löschen":"Delete all test data","Montag":"Monday","Dienstag":"Tuesday","Mittwoch":"Wednesday","Donnerstag":"Thursday","Freitag":"Friday","Samstag":"Saturday","Sonntag":"Sunday","Sollzeit je regulärem Arbeitstag":"Target hours per regular workday","Test-QR-Code":"Test QR code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"One QR code for all bookings. After scanning, choose clock in, start break, end break or clock out.","Arbeitszeit stempeln":"Clock work time","App-Version":"App version","Aktuelle Testversion":"Current test version","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"This version includes language selection and one QR code for all clock actions.","Admin-PIN":"Admin PIN","Adminbereich öffnen":"Open admin area","Zeitkorrekturen":"Time corrections","Nur im Adminbereich möglich":"Admin only","Sperren":"Lock","Datum auswählen":"Select date","Grund der Korrektur":"Reason for correction","Fehlenden Arbeitsblock ergänzen":"Add missing work block","Arbeitsblock hinzufügen":"Add work block","Änderungsprotokoll":"Change log","Frei":"Off","Arbeit":"Work","Zusatzarbeit / Notdienst":"Additional work / on-call","Nicht eingestempelt":"Not clocked in","Bearbeiten":"Edit","Löschen":"Delete","läuft":"running"},"it":{"Arbeitszeiterfassung":"Registrazione orari","Stempeln":"Timbratura","Kalender":"Calendario","Übersicht":"Panoramica","Einstellungen":"Impostazioni","Adminbereich":"Area admin","Version anzeigen":"Mostra versione","Sprache":"Lingua","Abwesenheit":"Assenza","Daten":"Dati","Admin":"Admin","Name":"Nome","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Versione test: gli orari vengono registrati solo con i pulsanti di timbratura.","Heute":"Oggi","KOMMEN":"ENTRATA","PAUSE STARTEN":"INIZIA PAUSA","PAUSE BEENDEN":"FINE PAUSA","GEHEN":"USCITA","Optional per QR-Code stempeln":"Timbratura opzionale con QR code","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"I normali pulsanti restano disponibili. Dopo la scansione scegli cosa registrare.","📷 QR-Code scannen":"📷 Scansiona QR code","Kamera wird vorbereitet …":"Preparazione fotocamera …","Kamera schliessen":"Chiudi fotocamera","Was möchtest du buchen?":"Cosa vuoi registrare?","Wähle die gewünschte Aktion.":"Scegli l'azione desiderata.","Abbrechen":"Annulla","Arbeitszeit":"Ore lavorate","Pause":"Pausa","Soll":"Obiettivo","Differenz zum Soll":"Differenza dall'obiettivo","Ferien- und Abwesenheitskalender":"Calendario ferie e assenze","regulärer Arbeitstag":"giorno lavorativo regolare","planmässig frei":"giorno libero previsto","Auswahl bearbeiten":"Modifica selezione","Von":"Dal","Bis":"Al","Art":"Tipo","Ferien / Urlaub":"Ferie","Krankheit":"Malattia","Hochzeit":"Matrimonio","Todesfall / Trauerfall":"Lutto","Arzt / medizinische Abwesenheit":"Medico / assenza sanitaria","Militär / Zivilschutz":"Militare / protezione civile","Sonstige bezahlte Abwesenheit":"Altra assenza retribuita","Speichern / ändern":"Salva / modifica","Auswahl löschen":"Elimina selezione","Auswahl zurücksetzen":"Azzera selezione","Weitere Abwesenheit / Überstundenabbau":"Altra assenza / recupero straordinari","Überstundenabbau":"Recupero straordinari","Überstundenabbau in Stunden pro Tag":"Recupero straordinari in ore al giorno","Abwesenheit speichern":"Salva assenza","Gespeicherte Abwesenheiten":"Assenze salvate","Aktueller Monat":"Mese corrente","Sollzeit bis heute":"Ore previste fino a oggi","Monatssaldo":"Saldo mensile","Ferientage geplant":"Giorni ferie pianificati","Krankheitstage":"Giorni di malattia","Überstundenkonto":"Saldo straordinari","Tagesübersicht":"Panoramica giornaliera","Datum":"Data","Status":"Stato","Ist":"Effettive","Saldo":"Saldo","CSV exportieren":"Esporta CSV","Testdaten komplett löschen":"Elimina tutti i dati di test","Montag":"Lunedì","Dienstag":"Martedì","Mittwoch":"Mercoledì","Donnerstag":"Giovedì","Freitag":"Venerdì","Samstag":"Sabato","Sonntag":"Domenica","Sollzeit je regulärem Arbeitstag":"Ore previste per giorno lavorativo regolare","Test-QR-Code":"QR code di test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un solo QR code per tutte le registrazioni. Dopo la scansione scegli entrata, inizio pausa, fine pausa o uscita.","Arbeitszeit stempeln":"Timbratura orario","App-Version":"Versione app","Aktuelle Testversion":"Versione test attuale","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Questa versione include la selezione della lingua e un solo QR code per tutte le timbrature.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Apri area admin","Zeitkorrekturen":"Correzioni orari","Nur im Adminbereich möglich":"Solo area admin","Sperren":"Blocca","Datum auswählen":"Seleziona data","Grund der Korrektur":"Motivo della correzione","Fehlenden Arbeitsblock ergänzen":"Aggiungi turno mancante","Arbeitsblock hinzufügen":"Aggiungi turno","Änderungsprotokoll":"Registro modifiche","Frei":"Libero","Arbeit":"Lavoro","Zusatzarbeit / Notdienst":"Lavoro aggiuntivo / reperibilità","Nicht eingestempelt":"Non timbrato","Bearbeiten":"Modifica","Löschen":"Elimina","läuft":"in corso"},"fr":{"Arbeitszeiterfassung":"Saisie du temps","Stempeln":"Pointer","Kalender":"Calendrier","Übersicht":"Aperçu","Einstellungen":"Réglages","Adminbereich":"Zone admin","Version anzeigen":"Afficher la version","Sprache":"Langue","Abwesenheit":"Absence","Daten":"Données","Admin":"Admin","Name":"Nom","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Version test : les heures sont enregistrées uniquement avec les boutons de pointage.","Heute":"Aujourd’hui","KOMMEN":"ARRIVÉE","PAUSE STARTEN":"DÉBUT PAUSE","PAUSE BEENDEN":"FIN PAUSE","GEHEN":"DÉPART","Optional per QR-Code stempeln":"Pointage QR optionnel","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"Les boutons habituels restent disponibles. Après le scan, choisissez l'action à enregistrer.","📷 QR-Code scannen":"📷 Scanner le QR code","Kamera wird vorbereitet …":"Préparation de la caméra …","Kamera schliessen":"Fermer la caméra","Was möchtest du buchen?":"Que souhaitez-vous enregistrer ?","Wähle die gewünschte Aktion.":"Choisissez l'action souhaitée.","Abbrechen":"Annuler","Arbeitszeit":"Temps de travail","Pause":"Pause","Soll":"Prévu","Differenz zum Soll":"Écart par rapport au prévu","Ferien- und Abwesenheitskalender":"Calendrier des vacances et absences","regulärer Arbeitstag":"jour de travail régulier","planmässig frei":"jour libre prévu","Auswahl bearbeiten":"Modifier la sélection","Von":"Du","Bis":"Au","Art":"Type","Ferien / Urlaub":"Vacances","Krankheit":"Maladie","Hochzeit":"Mariage","Todesfall / Trauerfall":"Décès / deuil","Arzt / medizinische Abwesenheit":"Médecin / absence médicale","Militär / Zivilschutz":"Militaire / protection civile","Sonstige bezahlte Abwesenheit":"Autre absence payée","Speichern / ändern":"Enregistrer / modifier","Auswahl löschen":"Supprimer la sélection","Auswahl zurücksetzen":"Réinitialiser la sélection","Weitere Abwesenheit / Überstundenabbau":"Autre absence / récupération d'heures","Überstundenabbau":"Récupération d'heures","Überstundenabbau in Stunden pro Tag":"Récupération en heures par jour","Abwesenheit speichern":"Enregistrer l'absence","Gespeicherte Abwesenheiten":"Absences enregistrées","Aktueller Monat":"Mois actuel","Sollzeit bis heute":"Heures prévues à ce jour","Monatssaldo":"Solde mensuel","Ferientage geplant":"Jours de vacances planifiés","Krankheitstage":"Jours de maladie","Überstundenkonto":"Solde d'heures supplémentaires","Tagesübersicht":"Aperçu journalier","Datum":"Date","Status":"Statut","Ist":"Réel","Saldo":"Solde","CSV exportieren":"Exporter CSV","Testdaten komplett löschen":"Supprimer toutes les données de test","Montag":"Lundi","Dienstag":"Mardi","Mittwoch":"Mercredi","Donnerstag":"Jeudi","Freitag":"Vendredi","Samstag":"Samedi","Sonntag":"Dimanche","Sollzeit je regulärem Arbeitstag":"Heures prévues par jour de travail régulier","Test-QR-Code":"QR code de test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un seul QR code pour toutes les opérations. Après le scan, choisissez arrivée, début de pause, fin de pause ou départ.","Arbeitszeit stempeln":"Pointer le temps de travail","App-Version":"Version de l’application","Aktuelle Testversion":"Version test actuelle","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Cette version comprend le choix de la langue et un seul QR code pour toutes les opérations.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Ouvrir la zone admin","Zeitkorrekturen":"Corrections d'heures","Nur im Adminbereich möglich":"Admin uniquement","Sperren":"Verrouiller","Datum auswählen":"Choisir la date","Grund der Korrektur":"Motif de la correction","Fehlenden Arbeitsblock ergänzen":"Ajouter un bloc de travail manquant","Arbeitsblock hinzufügen":"Ajouter un bloc","Änderungsprotokoll":"Journal des modifications","Frei":"Libre","Arbeit":"Travail","Zusatzarbeit / Notdienst":"Travail supplémentaire / permanence","Nicht eingestempelt":"Non pointé","Bearbeiten":"Modifier","Löschen":"Supprimer","läuft":"en cours"},"gsw":{"Arbeitszeiterfassung":"Arbeitsziiterfassig","Stempeln":"Stämple","Kalender":"Kaländer","Übersicht":"Übersicht","Einstellungen":"Iistellige","Adminbereich":"Adminberäich","Version anzeigen":"Version aazeige","Sprache":"Sprach","Abwesenheit":"Abwäseheit","Daten":"Date","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Testversion: D Ziite wärde nume über d Stämpel-Chnöpf erfasst.","Heute":"Hüt","KOMMEN":"CHO","PAUSE STARTEN":"PAUSE STARTE","PAUSE BEENDEN":"PAUSE BEÄNDE","GEHEN":"GOH","Optional per QR-Code stempeln":"Optional mit QR-Code stämple","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"D normale Stämpel-Chnöpf blibed verfügbar. Nach em Scan wählsch, was buecht werde söll.","📷 QR-Code scannen":"📷 QR-Code scanne","Kamera wird vorbereitet …":"Kamera wird vorbereitet …","Kamera schliessen":"Kamera schliesse","Was möchtest du buchen?":"Was möchtsch bueche?","Wähle die gewünschte Aktion.":"Wähl d gewünschti Aktion.","Abbrechen":"Abbräche","Arbeitszeit":"Arbeitsziit","Pause":"Pause","Soll":"Soll","Differenz zum Soll":"Differänz zum Soll","Ferien- und Abwesenheitskalender":"Ferie- und Abwäseheitskaländer","regulärer Arbeitstag":"reguläre Arbeitstag","planmässig frei":"planmässig frei","Auswahl bearbeiten":"Uuswahl bearbeite","Von":"Vo","Bis":"Bis","Art":"Art","Ferien / Urlaub":"Ferie","Krankheit":"Chrank","Hochzeit":"Hochziit","Todesfall / Trauerfall":"Todesfall / Trauerfall","Arzt / medizinische Abwesenheit":"Arzt / medizinischi Abwäseheit","Militär / Zivilschutz":"Militär / Zivilschutz","Sonstige bezahlte Abwesenheit":"Anderi bezahlti Abwäseheit","Speichern / ändern":"Speichere / ändere","Auswahl löschen":"Uuswahl lösche","Auswahl zurücksetzen":"Uuswahl zruggsetze","Weitere Abwesenheit / Überstundenabbau":"Witeri Abwäseheit / Überstunde abbaue","Überstundenabbau":"Überstunde abbaue","Überstundenabbau in Stunden pro Tag":"Überstundeabbau in Stunde pro Tag","Abwesenheit speichern":"Abwäseheit speichere","Gespeicherte Abwesenheiten":"Gspeichereti Abwäseheite","Aktueller Monat":"Aktuelle Monet","Sollzeit bis heute":"Sollziit bis hüt","Monatssaldo":"Monetssaldo","Ferientage geplant":"Planti Ferietäg","Krankheitstage":"Chrankheitstäg","Überstundenkonto":"Überstundekonto","Tagesübersicht":"Tagesübersicht","Datum":"Datum","Status":"Status","Ist":"Ist","Saldo":"Saldo","CSV exportieren":"CSV exportiere","Testdaten komplett löschen":"Testdate komplett lösche","Montag":"Mäntig","Dienstag":"Zischtig","Mittwoch":"Mittwuch","Donnerstag":"Dunschtig","Freitag":"Friitig","Samstag":"Samschtig","Sonntag":"Sunntig","Sollzeit je regulärem Arbeitstag":"Sollziit pro reguläre Arbeitstag","Test-QR-Code":"Test-QR-Code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Nume ein QR-Code für alli Buechige. Nach em Scan wählsch Cho, Pause starte, Pause beände oder Goh.","Arbeitszeit stempeln":"Arbeitsziit stämple","App-Version":"App-Version","Aktuelle Testversion":"Aktuelli Testversion","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Die Version het e Sprachwahl und nume ein QR-Code für alli Stämpelaktione.","Admin-PIN":"Admin-PIN","Adminbereich öffnen":"Adminberäich öffne","Zeitkorrekturen":"Ziitkorrekture","Nur im Adminbereich möglich":"Nume im Adminberäich möglich","Sperren":"Sperre","Datum auswählen":"Datum uswähle","Grund der Korrektur":"Grund vo de Korrektur","Fehlenden Arbeitsblock ergänzen":"Fählende Arbeitsblock ergänze","Arbeitsblock hinzufügen":"Arbeitsblock dezue tue","Änderungsprotokoll":"Änderigsprotokoll","Frei":"Frei","Arbeit":"Arbeit","Zusatzarbeit / Notdienst":"Zuesatzarbeit / Notdienscht","Nicht eingestempelt":"Nöd iigstämpelt","Bearbeiten":"Bearbeite","Löschen":"Lösche","läuft":"lauft"}};
+function currentLang(){return state.settings.language||"de"}
+function uiLocale(){let l=currentLang();return l==="en"?"en-GB":l==="it"?"it-CH":l==="fr"?"fr-CH":"de-CH"}
+function tr(base){
+  if(currentLang()==="de") return base;
+  return (UI_TRANSLATIONS[currentLang()]&&UI_TRANSLATIONS[currentLang()][base])||base;
+}
+function translateText(base){
+  let direct=tr(base);
+  if(direct!==base)return direct;
+  let m;
+  if((m=base.match(/^Arbeitsblock (\d+)$/)))return `${tr("Arbeitszeit")} ${m[1]}`;
+  if((m=base.match(/^Pause (\d+)$/)))return `${tr("Pause")} ${m[1]}`;
+  return base;
+}
+function applyLanguage(){
+  document.documentElement.lang=currentLang()==="gsw"?"de-CH":currentLang();
+  let walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  let node;
+  while(node=walker.nextNode()){
+    let parent=node.parentElement;
+    if(!parent||["SCRIPT","STYLE"].includes(parent.tagName))continue;
+    let raw=node.nodeValue, trim=raw.trim();
+    if(!trim)continue;
+    if(node.__baseText===undefined)node.__baseText=trim;
+    let translated=translateText(node.__baseText);
+    let lead=(raw.match(/^\s*/)||[""])[0], trail=(raw.match(/\s*$/)||[""])[0];
+    node.nodeValue=lead+translated+trail;
+  }
+  document.querySelectorAll("input[placeholder]").forEach(el=>{
+    if(!el.dataset.basePlaceholder)el.dataset.basePlaceholder=el.getAttribute("placeholder")||"";
+    el.setAttribute("placeholder",tr(el.dataset.basePlaceholder));
+  });
+  let lab=document.getElementById("currentLanguageLabel");
+  if(lab)lab.textContent={de:"Deutsch",en:"English",it:"Italiano",fr:"Français",gsw:"Schwiizerdütsch"}[currentLang()]||"Deutsch";
+}
+function setLanguage(lang){
+  if(!["de","en","it","fr","gsw"].includes(lang))return;
+  state.settings.language=lang;
+  localStorage.setItem(KEY,JSON.stringify(state));
+  renderAll();
+  document.getElementById("languageMenu").classList.remove("open");
+  document.getElementById("mainDropdown").classList.remove("open");
+}
+
+function load(){try{let b=empty(),r=JSON.parse(localStorage.getItem(KEY)||"{}");let m={...b,...r};m.settings={...b.settings,...(r.settings||{})};if(!Array.isArray(m.settings.workdays))m.settings.workdays=[...DEFAULT_WORKDAYS];if(!m.settings.targetMinutes)m.settings.targetMinutes=DEFAULT_TARGET;if(!m.settings.language)m.settings.language="de";if(!Array.isArray(m.correctionLog))m.correctionLog=[];return m}catch(e){return empty()}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+function p(n){return String(n).padStart(2,"0")}function keyOf(d=new Date()){return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}function nowTime(){let d=new Date();return `${p(d.getHours())}:${p(d.getMinutes())}`}function mins(t){if(!t)return 0;let[h,m]=t.split(":").map(Number);return h*60+m}function fmt(m,signed=false){m=Math.round(m);let s=m<0?"-":signed&&m>0?"+":"";m=Math.abs(m);return `${s}${Math.floor(m/60)}:${p(m%60)}`}function dayNumber(k){return new Date(k+"T12:00:00").getDay()}function isWorkday(k){return state.settings.workdays.includes(dayNumber(k))}function targetFor(k){return isWorkday(k)?Number(state.settings.targetMinutes||DEFAULT_TARGET):0}function dateLabel(k){return new Date(k+"T12:00:00").toLocaleDateString(uiLocale(),{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}
+function worked(day){if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>{if(!x.in)return s;let end=x.out?mins(x.out):(keyOf()===day.date?mins(nowTime()):mins(x.in));return s+Math.max(0,end-mins(x.in))},0)}function getAbs(k){return state.absences[k]||null}function overtimeReduction(a){return a&&a.type==="Ueberstundenabbau"?Math.round(Number(a.hours||((state.settings.targetMinutes||DEFAULT_TARGET)/60))*60):0}
+function dailyBalance(k){let target=targetFor(k),a=getAbs(k),w=worked(state.days[k]);if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a);if(a)return 0;if(target===0)return w;return w-target}
+function monthKeys(){let n=new Date(),y=n.getFullYear(),m=n.getMonth(),arr=[],last=new Date(y,m+1,0).getDate();for(let i=1;i<=last;i++)arr.push(`${y}-${p(m+1)}-${p(i)}`);return arr}function allKeysToToday(){let keys=new Set([...Object.keys(state.days),...Object.keys(state.absences)]),today=new Date(),start=new Date(today.getFullYear(),0,1);for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1))keys.add(keyOf(d));return[...keys].filter(k=>k<=keyOf()).sort()}
+function currentSession(){let d=state.days[keyOf()];if(!d||!d.sessions||!d.sessions.length)return null;let s=d.sessions[d.sessions.length-1];return s.in&&!s.out?s:null}function activePause(){let d=state.days[keyOf()];return d&&d.activePause?d.activePause:null}function pauseMinutes(day){if(!day)return 0;let total=(day.pauses||[]).reduce((s,x)=>s+Math.max(0,mins(x.end)-mins(x.start)),0);if(day.activePause)total+=Math.max(0,mins(nowTime())-mins(day.activePause.start));return total}
+function stampIn(){let k=keyOf();if(getAbs(k)){alert("Für heute ist bereits eine Abwesenheit eingetragen. Lösche oder ändere sie zuerst im Kalender.");return}if(currentSession()||activePause())return;state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].sessions.push({in:nowTime(),out:null});save()}function pauseStart(){let k=keyOf(),d=state.days[k],s=currentSession();if(!d||!s||activePause())return;s.out=nowTime();d.pauses||=[];d.activePause={start:nowTime()};save()}function pauseEnd(){let k=keyOf(),d=state.days[k];if(!d||!d.activePause||currentSession())return;let end=nowTime();d.pauses||=[];d.pauses.push({start:d.activePause.start,end});d.activePause=null;d.sessions||=[];d.sessions.push({in:end,out:null});save()}function stampOut(){if(activePause())return;let s=currentSession();if(!s)return;s.out=nowTime();save()}
+function labelType(t){let base=({Ferien:"Ferien / Urlaub",Krank:"Krankheit",Hochzeit:"Hochzeit",Todesfall:"Todesfall / Trauerfall",Arzt:"Arzt / medizinische Abwesenheit",Militaer:"Militär / Zivilschutz",Sonstige:"Sonstige bezahlte Abwesenheit",Ueberstundenabbau:"Überstundenabbau"})[t]||t;return tr(base)}
+function renderToday(){let k=keyOf(),a=getAbs(k),d=state.days[k],w=worked(d),pm=pauseMinutes(d),target=targetFor(k),cur=currentSession(),pau=activePause();document.getElementById("todayDate").textContent=dateLabel(k);let status;
+if(a)status=`${tr("Abwesenheit")}: ${labelType(a.type)}`;
+else if(pau)status=currentLang()==="en"?`On break since ${pau.start}`:currentLang()==="it"?`In pausa dalle ${pau.start}`:currentLang()==="fr"?`En pause depuis ${pau.start}`:currentLang()==="gsw"?`I de Pause sit ${pau.start}`:`In Pause seit ${pau.start}`;
+else if(cur)status=(target===0?tr("Zusatzarbeit / Notdienst")+" – ":"")+(currentLang()==="en"?`working since ${cur.in}`:currentLang()==="it"?`al lavoro dalle ${cur.in}`:currentLang()==="fr"?`au travail depuis ${cur.in}`:currentLang()==="gsw"?`am Schaffe sit ${cur.in}`:`bei der Arbeit seit ${cur.in}`);
+else status=target===0?(currentLang()==="en"?"Scheduled day off – additional work / on-call can still be clocked":currentLang()==="it"?"Giorno libero previsto – il lavoro aggiuntivo / reperibilità può comunque essere timbrato":currentLang()==="fr"?"Jour libre prévu – le travail supplémentaire / permanence peut quand même être pointé":currentLang()==="gsw"?"Planmässig frei – Zuesatzarbeit / Notdienscht cha trotzdem gstämplet werde":"Planmässig frei – Zusatzarbeit / Notdienst kann trotzdem gestempelt werden"):tr("Nicht eingestempelt");document.getElementById("todayStatus").textContent=status;document.getElementById("comeBtn").disabled=!!cur||!!pau||!!a;document.getElementById("pauseStartBtn").disabled=!cur||!!pau||!!a;document.getElementById("pauseEndBtn").disabled=!pau||!!a;document.getElementById("goBtn").disabled=!cur||!!pau||!!a;document.getElementById("todayWork").textContent=fmt(w);document.getElementById("todayPause").textContent=fmt(pm);document.getElementById("todayTarget").textContent=fmt(target);let bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a):0):(target>0?w-target:w),el=document.getElementById("todayDiff");el.textContent=fmt(bal,true);el.className=bal>=0?"positive":"negative";let h="";if(d&&d.sessions&&d.sessions.length)d.sessions.forEach((s,i)=>h+=`<div class="entry"><span>Arbeitsblock ${i+1}</span><b>${s.in} – ${s.out||tr("läuft")}</b></div>`);if(d&&d.pauses&&d.pauses.length)d.pauses.forEach((x,i)=>h+=`<div class="entry"><span>Pause ${i+1}</span><b>${x.start} – ${x.end} (${fmt(mins(x.end)-mins(x.start))})</b></div>`);if(d&&d.activePause)h+=`<div class="entry"><span>Pause</span><b>${d.activePause.start} – ${tr("läuft")} (${fmt(pm)})</b></div>`;document.getElementById("sessions").innerHTML=h||'<div class="small">Noch keine Buchungen heute.</div>'}
+function dateRangeKeys(from,to){let out=[],d=new Date(from+"T12:00:00"),e=new Date(to+"T12:00:00");while(d<=e){out.push(keyOf(d));d.setDate(d.getDate()+1)}return out}
+function selectedCalendarRange(){let f=document.getElementById("calFrom").value,t=document.getElementById("calTo").value||f;if(!f)return[];if(t<f){let x=f;f=t;t=x}return dateRangeKeys(f,t)}
+function renderCalendar(){let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth();document.getElementById("calendarTitle").textContent=new Date(y,m,1).toLocaleDateString(uiLocale(),{month:"long",year:"numeric"});let cal=document.getElementById("calendar"),names=currentLang()==="en"?["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]:currentLang()==="it"?["Lun","Mar","Mer","Gio","Ven","Sab","Dom"]:currentLang()==="fr"?["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"]:currentLang()==="gsw"?["Mä","Zi","Mi","Du","Fr","Sa","Su"]:["Mo","Di","Mi","Do","Fr","Sa","So"],h=names.map(n=>`<div class="cal-week">${n}</div>`).join(""),first=new Date(y,m,1),offset=(first.getDay()+6)%7,start=new Date(y,m,1-offset),from=document.getElementById("calFrom").value,to=document.getElementById("calTo").value||from;for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let k=keyOf(d),other=d.getMonth()!==m,free=!isWorkday(k),a=getAbs(k),w=worked(state.days[k]),sel=from&&k>=from&&k<=to,cls=["cal-day",other?"other":"",free?"free":"",sel?"selected":"",a?"has-absence":"",w>0?"has-work":""].filter(Boolean).join(" ");h+=`<button class="${cls}" data-date="${k}">${d.getDate()}${a?`<span class="badge">${labelType(a.type)}</span>`:""}${w>0?`<span class="workbadge">${tr("Arbeit")} ${fmt(w)}</span>`:""}</button>`}cal.innerHTML=h;cal.querySelectorAll("[data-date]").forEach(b=>b.onclick=()=>pickCalendarDate(b.dataset.date));renderCalendarEditInfo()}
+function pickCalendarDate(k){let cf=document.getElementById("calFrom"),ct=document.getElementById("calTo");if(!calendarPickStart){calendarPickStart=k;cf.value=k;ct.value=k;let a=getAbs(k);if(a&&a.type!=="Ueberstundenabbau")document.getElementById("calType").value=a.type}else{let a=calendarPickStart,b=k;if(b<a){let t=a;a=b;b=t}cf.value=a;ct.value=b;calendarPickStart=null}renderCalendar()}
+function renderCalendarEditInfo(){let keys=selectedCalendarRange(),existing=keys.filter(k=>getAbs(k));let el=document.getElementById("calendarEditInfo");if(!keys.length)el.textContent="Noch keine Auswahl.";else if(existing.length)el.textContent=`Ausgewählt: ${dateLabel(keys[0])}${keys.length>1?" bis "+dateLabel(keys[keys.length-1]):""}. Davon ${existing.length} Tag(e) bereits eingetragen.`;else el.textContent=`Ausgewählt: ${dateLabel(keys[0])}${keys.length>1?" bis "+dateLabel(keys[keys.length-1]):""}. Noch kein Eintrag vorhanden.`}
+function saveCalendarEntry(){let keys=selectedCalendarRange(),type=document.getElementById("calType").value;if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");let eligible=keys.filter(isWorkday);if(!eligible.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag. An freien Tagen bitte einfach stempeln, wenn Zusatzarbeit oder Notdienst anfällt.");let conflict=eligible.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");eligible.forEach(k=>state.absences[k]={type});save();alert(eligible.length===1?"Eintrag gespeichert / geändert.":`${eligible.length} Arbeitstage gespeichert / geändert.`)}
+function deleteCalendarEntry(){let keys=selectedCalendarRange();if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");let existing=keys.filter(k=>getAbs(k));if(!existing.length)return alert("In der Auswahl gibt es keinen Abwesenheitseintrag zum Löschen.");if(!confirm(existing.length===1?"Diesen Eintrag wirklich löschen?":`${existing.length} Einträge wirklich löschen?`))return;existing.forEach(k=>delete state.absences[k]);save();alert(existing.length===1?"Eintrag gelöscht.":`${existing.length} Einträge gelöscht.`)}
+function renderAbs(){let keys=Object.keys(state.absences).sort().reverse(),el=document.getElementById("absenceList");el.innerHTML=keys.length?keys.map(k=>{let a=state.absences[k];return `<div class="entry"><div><b>${dateLabel(k)}</b><div class="small">${labelType(a.type)}${a.type==="Ueberstundenabbau"?` · ${a.hours} h`:""}</div></div><div><button class="mini secondary" onclick="editAbs('${k}')">Bearbeiten</button> <button class="mini mutedbtn" onclick="removeAbs('${k}')">Löschen</button></div></div>`}).join(""):'<div class="small">Noch keine Abwesenheiten gespeichert.</div>'}
+window.removeAbs=function(k){
+  if(confirm("Eintrag wirklich löschen?")){
+    delete state.absences[k];
+    save();
+  }
+};
+window.editAbs=function(k){
+  let a=getAbs(k);
+  document.getElementById("calFrom").value=k;
+  document.getElementById("calTo").value=k;
+  if(a&&a.type!=="Ueberstundenabbau") document.getElementById("calType").value=a.type;
+  let d=new Date(k+"T12:00:00");
+  calendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
+  activateView("calendarView");
+  renderCalendar();
+};
+
+
+
+let qrStream=null;
+let qrDetector=null;
+let qrScanRunning=false;
+let qrDetectBusy=false;
+
+function qrCodeRecognized(code){
+  return code==="AZ:STEMPELN";
+}
+function updateQrActionButtons(){
+  let a=getAbs(keyOf()),cur=currentSession(),pau=activePause();
+  document.getElementById("qrComeBtn").disabled=!!a||!!cur||!!pau;
+  document.getElementById("qrPauseStartBtn").disabled=!!a||!cur||!!pau;
+  document.getElementById("qrPauseEndBtn").disabled=!!a||!pau||!!cur;
+  document.getElementById("qrGoBtn").disabled=!!a||!cur||!!pau;
+  let hint=document.getElementById("qrActionHint");
+  if(a)hint.textContent=currentLang()==="en"?"An absence is entered for today.":currentLang()==="it"?"Per oggi è registrata un'assenza.":currentLang()==="fr"?"Une absence est enregistrée pour aujourd’hui.":currentLang()==="gsw"?"Für hüt isch e Abwäseheit iitreit.":"Für heute ist eine Abwesenheit eingetragen.";
+  else if(pau)hint.textContent=currentLang()==="en"?"You are currently on break.":currentLang()==="it"?"Sei attualmente in pausa.":currentLang()==="fr"?"Vous êtes actuellement en pause.":currentLang()==="gsw"?"Du bisch aktuell i de Pause.":"Du bist aktuell in der Pause.";
+  else if(cur)hint.textContent=currentLang()==="en"?"You are currently clocked in.":currentLang()==="it"?"Sei attualmente al lavoro.":currentLang()==="fr"?"Vous êtes actuellement pointé.":currentLang()==="gsw"?"Du bisch aktuell iigstämpelt.":"Du bist aktuell eingestempelt.";
+  else hint.textContent=tr("Wähle die gewünschte Aktion.");
+  applyLanguage();
+}
+function showQrActionPanel(){
+  updateQrActionButtons();
+  document.getElementById("qrActionPanel").classList.add("open");
+}
+function hideQrActionPanel(){
+  document.getElementById("qrActionPanel").classList.remove("open");
+}
+function performQrChoice(action){
+  let a=getAbs(keyOf());
+  if(a)return false;
+  if(action==="kommen")stampIn();
+  else if(action==="pause_start")pauseStart();
+  else if(action==="pause_ende")pauseEnd();
+  else if(action==="gehen")stampOut();
+  hideQrActionPanel();
+  return true;
+}
+async function stopQrScanner(){
+  qrScanRunning=false;
+  let video=document.getElementById("qrVideo");
+  if(qrStream){
+    qrStream.getTracks().forEach(t=>t.stop());
+    qrStream=null;
+  }
+  if(video) video.srcObject=null;
+  document.getElementById("qrReader").classList.remove("open");
+  document.getElementById("qrStatus").textContent="";
+}
+async function startQrScanner(){
+  let reader=document.getElementById("qrReader"),
+      status=document.getElementById("qrStatus"),
+      video=document.getElementById("qrVideo");
+
+  reader.classList.add("open");
+  status.textContent="Kamera wird vorbereitet …";
+
+  if(!window.isSecureContext){
+    status.textContent="Kamerazugriff benötigt HTTPS oder localhost. Die normalen Stempel-Buttons funktionieren weiterhin.";
+    return;
+  }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    status.textContent="Dieser Browser stellt keinen Kamerazugriff für die Web-App bereit.";
+    return;
+  }
+  if(!("BarcodeDetector" in window)){
+    status.textContent="Die Kamera ist verfügbar, aber dieser Browser unterstützt die automatische QR-Erkennung nicht. Bitte die normalen Stempel-Buttons verwenden.";
+    return;
+  }
+
+  try{
+    let formats=await BarcodeDetector.getSupportedFormats();
+    if(!formats.includes("qr_code")){
+      status.textContent="Dieser Browser kann QR-Codes nicht automatisch erkennen.";
+      return;
+    }
+    qrDetector=new BarcodeDetector({formats:["qr_code"]});
+    qrStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:"environment"}},
+      audio:false
+    });
+    video.srcObject=qrStream;
+    await video.play();
+    qrScanRunning=true;
+    status.textContent="QR-Code vor die Kamera halten …";
+    scanQrFrame();
+  }catch(err){
+    qrScanRunning=false;
+    status.textContent="Kamera konnte nicht geöffnet werden. Bitte Kameraberechtigung prüfen oder normal per Button stempeln.";
+  }
+}
+async function scanQrFrame(){
+  if(!qrScanRunning)return;
+  if(qrDetectBusy){
+    setTimeout(scanQrFrame,200);
+    return;
+  }
+  qrDetectBusy=true;
+  try{
+    let video=document.getElementById("qrVideo");
+    if(video.readyState>=2&&qrDetector){
+      let codes=await qrDetector.detect(video);
+      if(codes&&codes.length){
+        let value=String(codes[0].rawValue||"").trim();
+        if(qrCodeRecognized(value)){
+          await stopQrScanner();
+          showQrActionPanel();
+          qrDetectBusy=false;
+          return;
+        }else{
+          document.getElementById("qrStatus").textContent=currentLang()==="en"?"Unknown QR code – please scan the work-time QR code.":currentLang()==="it"?"QR code sconosciuto – scansiona il QR code dell'orario di lavoro.":currentLang()==="fr"?"QR code inconnu – scannez le QR code du temps de travail.":currentLang()==="gsw"?"Frömde QR-Code – bitte de Arbeitsziit-QR-Code scanne.":"Fremder QR-Code erkannt – bitte den Arbeitszeit-QR-Code scannen.";
+        }
+      }
+    }
+  }catch(err){
+    document.getElementById("qrStatus").textContent="QR-Erkennung konnte dieses Bild nicht lesen. Bitte erneut ausrichten.";
+  }finally{
+    qrDetectBusy=false;
+  }
+  if(qrScanRunning)setTimeout(scanQrFrame,250);
+}
+
+let adminUnlocked=false;
+
+function requireAdminReason(){
+  let reason=document.getElementById("adminReason").value.trim();
+  if(!reason){alert("Bitte einen Grund für die Korrektur eingeben.");return null}
+  return reason;
+}
+function logCorrection(date, action, oldValue, newValue, reason){
+  state.correctionLog ||= [];
+  state.correctionLog.unshift({
+    timestamp:new Date().toISOString(),
+    date, action,
+    oldValue:String(oldValue??""),
+    newValue:String(newValue??""),
+    reason
+  });
+}
+function ensureAdminDay(k){
+  state.days[k] ||= {date:k,sessions:[],pauses:[],activePause:null};
+  state.days[k].sessions ||= [];
+  state.days[k].pauses ||= [];
+  return state.days[k];
+}
+function validTimeRange(start,end){
+  if(!start || !end)return false;
+  return mins(end)>=mins(start);
+}
+function renderAdmin(){
+  document.getElementById("adminLoginCard").style.display=adminUnlocked?"none":"block";
+  document.getElementById("adminPanel").style.display=adminUnlocked?"block":"none";
+  if(!adminUnlocked)return;
+
+  let k=document.getElementById("adminDate").value||keyOf();
+  let d=state.days[k];
+  let box=document.getElementById("adminEntries");
+  let h=`<div class="small">${dateLabel(k)} · Soll ${fmt(targetFor(k))}</div>`;
+
+  if(!d || ((!d.sessions || !d.sessions.length) && (!d.pauses || !d.pauses.length) && !d.activePause)){
+    h+=`<div class="notice" style="margin-top:10px">Für diesen Tag sind noch keine Zeitbuchungen vorhanden.</div>`;
+  }
+
+  (d?.sessions||[]).forEach((s,i)=>{
+    h+=`<div class="admin-entry">
+      <h3>Arbeitsblock ${i+1}</h3>
+      <div class="grid2">
+        <div><label>Kommen</label><input id="sessIn_${i}" type="time" value="${s.in||""}"></div>
+        <div><label>Gehen</label><input id="sessOut_${i}" type="time" value="${s.out||""}"></div>
+      </div>
+      <div class="admin-actions">
+        <button class="secondary mini" onclick="saveSessionCorrection(${i})">Änderung speichern</button>
+        <button class="danger mini" onclick="deleteSessionCorrection(${i})">Arbeitsblock löschen</button>
+      </div>
+    </div>`;
+  });
+
+  (d?.pauses||[]).forEach((pse,i)=>{
+    h+=`<div class="admin-entry">
+      <h3>Pause ${i+1}</h3>
+      <div class="grid2">
+        <div><label>Pause Start</label><input id="pauseStart_${i}" type="time" value="${pse.start||""}"></div>
+        <div><label>Pause Ende</label><input id="pauseEnd_${i}" type="time" value="${pse.end||""}"></div>
+      </div>
+      <div class="admin-actions">
+        <button class="secondary mini" onclick="savePauseCorrection(${i})">Änderung speichern</button>
+        <button class="danger mini" onclick="deletePauseCorrection(${i})">Pause löschen</button>
+      </div>
+    </div>`;
+  });
+
+  if(d?.activePause){
+    h+=`<div class="admin-entry">
+      <h3>Aktive Pause</h3>
+      <div><label>Pause Start</label><input id="activePauseStart" type="time" value="${d.activePause.start||""}"></div>
+      <div class="admin-actions">
+        <button class="secondary mini" onclick="saveActivePauseCorrection()">Startzeit ändern</button>
+        <button class="danger mini" onclick="deleteActivePauseCorrection()">Aktive Pause löschen</button>
+      </div>
+    </div>`;
+  }
+
+  box.innerHTML=h;
+
+  let logs=state.correctionLog||[];
+  document.getElementById("correctionLog").innerHTML=logs.length?logs.slice(0,50).map(x=>{
+    let dt=new Date(x.timestamp);
+    let when=isNaN(dt)?x.timestamp:dt.toLocaleString("de-CH");
+    return `<div class="log-item"><b>${dateLabel(x.date)} · ${x.action}</b><br>
+      ${x.oldValue?`Alt: ${x.oldValue}<br>`:""}${x.newValue?`Neu: ${x.newValue}<br>`:""}
+      Grund: ${escapeHtml(x.reason)}<br><span class="small">${when}</span></div>`;
+  }).join(""):'<div class="small">Noch keine Zeitkorrekturen vorhanden.</div>';
+}
+function escapeHtml(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+}
+window.saveSessionCorrection=function(i){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k),s=d.sessions[i];
+  if(!s)return;
+  let ni=document.getElementById(`sessIn_${i}`).value,no=document.getElementById(`sessOut_${i}`).value;
+  if(!ni)return alert("Kommen darf nicht leer sein.");
+  if(no && !validTimeRange(ni,no))return alert("Gehen darf nicht vor Kommen liegen.");
+  let old=`${s.in||""} – ${s.out||"offen"}`, neu=`${ni} – ${no||"offen"}`;
+  if(old===neu)return alert("Es wurde nichts geändert.");
+  logCorrection(k,`Arbeitsblock ${i+1} geändert`,old,neu,reason);
+  s.in=ni;s.out=no||null;save();document.getElementById("adminReason").value="";renderAdmin();
+}
+window.deleteSessionCorrection=function(i){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k),s=d.sessions[i];
+  if(!s)return;
+  if(!confirm("Diesen Arbeitsblock wirklich löschen?"))return;
+  logCorrection(k,`Arbeitsblock ${i+1} gelöscht`,`${s.in||""} – ${s.out||"offen"}`,"gelöscht",reason);
+  d.sessions.splice(i,1);save();document.getElementById("adminReason").value="";renderAdmin();
+}
+window.savePauseCorrection=function(i){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k),pse=d.pauses[i];
+  if(!pse)return;
+  let ns=document.getElementById(`pauseStart_${i}`).value,ne=document.getElementById(`pauseEnd_${i}`).value;
+  if(!validTimeRange(ns,ne))return alert("Bitte gültige Start- und Endzeit der Pause eingeben.");
+  let old=`${pse.start||""} – ${pse.end||""}`,neu=`${ns} – ${ne}`;
+  if(old===neu)return alert("Es wurde nichts geändert.");
+  logCorrection(k,`Pause ${i+1} geändert`,old,neu,reason);
+  pse.start=ns;pse.end=ne;save();document.getElementById("adminReason").value="";renderAdmin();
+}
+window.deletePauseCorrection=function(i){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k),pse=d.pauses[i];
+  if(!pse)return;
+  if(!confirm("Diese Pause wirklich löschen?"))return;
+  logCorrection(k,`Pause ${i+1} gelöscht`,`${pse.start||""} – ${pse.end||""}`,"gelöscht",reason);
+  d.pauses.splice(i,1);save();document.getElementById("adminReason").value="";renderAdmin();
+}
+window.saveActivePauseCorrection=function(){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k);
+  if(!d.activePause)return;
+  let ns=document.getElementById("activePauseStart").value;
+  if(!ns)return alert("Bitte eine Startzeit eingeben.");
+  let old=d.activePause.start,neu=ns;
+  if(old===neu)return alert("Es wurde nichts geändert.");
+  logCorrection(k,"Aktive Pause geändert",old,neu,reason);
+  d.activePause.start=ns;save();document.getElementById("adminReason").value="";renderAdmin();
+}
+window.deleteActivePauseCorrection=function(){
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,d=ensureAdminDay(k);
+  if(!d.activePause)return;
+  if(!confirm("Aktive Pause wirklich löschen?"))return;
+  logCorrection(k,"Aktive Pause gelöscht",d.activePause.start,"gelöscht",reason);
+  d.activePause=null;save();document.getElementById("adminReason").value="";renderAdmin();
+}
+
+function shortDate(k){
+  let d=new Date(k+"T12:00:00");
+  return `${p(d.getDate())}.${p(d.getMonth()+1)}`;
+}
+function renderOverview(){
+  let mk=monthKeys(),
+      now=keyOf(),
+      workedMonth=0,
+      targetMonth=0,
+      balanceMonth=0,
+      vac=0,
+      sick=0,
+      rows=[];
+
+  mk.forEach(k=>{
+    let a=getAbs(k);
+
+    if(a?.type==="Ferien") vac++;
+    if(a?.type==="Krank") sick++;
+
+    // Zukünftige Tage in der Tagesübersicht noch nicht anzeigen.
+    if(k>now) return;
+
+    let d=state.days[k],
+        w=worked(d),
+        target=targetFor(k),
+        bal=0,
+        status=target>0?tr("Arbeit"):tr("Frei");
+
+    if(a){
+      status=labelType(a.type);
+      bal=a.type==="Ueberstundenabbau" ? -overtimeReduction(a) : 0;
+    }else if(target>0){
+      bal=w-target;
+    }else{
+      target=0;
+      bal=w;
+      if(w>0) status=tr("Zusatzarbeit / Notdienst");
+    }
+
+    workedMonth+=w;
+    targetMonth+=target;
+    balanceMonth+=bal;
+
+    // Jeden Kalendertag vom 01. bis heute anzeigen.
+    rows.push(
+      `<tr>
+        <td><b>${shortDate(k)}</b></td>
+        <td>${status}</td>
+        <td>${fmt(w)}</td>
+        <td>${fmt(target)}</td>
+        <td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td>
+      </tr>`
+    );
+  });
+
+  let total=allKeysToToday().reduce((s,k)=>s+dailyBalance(k),0);
+
+  document.getElementById("monthWorked").textContent=fmt(workedMonth);
+  document.getElementById("monthTarget").textContent=fmt(targetMonth);
+
+  let mb=document.getElementById("monthBalance");
+  mb.textContent=fmt(balanceMonth,true);
+  mb.className=balanceMonth>=0?"positive":"negative";
+
+  document.getElementById("vacDays").textContent=vac;
+  document.getElementById("sickDays").textContent=sick;
+
+  let ot=document.getElementById("overtimeTotal");
+  ot.textContent=fmt(total,true);
+  ot.className=total>=0?"positive":"negative";
+
+  // KEIN reverse(): Reihenfolge bleibt 01.08, 02.08, 03.08 ...
+  document.getElementById("dayTable").innerHTML=rows.join("");
+}
+function renderSettings(){
+  document.querySelectorAll(".workdayBox").forEach(b=>b.checked=state.settings.workdays.includes(Number(b.value)));
+  document.getElementById("dailyTargetHours").value=(state.settings.targetMinutes/60).toFixed(2).replace(/\.00$/,"");
+  let days=currentLang()==="en"?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]:
+           currentLang()==="it"?["Dom","Lun","Mar","Mer","Gio","Ven","Sab"]:
+           currentLang()==="fr"?["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"]:
+           currentLang()==="gsw"?["Su","Mä","Zi","Mi","Du","Fr","Sa"]:
+           ["So","Mo","Di","Mi","Do","Fr","Sa"];
+  let sel=state.settings.workdays.map(x=>days[x]).join(", "),
+      week=state.settings.workdays.length*state.settings.targetMinutes,
+      text=currentLang()==="en"?`Regular: ${sel||"no days"} · Weekly target ${fmt(week)}. Additional work is possible on all 7 days.`:
+           currentLang()==="it"?`Regolare: ${sel||"nessun giorno"} · Obiettivo settimanale ${fmt(week)}. Il lavoro aggiuntivo è possibile tutti i 7 giorni.`:
+           currentLang()==="fr"?`Régulier : ${sel||"aucun jour"} · Objectif hebdomadaire ${fmt(week)}. Le travail supplémentaire est possible les 7 jours.`:
+           currentLang()==="gsw"?`Regulär: ${sel||"kei Täg"} · Wuche-Soll ${fmt(week)}. Zuesatzisätz sind a allne 7 Täg möglich.`:
+           `Regulär: ${sel||"keine Tage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze sind an allen 7 Tagen möglich.`;
+  document.getElementById("weekModelText").textContent=text;
+  let ah=document.getElementById("absenceHours");
+  if(ah&&!ah.dataset.touched)ah.value=(state.settings.targetMinutes/60).toFixed(2);
+}
+function renderAll(){document.getElementById("name").value=state.name||"";renderSettings();renderToday();renderCalendar();renderAbs();renderOverview();applyLanguage()}
+
+document.getElementById("comeBtn").onclick=stampIn;document.getElementById("pauseStartBtn").onclick=pauseStart;document.getElementById("pauseEndBtn").onclick=pauseEnd;document.getElementById("goBtn").onclick=stampOut;document.getElementById("name").addEventListener("change",e=>{state.name=e.target.value.trim();save()});document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{state.settings.workdays=[...document.querySelectorAll(".workdayBox:checked")].map(x=>Number(x.value));save()}));document.getElementById("dailyTargetHours").addEventListener("change",e=>{let h=Number(e.target.value);if(!h||h<=0||h>16){alert("Bitte eine gültige Sollzeit eingeben.");renderSettings();return}state.settings.targetMinutes=Math.round(h*60);save()});
+let today=keyOf();["calFrom","calTo","absenceFrom","absenceTo"].forEach(id=>document.getElementById(id).value=today);document.getElementById("absenceType").addEventListener("change",e=>document.getElementById("hoursBox").style.display=e.target.value==="Ueberstundenabbau"?"block":"none");document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
+document.getElementById("saveAbsence").onclick=()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(isWorkday);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");let h=state.settings.targetMinutes/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}keys.forEach(k=>state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:{type});save();alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)};
+document.getElementById("saveCalendarEntry").onclick=saveCalendarEntry;document.getElementById("deleteCalendarEntry").onclick=deleteCalendarEntry;document.getElementById("clearCalendarSelection").onclick=()=>{calendarPickStart=null;document.getElementById("calFrom").value=today;document.getElementById("calTo").value=today;renderCalendar()};document.getElementById("prevMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()-1);renderCalendar()};document.getElementById("nextMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()+1);renderCalendar()};document.getElementById("calFrom").addEventListener("change",e=>{if(e.target.value){let d=new Date(e.target.value+"T12:00:00");calendarCursor=new Date(d.getFullYear(),d.getMonth(),1)}calendarPickStart=null;renderCalendar()});document.getElementById("calTo").addEventListener("change",()=>{calendarPickStart=null;renderCalendar()});
+
+document.getElementById("openQrScanner").onclick=startQrScanner;
+document.getElementById("closeQrScanner").onclick=stopQrScanner;
+
+document.getElementById("qrComeBtn").onclick=()=>performQrChoice("kommen");
+document.getElementById("qrPauseStartBtn").onclick=()=>performQrChoice("pause_start");
+document.getElementById("qrPauseEndBtn").onclick=()=>performQrChoice("pause_ende");
+document.getElementById("qrGoBtn").onclick=()=>performQrChoice("gehen");
+document.getElementById("qrCancelAction").onclick=hideQrActionPanel;
+
+
+function activateView(viewId){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===viewId));
+  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===viewId));
+  document.getElementById("mainDropdown").classList.remove("open");
+  if(viewId!=="stamp"){stopQrScanner();hideQrActionPanel();}
+  renderAll();
+}
+document.getElementById("mainMenuBtn").onclick=(e)=>{
+  e.stopPropagation();
+  document.getElementById("mainDropdown").classList.toggle("open");
+};
+document.querySelectorAll("[data-menu-target]").forEach(b=>{
+  b.onclick=()=>activateView(b.dataset.menuTarget);
+});
+document.getElementById("languageMenuBtn").onclick=(e)=>{
+  e.stopPropagation();
+  document.getElementById("languageMenu").classList.toggle("open");
+};
+document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=(e)=>{
+  e.stopPropagation();
+  setLanguage(b.dataset.lang);
+});
+document.getElementById("showVersionBtn").onclick=()=>{
+  document.getElementById("mainDropdown").classList.remove("open");
+  let text=currentLang()==="en"?"HTM – Test version v14":
+           currentLang()==="it"?"HTM – Versione test v14":
+           currentLang()==="fr"?"HTM – Version test v14":
+           currentLang()==="gsw"?"Arbeitsziiterfassig – Testversion v14":
+           "HTM – Testversion v14";
+  alert(text);
+};
+document.addEventListener("click",(e)=>{
+  let wrap=document.querySelector(".menu-wrap");
+  if(wrap&&!wrap.contains(e.target)){document.getElementById("mainDropdown").classList.remove("open");document.getElementById("languageMenu").classList.remove("open");}
+});
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.getElementById(b.dataset.view).classList.add("active");
+  if(b.dataset.view!=="stamp"){stopQrScanner();hideQrActionPanel();}
+  renderAll();
+});
+
+document.getElementById("adminDate").value=keyOf();
+document.getElementById("adminLoginBtn").onclick=()=>{
+  let pin=document.getElementById("adminPin").value;
+  if(pin!==ADMIN_PIN){alert("Falscher Admin-PIN.");return}
+  adminUnlocked=true;
+  document.getElementById("adminPin").value="";
+  renderAdmin();
+};
+document.getElementById("adminLogoutBtn").onclick=()=>{adminUnlocked=false;renderAdmin()};
+document.getElementById("adminDate").addEventListener("change",renderAdmin);
+document.getElementById("addWorkBlock").onclick=()=>{
+  if(!adminUnlocked)return;
+  let reason=requireAdminReason();if(!reason)return;
+  let k=document.getElementById("adminDate").value,
+      ni=document.getElementById("newBlockIn").value,
+      no=document.getElementById("newBlockOut").value;
+  if(!validTimeRange(ni,no))return alert("Bitte gültige Kommen- und Gehen-Zeit eingeben.");
+  let d=ensureAdminDay(k);
+  d.sessions.push({in:ni,out:no});
+  logCorrection(k,"Arbeitsblock hinzugefügt","",`${ni} – ${no}`,reason);
+  save();
+  document.getElementById("newBlockIn").value="";
+  document.getElementById("newBlockOut").value="";
+  document.getElementById("adminReason").value="";
+  renderAdmin();
+};
+
+document.getElementById("resetBtn").onclick=()=>{if(confirm("Wirklich alle Testdaten löschen?")){localStorage.removeItem(KEY);state=empty();save()}};document.getElementById("exportBtn").onclick=()=>{let rows=[["Name","Datum","Status","Kommen/Gehen","Arbeitszeit","Soll","Saldo"]],keys=[...new Set([...Object.keys(state.days),...Object.keys(state.absences)])].sort();keys.forEach(k=>{let a=getAbs(k),d=state.days[k],w=worked(d),target=targetFor(k),bal=dailyBalance(k),sess=d&&d.sessions?d.sessions.map(x=>`${x.in}-${x.out||""}`).join(" | "):"",status=a?labelType(a.type):(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit");rows.push([state.name,k,status,sess,fmt(w),fmt(target),fmt(bal,true)])});let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(";")).join("\n"),blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="arbeitszeiten.csv";a.click();URL.revokeObjectURL(url)};
+renderAll();setInterval(renderToday,60000);if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>
