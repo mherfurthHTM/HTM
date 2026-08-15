@@ -1,9 +1,9 @@
-HTM v20 – GitHub Pages aktualisieren
+HTM Beta 0.024 – GitHub Pages aktualisieren
 ==================================
 
 1. Diese ZIP-Datei auf dem PC entpacken.
 2. In GitHub dein HTM-Repository öffnen.
-3. Die Dateien im Hauptverzeichnis durch die neuen v20-Dateien ersetzen.
+3. Die Dateien im Hauptverzeichnis durch die neuen Beta-0.024-Dateien ersetzen.
 4. Die Ordner icons und qr ebenfalls vollständig hochladen/ersetzen.
 5. Änderungen (Commit) speichern.
 6. GitHub Pages kurz aktualisieren lassen.
@@ -22,4 +22,4 @@ Auf GitHub gehören genau diese Elemente:
 NICHT die ZIP-Datei selbst in das Repository hochladen.
 
 DATEN:
-HTM v20 verwendet weiterhin den bestehenden Speicherbereich htm_app_data_v1. Dadurch bleiben die bereits vorhandenen Profile, Ferien, Abwesenheiten, Stempelungen, Überstunden, Standorte und Nachträge bei einem normalen Update unter derselben GitHub-Pages-Adresse und demselben Browser erhalten. Trotzdem vor einem grösseren Update am besten unter Daten -> Datensicherung erstellen eine JSON-Sicherung anlegen.
+HTM Beta 0.024 verwendet weiterhin den bestehenden Speicherbereich htm_app_data_v1. Dadurch bleiben die bereits vorhandenen Profile, Ferien, Abwesenheiten, Stempelungen, Überstunden, Standorte und Nachträge bei einem normalen Update unter derselben GitHub-Pages-Adresse und demselben Browser erhalten. Trotzdem vor einem grösseren Update am besten unter Daten -> Datensicherung erstellen eine JSON-Sicherung anlegen.
