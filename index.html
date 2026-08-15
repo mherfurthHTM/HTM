@@ -89,7 +89,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
   </div>
   <div style="flex:1">
     <h1 style="margin:0">HTM</h1>
-    <div class="version-badge">Testversion v14</div>
+    <div class="version-badge">Testversion v16</div>
   </div>
 </div>
 
@@ -106,7 +106,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 <div class="qr-card">
   <b>Optional per QR-Code stempeln</b>
   <div class="small" style="margin-top:4px">Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.</div>
-  <button id="openQrScanner" class="secondary" style="width:100%;margin-top:10px">📷 QR-Code scannen</button>
+  <button id="openQrScanner" class="secondary" style="width:100%;margin-top:10px">📷 QR-Code scannen</button><div class="small" style="margin-top:6px">iPhone/Safari und Android werden unterstützt. Beim ersten Start bitte Kamerazugriff erlauben.</div>
   <div id="qrReader" class="qr-reader">
     <video id="qrVideo" class="qr-video" playsinline muted></video>
     <div id="qrStatus" class="qr-status">Kamera wird vorbereitet …</div>
@@ -137,7 +137,44 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 
 <section id="absence" class="view"><div class="card"><h2>Weitere Abwesenheit / Überstundenabbau</h2><div class="grid2"><div><label for="absenceFrom">Von</label><input id="absenceFrom" type="date"></div><div><label for="absenceTo">Bis</label><input id="absenceTo" type="date"></div></div><div style="margin-top:10px"><label for="absenceType">Art</label><select id="absenceType"><option value="Krank">Krankheit</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option><option value="Ueberstundenabbau">Überstundenabbau</option></select></div><div id="hoursBox" style="display:none;margin-top:10px"><label for="absenceHours">Überstundenabbau in Stunden pro Tag</label><input id="absenceHours" type="number" min="0.25" max="16" step="0.25" value="8.5"></div><button id="saveAbsence" class="secondary" style="width:100%;margin-top:12px">Abwesenheit speichern</button><div class="small" style="margin-top:10px">Einträge werden nur an regulären Arbeitstagen angelegt. Überstundenabbau reduziert das Überstundenkonto.</div></div><div class="card"><h2>Gespeicherte Abwesenheiten</h2><div id="absenceList"></div></div></section>
 
-<section id="overview" class="view"><div class="card"><h2>Aktueller Monat</h2><div class="grid3"><div class="stat"><span class="small">Arbeitszeit</span><b id="monthWorked">0:00</b></div><div class="stat"><span class="small">Sollzeit bis heute</span><b id="monthTarget">0:00</b></div><div class="stat"><span class="small">Monatssaldo</span><b id="monthBalance">0:00</b></div></div><div class="grid3" style="margin-top:10px"><div class="stat"><span class="small">Ferientage geplant</span><b id="vacDays">0</b></div><div class="stat"><span class="small">Krankheitstage</span><b id="sickDays">0</b></div><div class="stat"><span class="small">Überstundenkonto</span><b id="overtimeTotal">0:00</b></div></div></div><div class="card"><h2>Tagesübersicht</h2><div class="scroll"><table><thead><tr><th>Datum</th><th>Status</th><th>Ist</th><th>Soll</th><th>Saldo</th></tr></thead><tbody id="dayTable"></tbody></table></div></div></section>
+<section id="overview" class="view">
+  <div class="card">
+    <h2>Monatsübersicht</h2>
+    <div class="grid3" style="align-items:end">
+      <div>
+        <label for="overviewMonth">Monat auswählen</label>
+        <input id="overviewMonth" type="month">
+      </div>
+      <button id="overviewPrevMonth" class="mutedbtn">← Vorheriger Monat</button>
+      <button id="overviewNextMonth" class="mutedbtn">Nächster Monat →</button>
+    </div>
+    <div id="monthlyImportNotice" class="notice" style="display:none;margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="overviewMonthTitle">Monatsübersicht</h2>
+    <div class="grid3">
+      <div class="stat"><span class="small">Arbeitszeit</span><b id="monthWorked">0:00</b></div>
+      <div class="stat"><span class="small">Sollzeit</span><b id="monthTarget">0:00</b></div>
+      <div class="stat"><span class="small">Monatssaldo</span><b id="monthBalance">0:00</b></div>
+    </div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="stat"><span class="small">Ferientage geplant</span><b id="vacDays">0</b></div>
+      <div class="stat"><span class="small">Krankheitstage</span><b id="sickDays">0</b></div>
+      <div class="stat"><span class="small">Überstundenkonto gesamt</span><b id="overtimeTotal">0:00</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tagesübersicht</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Datum</th><th>Status</th><th>Ist</th><th>Soll</th><th>Saldo</th></tr></thead>
+        <tbody id="dayTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
 <section id="data" class="view"><div class="card"><h2>Daten</h2><button id="exportBtn" class="secondary" style="width:100%;margin-bottom:10px">CSV exportieren</button><button id="resetBtn" class="mutedbtn" style="width:100%">Testdaten komplett löschen</button><div class="notice" style="margin-top:12px">Testversion: Die Daten werden nur auf diesem Gerät im Browser gespeichert. Browserdaten löschen bedeutet Datenverlust. Für einen späteren Einsatz mit mehreren Personen brauchen wir eine zentrale Datenbank und persönliche Benutzerkonten mit Rollen. Der Test-Admin-PIN ist bewusst nur eine Übergangslösung.</div></div></section>
 
@@ -160,6 +197,11 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
       <input id="dailyTargetHours" type="number" min="0.25" max="16" step="0.25" value="8.5">
     </div>
     <div id="weekModelText" class="small" style="margin-top:8px">Zusätzliche Einsätze an freien Tagen sind weiterhin möglich und werden als Pluszeit gezählt.</div>
+    <div style="margin-top:14px">
+      <label for="trackingStartDate">Startdatum der Zeiterfassung</label>
+      <input id="trackingStartDate" type="date">
+      <div class="small" style="margin-top:6px">Vor diesem Datum entstehen keine automatischen Minus- oder Sollstunden. Ältere Monate können im Adminbereich nachgetragen werden.</div>
+    </div>
   </div>
 
   <div class="card">
@@ -176,9 +218,9 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
     <h2>App-Version</h2>
     <div class="stat">
       <span class="small">Aktuelle Testversion</span>
-      <b>v14</b>
+      <b>v16</b>
     </div>
-    <div class="small" style="margin-top:8px">Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.</div>
+    <div class="small" style="margin-top:8px">Diese Version enthält Sprachwahl, Monatsnachträge und einen iPhone-kompatiblen QR-Scanner.</div>
   </div>
 </section>
 
@@ -221,6 +263,36 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
     </div>
 
     <div class="card">
+      <h2>Alten Monat nachtragen</h2>
+      <div class="small" style="margin-bottom:10px">Nur für abgeschlossene Monate vor dem Start der laufenden Erfassung. Beispiel: 102:30 bedeutet 102 Stunden und 30 Minuten.</div>
+      <div class="grid2">
+        <div>
+          <label for="adminMonthRecord">Monat</label>
+          <input id="adminMonthRecord" type="month">
+        </div>
+        <div>
+          <label for="adminMonthWorked">Ist-Stunden</label>
+          <input id="adminMonthWorked" inputmode="decimal" placeholder="z. B. 102:30">
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <div>
+          <label for="adminMonthTarget">Soll-Stunden</label>
+          <input id="adminMonthTarget" inputmode="decimal" placeholder="z. B. 102:00">
+        </div>
+        <div>
+          <label for="adminMonthReason">Bemerkung / Grund</label>
+          <input id="adminMonthReason" placeholder="z. B. Übernahme aus bisheriger Zeiterfassung">
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button id="saveMonthlyRecord" class="secondary">Monat speichern / ändern</button>
+        <button id="deleteMonthlyRecord" class="danger">Monatsnachtrag löschen</button>
+      </div>
+      <div id="adminMonthRecordInfo" class="small" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
       <h2>Änderungsprotokoll</h2>
       <div id="correctionLog"></div>
     </div>
@@ -228,12 +300,13 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 </section>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
 const KEY="arbeitszeit_test_v1", DEFAULT_WORKDAYS=[3,4,5], DEFAULT_TARGET=510, ADMIN_PIN="0000";
-const empty=()=>({name:"",days:{},absences:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de"}});
-let state=load(), calendarCursor=new Date(), calendarPickStart=null;
+const empty=()=>({name:"",days:{},absences:{},monthlyRecords:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de",trackingStartDate:""}});
+let state=load(), calendarCursor=new Date(), calendarPickStart=null, overviewMonthKey=localTodayKey().slice(0,7);
 
-const UI_TRANSLATIONS={"en":{"Arbeitszeiterfassung":"Time Tracking","Stempeln":"Clock","Kalender":"Calendar","Übersicht":"Overview","Einstellungen":"Settings","Adminbereich":"Admin area","Version anzeigen":"Show version","Sprache":"Language","Abwesenheit":"Absence","Daten":"Data","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Test version: Times are recorded only with the clock buttons.","Heute":"Today","KOMMEN":"CLOCK IN","PAUSE STARTEN":"START BREAK","PAUSE BEENDEN":"END BREAK","GEHEN":"CLOCK OUT","Optional per QR-Code stempeln":"Optional QR clocking","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"The normal clock buttons remain available. After scanning, choose what you want to record.","📷 QR-Code scannen":"📷 Scan QR code","Kamera wird vorbereitet …":"Preparing camera …","Kamera schliessen":"Close camera","Was möchtest du buchen?":"What would you like to record?","Wähle die gewünschte Aktion.":"Choose the desired action.","Abbrechen":"Cancel","Arbeitszeit":"Working time","Pause":"Break","Soll":"Target","Differenz zum Soll":"Difference to target","Ferien- und Abwesenheitskalender":"Vacation and absence calendar","regulärer Arbeitstag":"regular workday","planmässig frei":"scheduled day off","Auswahl bearbeiten":"Edit selection","Von":"From","Bis":"To","Art":"Type","Ferien / Urlaub":"Vacation","Krankheit":"Sick leave","Hochzeit":"Wedding","Todesfall / Trauerfall":"Bereavement","Arzt / medizinische Abwesenheit":"Doctor / medical absence","Militär / Zivilschutz":"Military / civil protection","Sonstige bezahlte Abwesenheit":"Other paid absence","Speichern / ändern":"Save / edit","Auswahl löschen":"Delete selection","Auswahl zurücksetzen":"Reset selection","Weitere Abwesenheit / Überstundenabbau":"Other absence / overtime reduction","Überstundenabbau":"Overtime reduction","Überstundenabbau in Stunden pro Tag":"Overtime reduction in hours per day","Abwesenheit speichern":"Save absence","Gespeicherte Abwesenheiten":"Saved absences","Aktueller Monat":"Current month","Sollzeit bis heute":"Target hours to date","Monatssaldo":"Monthly balance","Ferientage geplant":"Vacation days planned","Krankheitstage":"Sick days","Überstundenkonto":"Overtime balance","Tagesübersicht":"Daily overview","Datum":"Date","Status":"Status","Ist":"Actual","Saldo":"Balance","CSV exportieren":"Export CSV","Testdaten komplett löschen":"Delete all test data","Montag":"Monday","Dienstag":"Tuesday","Mittwoch":"Wednesday","Donnerstag":"Thursday","Freitag":"Friday","Samstag":"Saturday","Sonntag":"Sunday","Sollzeit je regulärem Arbeitstag":"Target hours per regular workday","Test-QR-Code":"Test QR code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"One QR code for all bookings. After scanning, choose clock in, start break, end break or clock out.","Arbeitszeit stempeln":"Clock work time","App-Version":"App version","Aktuelle Testversion":"Current test version","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"This version includes language selection and one QR code for all clock actions.","Admin-PIN":"Admin PIN","Adminbereich öffnen":"Open admin area","Zeitkorrekturen":"Time corrections","Nur im Adminbereich möglich":"Admin only","Sperren":"Lock","Datum auswählen":"Select date","Grund der Korrektur":"Reason for correction","Fehlenden Arbeitsblock ergänzen":"Add missing work block","Arbeitsblock hinzufügen":"Add work block","Änderungsprotokoll":"Change log","Frei":"Off","Arbeit":"Work","Zusatzarbeit / Notdienst":"Additional work / on-call","Nicht eingestempelt":"Not clocked in","Bearbeiten":"Edit","Löschen":"Delete","läuft":"running"},"it":{"Arbeitszeiterfassung":"Registrazione orari","Stempeln":"Timbratura","Kalender":"Calendario","Übersicht":"Panoramica","Einstellungen":"Impostazioni","Adminbereich":"Area admin","Version anzeigen":"Mostra versione","Sprache":"Lingua","Abwesenheit":"Assenza","Daten":"Dati","Admin":"Admin","Name":"Nome","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Versione test: gli orari vengono registrati solo con i pulsanti di timbratura.","Heute":"Oggi","KOMMEN":"ENTRATA","PAUSE STARTEN":"INIZIA PAUSA","PAUSE BEENDEN":"FINE PAUSA","GEHEN":"USCITA","Optional per QR-Code stempeln":"Timbratura opzionale con QR code","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"I normali pulsanti restano disponibili. Dopo la scansione scegli cosa registrare.","📷 QR-Code scannen":"📷 Scansiona QR code","Kamera wird vorbereitet …":"Preparazione fotocamera …","Kamera schliessen":"Chiudi fotocamera","Was möchtest du buchen?":"Cosa vuoi registrare?","Wähle die gewünschte Aktion.":"Scegli l'azione desiderata.","Abbrechen":"Annulla","Arbeitszeit":"Ore lavorate","Pause":"Pausa","Soll":"Obiettivo","Differenz zum Soll":"Differenza dall'obiettivo","Ferien- und Abwesenheitskalender":"Calendario ferie e assenze","regulärer Arbeitstag":"giorno lavorativo regolare","planmässig frei":"giorno libero previsto","Auswahl bearbeiten":"Modifica selezione","Von":"Dal","Bis":"Al","Art":"Tipo","Ferien / Urlaub":"Ferie","Krankheit":"Malattia","Hochzeit":"Matrimonio","Todesfall / Trauerfall":"Lutto","Arzt / medizinische Abwesenheit":"Medico / assenza sanitaria","Militär / Zivilschutz":"Militare / protezione civile","Sonstige bezahlte Abwesenheit":"Altra assenza retribuita","Speichern / ändern":"Salva / modifica","Auswahl löschen":"Elimina selezione","Auswahl zurücksetzen":"Azzera selezione","Weitere Abwesenheit / Überstundenabbau":"Altra assenza / recupero straordinari","Überstundenabbau":"Recupero straordinari","Überstundenabbau in Stunden pro Tag":"Recupero straordinari in ore al giorno","Abwesenheit speichern":"Salva assenza","Gespeicherte Abwesenheiten":"Assenze salvate","Aktueller Monat":"Mese corrente","Sollzeit bis heute":"Ore previste fino a oggi","Monatssaldo":"Saldo mensile","Ferientage geplant":"Giorni ferie pianificati","Krankheitstage":"Giorni di malattia","Überstundenkonto":"Saldo straordinari","Tagesübersicht":"Panoramica giornaliera","Datum":"Data","Status":"Stato","Ist":"Effettive","Saldo":"Saldo","CSV exportieren":"Esporta CSV","Testdaten komplett löschen":"Elimina tutti i dati di test","Montag":"Lunedì","Dienstag":"Martedì","Mittwoch":"Mercoledì","Donnerstag":"Giovedì","Freitag":"Venerdì","Samstag":"Sabato","Sonntag":"Domenica","Sollzeit je regulärem Arbeitstag":"Ore previste per giorno lavorativo regolare","Test-QR-Code":"QR code di test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un solo QR code per tutte le registrazioni. Dopo la scansione scegli entrata, inizio pausa, fine pausa o uscita.","Arbeitszeit stempeln":"Timbratura orario","App-Version":"Versione app","Aktuelle Testversion":"Versione test attuale","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Questa versione include la selezione della lingua e un solo QR code per tutte le timbrature.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Apri area admin","Zeitkorrekturen":"Correzioni orari","Nur im Adminbereich möglich":"Solo area admin","Sperren":"Blocca","Datum auswählen":"Seleziona data","Grund der Korrektur":"Motivo della correzione","Fehlenden Arbeitsblock ergänzen":"Aggiungi turno mancante","Arbeitsblock hinzufügen":"Aggiungi turno","Änderungsprotokoll":"Registro modifiche","Frei":"Libero","Arbeit":"Lavoro","Zusatzarbeit / Notdienst":"Lavoro aggiuntivo / reperibilità","Nicht eingestempelt":"Non timbrato","Bearbeiten":"Modifica","Löschen":"Elimina","läuft":"in corso"},"fr":{"Arbeitszeiterfassung":"Saisie du temps","Stempeln":"Pointer","Kalender":"Calendrier","Übersicht":"Aperçu","Einstellungen":"Réglages","Adminbereich":"Zone admin","Version anzeigen":"Afficher la version","Sprache":"Langue","Abwesenheit":"Absence","Daten":"Données","Admin":"Admin","Name":"Nom","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Version test : les heures sont enregistrées uniquement avec les boutons de pointage.","Heute":"Aujourd’hui","KOMMEN":"ARRIVÉE","PAUSE STARTEN":"DÉBUT PAUSE","PAUSE BEENDEN":"FIN PAUSE","GEHEN":"DÉPART","Optional per QR-Code stempeln":"Pointage QR optionnel","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"Les boutons habituels restent disponibles. Après le scan, choisissez l'action à enregistrer.","📷 QR-Code scannen":"📷 Scanner le QR code","Kamera wird vorbereitet …":"Préparation de la caméra …","Kamera schliessen":"Fermer la caméra","Was möchtest du buchen?":"Que souhaitez-vous enregistrer ?","Wähle die gewünschte Aktion.":"Choisissez l'action souhaitée.","Abbrechen":"Annuler","Arbeitszeit":"Temps de travail","Pause":"Pause","Soll":"Prévu","Differenz zum Soll":"Écart par rapport au prévu","Ferien- und Abwesenheitskalender":"Calendrier des vacances et absences","regulärer Arbeitstag":"jour de travail régulier","planmässig frei":"jour libre prévu","Auswahl bearbeiten":"Modifier la sélection","Von":"Du","Bis":"Au","Art":"Type","Ferien / Urlaub":"Vacances","Krankheit":"Maladie","Hochzeit":"Mariage","Todesfall / Trauerfall":"Décès / deuil","Arzt / medizinische Abwesenheit":"Médecin / absence médicale","Militär / Zivilschutz":"Militaire / protection civile","Sonstige bezahlte Abwesenheit":"Autre absence payée","Speichern / ändern":"Enregistrer / modifier","Auswahl löschen":"Supprimer la sélection","Auswahl zurücksetzen":"Réinitialiser la sélection","Weitere Abwesenheit / Überstundenabbau":"Autre absence / récupération d'heures","Überstundenabbau":"Récupération d'heures","Überstundenabbau in Stunden pro Tag":"Récupération en heures par jour","Abwesenheit speichern":"Enregistrer l'absence","Gespeicherte Abwesenheiten":"Absences enregistrées","Aktueller Monat":"Mois actuel","Sollzeit bis heute":"Heures prévues à ce jour","Monatssaldo":"Solde mensuel","Ferientage geplant":"Jours de vacances planifiés","Krankheitstage":"Jours de maladie","Überstundenkonto":"Solde d'heures supplémentaires","Tagesübersicht":"Aperçu journalier","Datum":"Date","Status":"Statut","Ist":"Réel","Saldo":"Solde","CSV exportieren":"Exporter CSV","Testdaten komplett löschen":"Supprimer toutes les données de test","Montag":"Lundi","Dienstag":"Mardi","Mittwoch":"Mercredi","Donnerstag":"Jeudi","Freitag":"Vendredi","Samstag":"Samedi","Sonntag":"Dimanche","Sollzeit je regulärem Arbeitstag":"Heures prévues par jour de travail régulier","Test-QR-Code":"QR code de test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un seul QR code pour toutes les opérations. Après le scan, choisissez arrivée, début de pause, fin de pause ou départ.","Arbeitszeit stempeln":"Pointer le temps de travail","App-Version":"Version de l’application","Aktuelle Testversion":"Version test actuelle","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Cette version comprend le choix de la langue et un seul QR code pour toutes les opérations.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Ouvrir la zone admin","Zeitkorrekturen":"Corrections d'heures","Nur im Adminbereich möglich":"Admin uniquement","Sperren":"Verrouiller","Datum auswählen":"Choisir la date","Grund der Korrektur":"Motif de la correction","Fehlenden Arbeitsblock ergänzen":"Ajouter un bloc de travail manquant","Arbeitsblock hinzufügen":"Ajouter un bloc","Änderungsprotokoll":"Journal des modifications","Frei":"Libre","Arbeit":"Travail","Zusatzarbeit / Notdienst":"Travail supplémentaire / permanence","Nicht eingestempelt":"Non pointé","Bearbeiten":"Modifier","Löschen":"Supprimer","läuft":"en cours"},"gsw":{"Arbeitszeiterfassung":"Arbeitsziiterfassig","Stempeln":"Stämple","Kalender":"Kaländer","Übersicht":"Übersicht","Einstellungen":"Iistellige","Adminbereich":"Adminberäich","Version anzeigen":"Version aazeige","Sprache":"Sprach","Abwesenheit":"Abwäseheit","Daten":"Date","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Testversion: D Ziite wärde nume über d Stämpel-Chnöpf erfasst.","Heute":"Hüt","KOMMEN":"CHO","PAUSE STARTEN":"PAUSE STARTE","PAUSE BEENDEN":"PAUSE BEÄNDE","GEHEN":"GOH","Optional per QR-Code stempeln":"Optional mit QR-Code stämple","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"D normale Stämpel-Chnöpf blibed verfügbar. Nach em Scan wählsch, was buecht werde söll.","📷 QR-Code scannen":"📷 QR-Code scanne","Kamera wird vorbereitet …":"Kamera wird vorbereitet …","Kamera schliessen":"Kamera schliesse","Was möchtest du buchen?":"Was möchtsch bueche?","Wähle die gewünschte Aktion.":"Wähl d gewünschti Aktion.","Abbrechen":"Abbräche","Arbeitszeit":"Arbeitsziit","Pause":"Pause","Soll":"Soll","Differenz zum Soll":"Differänz zum Soll","Ferien- und Abwesenheitskalender":"Ferie- und Abwäseheitskaländer","regulärer Arbeitstag":"reguläre Arbeitstag","planmässig frei":"planmässig frei","Auswahl bearbeiten":"Uuswahl bearbeite","Von":"Vo","Bis":"Bis","Art":"Art","Ferien / Urlaub":"Ferie","Krankheit":"Chrank","Hochzeit":"Hochziit","Todesfall / Trauerfall":"Todesfall / Trauerfall","Arzt / medizinische Abwesenheit":"Arzt / medizinischi Abwäseheit","Militär / Zivilschutz":"Militär / Zivilschutz","Sonstige bezahlte Abwesenheit":"Anderi bezahlti Abwäseheit","Speichern / ändern":"Speichere / ändere","Auswahl löschen":"Uuswahl lösche","Auswahl zurücksetzen":"Uuswahl zruggsetze","Weitere Abwesenheit / Überstundenabbau":"Witeri Abwäseheit / Überstunde abbaue","Überstundenabbau":"Überstunde abbaue","Überstundenabbau in Stunden pro Tag":"Überstundeabbau in Stunde pro Tag","Abwesenheit speichern":"Abwäseheit speichere","Gespeicherte Abwesenheiten":"Gspeichereti Abwäseheite","Aktueller Monat":"Aktuelle Monet","Sollzeit bis heute":"Sollziit bis hüt","Monatssaldo":"Monetssaldo","Ferientage geplant":"Planti Ferietäg","Krankheitstage":"Chrankheitstäg","Überstundenkonto":"Überstundekonto","Tagesübersicht":"Tagesübersicht","Datum":"Datum","Status":"Status","Ist":"Ist","Saldo":"Saldo","CSV exportieren":"CSV exportiere","Testdaten komplett löschen":"Testdate komplett lösche","Montag":"Mäntig","Dienstag":"Zischtig","Mittwoch":"Mittwuch","Donnerstag":"Dunschtig","Freitag":"Friitig","Samstag":"Samschtig","Sonntag":"Sunntig","Sollzeit je regulärem Arbeitstag":"Sollziit pro reguläre Arbeitstag","Test-QR-Code":"Test-QR-Code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Nume ein QR-Code für alli Buechige. Nach em Scan wählsch Cho, Pause starte, Pause beände oder Goh.","Arbeitszeit stempeln":"Arbeitsziit stämple","App-Version":"App-Version","Aktuelle Testversion":"Aktuelli Testversion","Diese Version enthält Sprachwahl und einen einzigen QR-Code für alle Stempelaktionen.":"Die Version het e Sprachwahl und nume ein QR-Code für alli Stämpelaktione.","Admin-PIN":"Admin-PIN","Adminbereich öffnen":"Adminberäich öffne","Zeitkorrekturen":"Ziitkorrekture","Nur im Adminbereich möglich":"Nume im Adminberäich möglich","Sperren":"Sperre","Datum auswählen":"Datum uswähle","Grund der Korrektur":"Grund vo de Korrektur","Fehlenden Arbeitsblock ergänzen":"Fählende Arbeitsblock ergänze","Arbeitsblock hinzufügen":"Arbeitsblock dezue tue","Änderungsprotokoll":"Änderigsprotokoll","Frei":"Frei","Arbeit":"Arbeit","Zusatzarbeit / Notdienst":"Zuesatzarbeit / Notdienscht","Nicht eingestempelt":"Nöd iigstämpelt","Bearbeiten":"Bearbeite","Löschen":"Lösche","läuft":"lauft"}};
+const UI_TRANSLATIONS={"en":{"Arbeitszeiterfassung":"Time Tracking","Stempeln":"Clock","Kalender":"Calendar","Übersicht":"Overview","Einstellungen":"Settings","Adminbereich":"Admin area","Version anzeigen":"Show version","Sprache":"Language","Abwesenheit":"Absence","Daten":"Data","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Test version: Times are recorded only with the clock buttons.","Heute":"Today","KOMMEN":"CLOCK IN","PAUSE STARTEN":"START BREAK","PAUSE BEENDEN":"END BREAK","GEHEN":"CLOCK OUT","Optional per QR-Code stempeln":"Optional QR clocking","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"The normal clock buttons remain available. After scanning, choose what you want to record.","📷 QR-Code scannen":"📷 Scan QR code","Kamera wird vorbereitet …":"Preparing camera …","Kamera schliessen":"Close camera","Was möchtest du buchen?":"What would you like to record?","Wähle die gewünschte Aktion.":"Choose the desired action.","Abbrechen":"Cancel","Arbeitszeit":"Working time","Pause":"Break","Soll":"Target","Differenz zum Soll":"Difference to target","Ferien- und Abwesenheitskalender":"Vacation and absence calendar","regulärer Arbeitstag":"regular workday","planmässig frei":"scheduled day off","Auswahl bearbeiten":"Edit selection","Von":"From","Bis":"To","Art":"Type","Ferien / Urlaub":"Vacation","Krankheit":"Sick leave","Hochzeit":"Wedding","Todesfall / Trauerfall":"Bereavement","Arzt / medizinische Abwesenheit":"Doctor / medical absence","Militär / Zivilschutz":"Military / civil protection","Sonstige bezahlte Abwesenheit":"Other paid absence","Speichern / ändern":"Save / edit","Auswahl löschen":"Delete selection","Auswahl zurücksetzen":"Reset selection","Weitere Abwesenheit / Überstundenabbau":"Other absence / overtime reduction","Überstundenabbau":"Overtime reduction","Überstundenabbau in Stunden pro Tag":"Overtime reduction in hours per day","Abwesenheit speichern":"Save absence","Gespeicherte Abwesenheiten":"Saved absences","Aktueller Monat":"Current month","Sollzeit bis heute":"Target hours to date","Monatssaldo":"Monthly balance","Ferientage geplant":"Vacation days planned","Krankheitstage":"Sick days","Überstundenkonto":"Overtime balance","Tagesübersicht":"Daily overview","Datum":"Date","Status":"Status","Ist":"Actual","Saldo":"Balance","CSV exportieren":"Export CSV","Testdaten komplett löschen":"Delete all test data","Montag":"Monday","Dienstag":"Tuesday","Mittwoch":"Wednesday","Donnerstag":"Thursday","Freitag":"Friday","Samstag":"Saturday","Sonntag":"Sunday","Sollzeit je regulärem Arbeitstag":"Target hours per regular workday","Test-QR-Code":"Test QR code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"One QR code for all bookings. After scanning, choose clock in, start break, end break or clock out.","Arbeitszeit stempeln":"Clock work time","App-Version":"App version","Aktuelle Testversion":"Current test version","Diese Version enthält Sprachwahl, Monatsnachträge und einen iPhone-kompatiblen QR-Scanner.":"This version includes language selection and one QR code for all clock actions.","Admin-PIN":"Admin PIN","Adminbereich öffnen":"Open admin area","Zeitkorrekturen":"Time corrections","Nur im Adminbereich möglich":"Admin only","Sperren":"Lock","Datum auswählen":"Select date","Grund der Korrektur":"Reason for correction","Fehlenden Arbeitsblock ergänzen":"Add missing work block","Arbeitsblock hinzufügen":"Add work block","Änderungsprotokoll":"Change log","Frei":"Off","Arbeit":"Work","Zusatzarbeit / Notdienst":"Additional work / on-call","Nicht eingestempelt":"Not clocked in","Bearbeiten":"Edit","Löschen":"Delete","läuft":"running","Monatsübersicht":"Monthly overview","Monat auswählen":"Select month","← Vorheriger Monat":"← Previous month","Nächster Monat →":"Next month →","Sollzeit":"Target hours","Überstundenkonto gesamt":"Total overtime balance","Startdatum der Zeiterfassung":"Time tracking start date","Vor diesem Datum entstehen keine automatischen Minus- oder Sollstunden. Ältere Monate können im Adminbereich nachgetragen werden.":"No automatic negative or target hours are created before this date. Older months can be entered in the admin area.","Alten Monat nachtragen":"Enter previous month","Ist-Stunden":"Actual hours","Soll-Stunden":"Target hours","Bemerkung / Grund":"Note / reason","Monat speichern / ändern":"Save / edit month","Monatsnachtrag löschen":"Delete monthly record"},"it":{"Arbeitszeiterfassung":"Registrazione orari","Stempeln":"Timbratura","Kalender":"Calendario","Übersicht":"Panoramica","Einstellungen":"Impostazioni","Adminbereich":"Area admin","Version anzeigen":"Mostra versione","Sprache":"Lingua","Abwesenheit":"Assenza","Daten":"Dati","Admin":"Admin","Name":"Nome","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Versione test: gli orari vengono registrati solo con i pulsanti di timbratura.","Heute":"Oggi","KOMMEN":"ENTRATA","PAUSE STARTEN":"INIZIA PAUSA","PAUSE BEENDEN":"FINE PAUSA","GEHEN":"USCITA","Optional per QR-Code stempeln":"Timbratura opzionale con QR code","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"I normali pulsanti restano disponibili. Dopo la scansione scegli cosa registrare.","📷 QR-Code scannen":"📷 Scansiona QR code","Kamera wird vorbereitet …":"Preparazione fotocamera …","Kamera schliessen":"Chiudi fotocamera","Was möchtest du buchen?":"Cosa vuoi registrare?","Wähle die gewünschte Aktion.":"Scegli l'azione desiderata.","Abbrechen":"Annulla","Arbeitszeit":"Ore lavorate","Pause":"Pausa","Soll":"Obiettivo","Differenz zum Soll":"Differenza dall'obiettivo","Ferien- und Abwesenheitskalender":"Calendario ferie e assenze","regulärer Arbeitstag":"giorno lavorativo regolare","planmässig frei":"giorno libero previsto","Auswahl bearbeiten":"Modifica selezione","Von":"Dal","Bis":"Al","Art":"Tipo","Ferien / Urlaub":"Ferie","Krankheit":"Malattia","Hochzeit":"Matrimonio","Todesfall / Trauerfall":"Lutto","Arzt / medizinische Abwesenheit":"Medico / assenza sanitaria","Militär / Zivilschutz":"Militare / protezione civile","Sonstige bezahlte Abwesenheit":"Altra assenza retribuita","Speichern / ändern":"Salva / modifica","Auswahl löschen":"Elimina selezione","Auswahl zurücksetzen":"Azzera selezione","Weitere Abwesenheit / Überstundenabbau":"Altra assenza / recupero straordinari","Überstundenabbau":"Recupero straordinari","Überstundenabbau in Stunden pro Tag":"Recupero straordinari in ore al giorno","Abwesenheit speichern":"Salva assenza","Gespeicherte Abwesenheiten":"Assenze salvate","Aktueller Monat":"Mese corrente","Sollzeit bis heute":"Ore previste fino a oggi","Monatssaldo":"Saldo mensile","Ferientage geplant":"Giorni ferie pianificati","Krankheitstage":"Giorni di malattia","Überstundenkonto":"Saldo straordinari","Tagesübersicht":"Panoramica giornaliera","Datum":"Data","Status":"Stato","Ist":"Effettive","Saldo":"Saldo","CSV exportieren":"Esporta CSV","Testdaten komplett löschen":"Elimina tutti i dati di test","Montag":"Lunedì","Dienstag":"Martedì","Mittwoch":"Mercoledì","Donnerstag":"Giovedì","Freitag":"Venerdì","Samstag":"Sabato","Sonntag":"Domenica","Sollzeit je regulärem Arbeitstag":"Ore previste per giorno lavorativo regolare","Test-QR-Code":"QR code di test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un solo QR code per tutte le registrazioni. Dopo la scansione scegli entrata, inizio pausa, fine pausa o uscita.","Arbeitszeit stempeln":"Timbratura orario","App-Version":"Versione app","Aktuelle Testversion":"Versione test attuale","Diese Version enthält Sprachwahl, Monatsnachträge und einen iPhone-kompatiblen QR-Scanner.":"Questa versione include la selezione della lingua e un solo QR code per tutte le timbrature.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Apri area admin","Zeitkorrekturen":"Correzioni orari","Nur im Adminbereich möglich":"Solo area admin","Sperren":"Blocca","Datum auswählen":"Seleziona data","Grund der Korrektur":"Motivo della correzione","Fehlenden Arbeitsblock ergänzen":"Aggiungi turno mancante","Arbeitsblock hinzufügen":"Aggiungi turno","Änderungsprotokoll":"Registro modifiche","Frei":"Libero","Arbeit":"Lavoro","Zusatzarbeit / Notdienst":"Lavoro aggiuntivo / reperibilità","Nicht eingestempelt":"Non timbrato","Bearbeiten":"Modifica","Löschen":"Elimina","läuft":"in corso","Monatsübersicht":"Panoramica mensile","Monat auswählen":"Seleziona mese","← Vorheriger Monat":"← Mese precedente","Nächster Monat →":"Mese successivo →","Sollzeit":"Ore previste","Überstundenkonto gesamt":"Saldo straordinari totale","Startdatum der Zeiterfassung":"Data di inizio registrazione","Alten Monat nachtragen":"Inserisci mese precedente","Ist-Stunden":"Ore effettive","Soll-Stunden":"Ore previste","Bemerkung / Grund":"Nota / motivo","Monat speichern / ändern":"Salva / modifica mese","Monatsnachtrag löschen":"Elimina registrazione mensile"},"fr":{"Arbeitszeiterfassung":"Saisie du temps","Stempeln":"Pointer","Kalender":"Calendrier","Übersicht":"Aperçu","Einstellungen":"Réglages","Adminbereich":"Zone admin","Version anzeigen":"Afficher la version","Sprache":"Langue","Abwesenheit":"Absence","Daten":"Données","Admin":"Admin","Name":"Nom","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Version test : les heures sont enregistrées uniquement avec les boutons de pointage.","Heute":"Aujourd’hui","KOMMEN":"ARRIVÉE","PAUSE STARTEN":"DÉBUT PAUSE","PAUSE BEENDEN":"FIN PAUSE","GEHEN":"DÉPART","Optional per QR-Code stempeln":"Pointage QR optionnel","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"Les boutons habituels restent disponibles. Après le scan, choisissez l'action à enregistrer.","📷 QR-Code scannen":"📷 Scanner le QR code","Kamera wird vorbereitet …":"Préparation de la caméra …","Kamera schliessen":"Fermer la caméra","Was möchtest du buchen?":"Que souhaitez-vous enregistrer ?","Wähle die gewünschte Aktion.":"Choisissez l'action souhaitée.","Abbrechen":"Annuler","Arbeitszeit":"Temps de travail","Pause":"Pause","Soll":"Prévu","Differenz zum Soll":"Écart par rapport au prévu","Ferien- und Abwesenheitskalender":"Calendrier des vacances et absences","regulärer Arbeitstag":"jour de travail régulier","planmässig frei":"jour libre prévu","Auswahl bearbeiten":"Modifier la sélection","Von":"Du","Bis":"Au","Art":"Type","Ferien / Urlaub":"Vacances","Krankheit":"Maladie","Hochzeit":"Mariage","Todesfall / Trauerfall":"Décès / deuil","Arzt / medizinische Abwesenheit":"Médecin / absence médicale","Militär / Zivilschutz":"Militaire / protection civile","Sonstige bezahlte Abwesenheit":"Autre absence payée","Speichern / ändern":"Enregistrer / modifier","Auswahl löschen":"Supprimer la sélection","Auswahl zurücksetzen":"Réinitialiser la sélection","Weitere Abwesenheit / Überstundenabbau":"Autre absence / récupération d'heures","Überstundenabbau":"Récupération d'heures","Überstundenabbau in Stunden pro Tag":"Récupération en heures par jour","Abwesenheit speichern":"Enregistrer l'absence","Gespeicherte Abwesenheiten":"Absences enregistrées","Aktueller Monat":"Mois actuel","Sollzeit bis heute":"Heures prévues à ce jour","Monatssaldo":"Solde mensuel","Ferientage geplant":"Jours de vacances planifiés","Krankheitstage":"Jours de maladie","Überstundenkonto":"Solde d'heures supplémentaires","Tagesübersicht":"Aperçu journalier","Datum":"Date","Status":"Statut","Ist":"Réel","Saldo":"Solde","CSV exportieren":"Exporter CSV","Testdaten komplett löschen":"Supprimer toutes les données de test","Montag":"Lundi","Dienstag":"Mardi","Mittwoch":"Mercredi","Donnerstag":"Jeudi","Freitag":"Vendredi","Samstag":"Samedi","Sonntag":"Dimanche","Sollzeit je regulärem Arbeitstag":"Heures prévues par jour de travail régulier","Test-QR-Code":"QR code de test","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Un seul QR code pour toutes les opérations. Après le scan, choisissez arrivée, début de pause, fin de pause ou départ.","Arbeitszeit stempeln":"Pointer le temps de travail","App-Version":"Version de l’application","Aktuelle Testversion":"Version test actuelle","Diese Version enthält Sprachwahl, Monatsnachträge und einen iPhone-kompatiblen QR-Scanner.":"Cette version comprend le choix de la langue et un seul QR code pour toutes les opérations.","Admin-PIN":"PIN admin","Adminbereich öffnen":"Ouvrir la zone admin","Zeitkorrekturen":"Corrections d'heures","Nur im Adminbereich möglich":"Admin uniquement","Sperren":"Verrouiller","Datum auswählen":"Choisir la date","Grund der Korrektur":"Motif de la correction","Fehlenden Arbeitsblock ergänzen":"Ajouter un bloc de travail manquant","Arbeitsblock hinzufügen":"Ajouter un bloc","Änderungsprotokoll":"Journal des modifications","Frei":"Libre","Arbeit":"Travail","Zusatzarbeit / Notdienst":"Travail supplémentaire / permanence","Nicht eingestempelt":"Non pointé","Bearbeiten":"Modifier","Löschen":"Supprimer","läuft":"en cours","Monatsübersicht":"Aperçu mensuel","Monat auswählen":"Choisir le mois","← Vorheriger Monat":"← Mois précédent","Nächster Monat →":"Mois suivant →","Sollzeit":"Heures prévues","Überstundenkonto gesamt":"Solde total des heures supplémentaires","Startdatum der Zeiterfassung":"Date de début du suivi","Alten Monat nachtragen":"Saisir un mois précédent","Ist-Stunden":"Heures réelles","Soll-Stunden":"Heures prévues","Bemerkung / Grund":"Remarque / motif","Monat speichern / ändern":"Enregistrer / modifier le mois","Monatsnachtrag löschen":"Supprimer la saisie mensuelle"},"gsw":{"Arbeitszeiterfassung":"Arbeitsziiterfassig","Stempeln":"Stämple","Kalender":"Kaländer","Übersicht":"Übersicht","Einstellungen":"Iistellige","Adminbereich":"Adminberäich","Version anzeigen":"Version aazeige","Sprache":"Sprach","Abwesenheit":"Abwäseheit","Daten":"Date","Admin":"Admin","Name":"Name","Testversion: Zeiten werden nur über die Stempelbuttons erfasst.":"Testversion: D Ziite wärde nume über d Stämpel-Chnöpf erfasst.","Heute":"Hüt","KOMMEN":"CHO","PAUSE STARTEN":"PAUSE STARTE","PAUSE BEENDEN":"PAUSE BEÄNDE","GEHEN":"GOH","Optional per QR-Code stempeln":"Optional mit QR-Code stämple","Die normalen Stempelbuttons bleiben weiterhin verfügbar. Nach dem Scan wählst du, was gebucht werden soll.":"D normale Stämpel-Chnöpf blibed verfügbar. Nach em Scan wählsch, was buecht werde söll.","📷 QR-Code scannen":"📷 QR-Code scanne","Kamera wird vorbereitet …":"Kamera wird vorbereitet …","Kamera schliessen":"Kamera schliesse","Was möchtest du buchen?":"Was möchtsch bueche?","Wähle die gewünschte Aktion.":"Wähl d gewünschti Aktion.","Abbrechen":"Abbräche","Arbeitszeit":"Arbeitsziit","Pause":"Pause","Soll":"Soll","Differenz zum Soll":"Differänz zum Soll","Ferien- und Abwesenheitskalender":"Ferie- und Abwäseheitskaländer","regulärer Arbeitstag":"reguläre Arbeitstag","planmässig frei":"planmässig frei","Auswahl bearbeiten":"Uuswahl bearbeite","Von":"Vo","Bis":"Bis","Art":"Art","Ferien / Urlaub":"Ferie","Krankheit":"Chrank","Hochzeit":"Hochziit","Todesfall / Trauerfall":"Todesfall / Trauerfall","Arzt / medizinische Abwesenheit":"Arzt / medizinischi Abwäseheit","Militär / Zivilschutz":"Militär / Zivilschutz","Sonstige bezahlte Abwesenheit":"Anderi bezahlti Abwäseheit","Speichern / ändern":"Speichere / ändere","Auswahl löschen":"Uuswahl lösche","Auswahl zurücksetzen":"Uuswahl zruggsetze","Weitere Abwesenheit / Überstundenabbau":"Witeri Abwäseheit / Überstunde abbaue","Überstundenabbau":"Überstunde abbaue","Überstundenabbau in Stunden pro Tag":"Überstundeabbau in Stunde pro Tag","Abwesenheit speichern":"Abwäseheit speichere","Gespeicherte Abwesenheiten":"Gspeichereti Abwäseheite","Aktueller Monat":"Aktuelle Monet","Sollzeit bis heute":"Sollziit bis hüt","Monatssaldo":"Monetssaldo","Ferientage geplant":"Planti Ferietäg","Krankheitstage":"Chrankheitstäg","Überstundenkonto":"Überstundekonto","Tagesübersicht":"Tagesübersicht","Datum":"Datum","Status":"Status","Ist":"Ist","Saldo":"Saldo","CSV exportieren":"CSV exportiere","Testdaten komplett löschen":"Testdate komplett lösche","Montag":"Mäntig","Dienstag":"Zischtig","Mittwoch":"Mittwuch","Donnerstag":"Dunschtig","Freitag":"Friitig","Samstag":"Samschtig","Sonntag":"Sunntig","Sollzeit je regulärem Arbeitstag":"Sollziit pro reguläre Arbeitstag","Test-QR-Code":"Test-QR-Code","Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.":"Nume ein QR-Code für alli Buechige. Nach em Scan wählsch Cho, Pause starte, Pause beände oder Goh.","Arbeitszeit stempeln":"Arbeitsziit stämple","App-Version":"App-Version","Aktuelle Testversion":"Aktuelli Testversion","Diese Version enthält Sprachwahl, Monatsnachträge und einen iPhone-kompatiblen QR-Scanner.":"Die Version het e Sprachwahl und nume ein QR-Code für alli Stämpelaktione.","Admin-PIN":"Admin-PIN","Adminbereich öffnen":"Adminberäich öffne","Zeitkorrekturen":"Ziitkorrekture","Nur im Adminbereich möglich":"Nume im Adminberäich möglich","Sperren":"Sperre","Datum auswählen":"Datum uswähle","Grund der Korrektur":"Grund vo de Korrektur","Fehlenden Arbeitsblock ergänzen":"Fählende Arbeitsblock ergänze","Arbeitsblock hinzufügen":"Arbeitsblock dezue tue","Änderungsprotokoll":"Änderigsprotokoll","Frei":"Frei","Arbeit":"Arbeit","Zusatzarbeit / Notdienst":"Zuesatzarbeit / Notdienscht","Nicht eingestempelt":"Nöd iigstämpelt","Bearbeiten":"Bearbeite","Löschen":"Lösche","läuft":"lauft","Monatsübersicht":"Monetsübersicht","Monat auswählen":"Monet uswähle","← Vorheriger Monat":"← Vorherige Monet","Nächster Monat →":"Nächste Monet →","Sollzeit":"Sollziit","Überstundenkonto gesamt":"Überstundekonto gsamt","Startdatum der Zeiterfassung":"Startdatum vo de Ziiterfassig","Alten Monat nachtragen":"Alte Monet nachetrage","Ist-Stunden":"Ist-Stunde","Soll-Stunden":"Soll-Stunde","Bemerkung / Grund":"Bemerkig / Grund","Monat speichern / ändern":"Monet speichere / ändere","Monatsnachtrag löschen":"Monetsnachtrag lösche"}};
 function currentLang(){return state.settings.language||"de"}
 function uiLocale(){let l=currentLang();return l==="en"?"en-GB":l==="it"?"it-CH":l==="fr"?"fr-CH":"de-CH"}
 function tr(base){
@@ -278,12 +351,81 @@ function setLanguage(lang){
   document.getElementById("mainDropdown").classList.remove("open");
 }
 
-function load(){try{let b=empty(),r=JSON.parse(localStorage.getItem(KEY)||"{}");let m={...b,...r};m.settings={...b.settings,...(r.settings||{})};if(!Array.isArray(m.settings.workdays))m.settings.workdays=[...DEFAULT_WORKDAYS];if(!m.settings.targetMinutes)m.settings.targetMinutes=DEFAULT_TARGET;if(!m.settings.language)m.settings.language="de";if(!Array.isArray(m.correctionLog))m.correctionLog=[];return m}catch(e){return empty()}}
+function localTodayKey(){
+  let d=new Date();
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function load(){
+  try{
+    let b=empty(),r=JSON.parse(localStorage.getItem(KEY)||"{}"),m={...b,...r};
+    m.settings={...b.settings,...(r.settings||{})};
+    if(!Array.isArray(m.settings.workdays))m.settings.workdays=[...DEFAULT_WORKDAYS];
+    if(!m.settings.targetMinutes)m.settings.targetMinutes=DEFAULT_TARGET;
+    if(!m.settings.language)m.settings.language="de";
+    if(!m.monthlyRecords||typeof m.monthlyRecords!=="object")m.monthlyRecords={};
+    if(!Array.isArray(m.correctionLog))m.correctionLog=[];
+    if(!m.settings.trackingStartDate){
+      let today=localTodayKey();
+      let existing=[...Object.keys(m.days||{}),...Object.keys(m.absences||{})].filter(k=>k<=today).sort();
+      m.settings.trackingStartDate=existing.length?existing[0]:today;
+    }
+    return m;
+  }catch(e){return empty()}
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function p(n){return String(n).padStart(2,"0")}function keyOf(d=new Date()){return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}function nowTime(){let d=new Date();return `${p(d.getHours())}:${p(d.getMinutes())}`}function mins(t){if(!t)return 0;let[h,m]=t.split(":").map(Number);return h*60+m}function fmt(m,signed=false){m=Math.round(m);let s=m<0?"-":signed&&m>0?"+":"";m=Math.abs(m);return `${s}${Math.floor(m/60)}:${p(m%60)}`}function dayNumber(k){return new Date(k+"T12:00:00").getDay()}function isWorkday(k){return state.settings.workdays.includes(dayNumber(k))}function targetFor(k){return isWorkday(k)?Number(state.settings.targetMinutes||DEFAULT_TARGET):0}function dateLabel(k){return new Date(k+"T12:00:00").toLocaleDateString(uiLocale(),{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}
 function worked(day){if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>{if(!x.in)return s;let end=x.out?mins(x.out):(keyOf()===day.date?mins(nowTime()):mins(x.in));return s+Math.max(0,end-mins(x.in))},0)}function getAbs(k){return state.absences[k]||null}function overtimeReduction(a){return a&&a.type==="Ueberstundenabbau"?Math.round(Number(a.hours||((state.settings.targetMinutes||DEFAULT_TARGET)/60))*60):0}
 function dailyBalance(k){let target=targetFor(k),a=getAbs(k),w=worked(state.days[k]);if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a);if(a)return 0;if(target===0)return w;return w-target}
-function monthKeys(){let n=new Date(),y=n.getFullYear(),m=n.getMonth(),arr=[],last=new Date(y,m+1,0).getDate();for(let i=1;i<=last;i++)arr.push(`${y}-${p(m+1)}-${p(i)}`);return arr}function allKeysToToday(){let keys=new Set([...Object.keys(state.days),...Object.keys(state.absences)]),today=new Date(),start=new Date(today.getFullYear(),0,1);for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1))keys.add(keyOf(d));return[...keys].filter(k=>k<=keyOf()).sort()}
+function currentMonthKey(){return localTodayKey().slice(0,7)}
+function monthKeys(monthKey=overviewMonthKey){
+  let [y,m]=monthKey.split("-").map(Number),arr=[],last=new Date(y,m,0).getDate();
+  for(let i=1;i<=last;i++)arr.push(`${y}-${p(m)}-${p(i)}`);
+  return arr;
+}
+function monthTargetMinutes(monthKey){
+  return monthKeys(monthKey).reduce((sum,k)=>sum+targetFor(k),0);
+}
+function isAfterTrackingStart(k){return k>=state.settings.trackingStartDate}
+function monthHasRecord(monthKey){return !!state.monthlyRecords[monthKey]}
+function totalOvertimeBalance(){
+  let total=0,today=localTodayKey(),start=state.settings.trackingStartDate;
+
+  // Alte, bewusst übernommene Monatswerte.
+  Object.entries(state.monthlyRecords).forEach(([month,rec])=>{
+    if(month<=currentMonthKey()) total += Number(rec.workedMinutes||0)-Number(rec.targetMinutes||0);
+  });
+
+  // Laufende tägliche Erfassung ab Startdatum; Monate mit Monatsnachtrag nicht doppelt zählen.
+  if(start<=today){
+    let d=new Date(start+"T12:00:00"),e=new Date(today+"T12:00:00");
+    while(d<=e){
+      let k=keyOf(d),month=k.slice(0,7);
+      if(!monthHasRecord(month)) total+=dailyBalance(k);
+      d.setDate(d.getDate()+1);
+    }
+  }
+  return total;
+}
+
+function parseHourValue(v){
+  v=String(v||"").trim().replace(",",".");
+  if(!v)return null;
+  if(v.includes(":")){
+    let parts=v.split(":");
+    if(parts.length!==2)return null;
+    let h=Number(parts[0]),m=Number(parts[1]);
+    if(!Number.isFinite(h)||!Number.isFinite(m)||h<0||m<0||m>=60)return null;
+    return Math.round(h*60+m);
+  }
+  let n=Number(v);
+  if(!Number.isFinite(n)||n<0)return null;
+  return Math.round(n*60);
+}
+function monthDisplay(monthKey){
+  let [y,m]=monthKey.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString(uiLocale(),{month:"long",year:"numeric"});
+}
+
 function currentSession(){let d=state.days[keyOf()];if(!d||!d.sessions||!d.sessions.length)return null;let s=d.sessions[d.sessions.length-1];return s.in&&!s.out?s:null}function activePause(){let d=state.days[keyOf()];return d&&d.activePause?d.activePause:null}function pauseMinutes(day){if(!day)return 0;let total=(day.pauses||[]).reduce((s,x)=>s+Math.max(0,mins(x.end)-mins(x.start)),0);if(day.activePause)total+=Math.max(0,mins(nowTime())-mins(day.activePause.start));return total}
 function stampIn(){let k=keyOf();if(getAbs(k)){alert("Für heute ist bereits eine Abwesenheit eingetragen. Lösche oder ändere sie zuerst im Kalender.");return}if(currentSession()||activePause())return;state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].sessions.push({in:nowTime(),out:null});save()}function pauseStart(){let k=keyOf(),d=state.days[k],s=currentSession();if(!d||!s||activePause())return;s.out=nowTime();d.pauses||=[];d.activePause={start:nowTime()};save()}function pauseEnd(){let k=keyOf(),d=state.days[k];if(!d||!d.activePause||currentSession())return;let end=nowTime();d.pauses||=[];d.pauses.push({start:d.activePause.start,end});d.activePause=null;d.sessions||=[];d.sessions.push({in:end,out:null});save()}function stampOut(){if(activePause())return;let s=currentSession();if(!s)return;s.out=nowTime();save()}
 function labelType(t){let base=({Ferien:"Ferien / Urlaub",Krank:"Krankheit",Hochzeit:"Hochzeit",Todesfall:"Todesfall / Trauerfall",Arzt:"Arzt / medizinische Abwesenheit",Militaer:"Militär / Zivilschutz",Sonstige:"Sonstige bezahlte Abwesenheit",Ueberstundenabbau:"Überstundenabbau"})[t]||t;return tr(base)}
@@ -323,6 +465,9 @@ let qrStream=null;
 let qrDetector=null;
 let qrScanRunning=false;
 let qrDetectBusy=false;
+let qrUseNativeDetector=false;
+let qrCanvas=document.createElement("canvas");
+let qrCanvasCtx=qrCanvas.getContext("2d",{willReadFrequently:true});
 
 function qrCodeRecognized(code){
   return code==="AZ:STEMPELN";
@@ -357,90 +502,173 @@ function performQrChoice(action){
   hideQrActionPanel();
   return true;
 }
+function qrUnknownMessage(){
+  return currentLang()==="en"?"Unknown QR code – please scan the HTM work-time QR code.":
+         currentLang()==="it"?"QR code sconosciuto – scansiona il QR code HTM.":
+         currentLang()==="fr"?"QR code inconnu – scannez le QR code HTM.":
+         currentLang()==="gsw"?"Frömde QR-Code – bitte de HTM-QR-Code scanne.":
+         "Fremder QR-Code erkannt – bitte den HTM-QR-Code scannen.";
+}
+function cameraErrorMessage(err){
+  let name=err&&err.name?err.name:"";
+  if(name==="NotAllowedError"||name==="SecurityError"){
+    return currentLang()==="en"?"Camera access was denied. Please allow camera access for this website in Safari settings.":
+           currentLang()==="it"?"Accesso alla fotocamera negato. Consenti l'accesso alla fotocamera per questo sito nelle impostazioni di Safari.":
+           currentLang()==="fr"?"L’accès à la caméra a été refusé. Autorisez la caméra pour ce site dans les réglages Safari.":
+           currentLang()==="gsw"?"Kamera-Zuegriff isch nöd erlaubt. Bitte i de Safari-Iistellige d Kamera für die Site erlaube.":
+           "Kamerazugriff wurde verweigert. Bitte in den Safari-Einstellungen den Kamerazugriff für diese Website erlauben.";
+  }
+  if(name==="NotFoundError"||name==="DevicesNotFoundError"){
+    return currentLang()==="en"?"No camera was found on this device.":
+           currentLang()==="it"?"Nessuna fotocamera trovata sul dispositivo.":
+           currentLang()==="fr"?"Aucune caméra n’a été trouvée sur cet appareil.":
+           currentLang()==="gsw"?"Uf däm Grät isch kei Kamera gfunde worde.":
+           "Auf diesem Gerät wurde keine Kamera gefunden.";
+  }
+  if(name==="NotReadableError"||name==="TrackStartError"){
+    return currentLang()==="en"?"The camera is currently being used by another app or could not be started.":
+           currentLang()==="it"?"La fotocamera è già utilizzata da un’altra app o non può essere avviata.":
+           currentLang()==="fr"?"La caméra est déjà utilisée par une autre app ou ne peut pas démarrer.":
+           currentLang()==="gsw"?"D Kamera wird grad vo ere andere App bruucht oder cha nöd gstartet werde.":
+           "Die Kamera wird möglicherweise von einer anderen App verwendet oder konnte nicht gestartet werden.";
+  }
+  return currentLang()==="en"?"The camera could not be opened. Please check the camera permission.":
+         currentLang()==="it"?"Impossibile aprire la fotocamera. Controlla l’autorizzazione.":
+         currentLang()==="fr"?"Impossible d’ouvrir la caméra. Vérifiez l’autorisation.":
+         currentLang()==="gsw"?"D Kamera het nöd chönne göffnet werde. Bitte d Berechtigung prüefe.":
+         "Die Kamera konnte nicht geöffnet werden. Bitte die Kameraberechtigung prüfen.";
+}
 async function stopQrScanner(){
   qrScanRunning=false;
+  qrDetectBusy=false;
   let video=document.getElementById("qrVideo");
   if(qrStream){
     qrStream.getTracks().forEach(t=>t.stop());
     qrStream=null;
   }
-  if(video) video.srcObject=null;
+  if(video){
+    try{video.pause()}catch(e){}
+    video.srcObject=null;
+  }
   document.getElementById("qrReader").classList.remove("open");
   document.getElementById("qrStatus").textContent="";
+}
+async function configureQrDetector(){
+  qrDetector=null;
+  qrUseNativeDetector=false;
+  if("BarcodeDetector" in window){
+    try{
+      let formats=await BarcodeDetector.getSupportedFormats();
+      if(formats.includes("qr_code")){
+        qrDetector=new BarcodeDetector({formats:["qr_code"]});
+        qrUseNativeDetector=true;
+        return true;
+      }
+    }catch(e){}
+  }
+  return typeof window.jsQR==="function";
 }
 async function startQrScanner(){
   let reader=document.getElementById("qrReader"),
       status=document.getElementById("qrStatus"),
       video=document.getElementById("qrVideo");
 
+  hideQrActionPanel();
   reader.classList.add("open");
   status.textContent="Kamera wird vorbereitet …";
 
   if(!window.isSecureContext){
-    status.textContent="Kamerazugriff benötigt HTTPS oder localhost. Die normalen Stempel-Buttons funktionieren weiterhin.";
+    status.textContent="Kamerazugriff benötigt HTTPS. Bitte HTM über die GitHub-Pages-Adresse öffnen.";
     return;
   }
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    status.textContent="Dieser Browser stellt keinen Kamerazugriff für die Web-App bereit.";
+    status.textContent="Dieser Browser stellt keinen Kamerazugriff für HTM bereit.";
     return;
   }
-  if(!("BarcodeDetector" in window)){
-    status.textContent="Die Kamera ist verfügbar, aber dieser Browser unterstützt die automatische QR-Erkennung nicht. Bitte die normalen Stempel-Buttons verwenden.";
+
+  let detectorReady=await configureQrDetector();
+  if(!detectorReady){
+    status.textContent="Die QR-Erkennung konnte nicht geladen werden. Bitte Internetverbindung prüfen und HTM neu laden.";
     return;
   }
 
   try{
-    let formats=await BarcodeDetector.getSupportedFormats();
-    if(!formats.includes("qr_code")){
-      status.textContent="Dieser Browser kann QR-Codes nicht automatisch erkennen.";
-      return;
-    }
-    qrDetector=new BarcodeDetector({formats:["qr_code"]});
     qrStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:"environment"}},
+      video:{
+        facingMode:{ideal:"environment"},
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
       audio:false
     });
     video.srcObject=qrStream;
+    video.setAttribute("playsinline","");
+    video.muted=true;
     await video.play();
     qrScanRunning=true;
-    status.textContent="QR-Code vor die Kamera halten …";
+    status.textContent=qrUseNativeDetector
+      ?"QR-Code vor die Kamera halten …"
+      :"QR-Code vor die Kamera halten … (iPhone-Modus)";
     scanQrFrame();
   }catch(err){
     qrScanRunning=false;
-    status.textContent="Kamera konnte nicht geöffnet werden. Bitte Kameraberechtigung prüfen oder normal per Button stempeln.";
+    status.textContent=cameraErrorMessage(err);
   }
+}
+async function readQrFromVideo(video){
+  if(qrUseNativeDetector&&qrDetector){
+    let codes=await qrDetector.detect(video);
+    return codes&&codes.length?String(codes[0].rawValue||"").trim():"";
+  }
+  if(typeof window.jsQR!=="function"||!qrCanvasCtx)return "";
+  let vw=video.videoWidth||0,vh=video.videoHeight||0;
+  if(!vw||!vh)return "";
+  let maxWidth=720,scale=Math.min(1,maxWidth/vw),
+      cw=Math.max(1,Math.round(vw*scale)),
+      ch=Math.max(1,Math.round(vh*scale));
+  if(qrCanvas.width!==cw)qrCanvas.width=cw;
+  if(qrCanvas.height!==ch)qrCanvas.height=ch;
+  qrCanvasCtx.drawImage(video,0,0,cw,ch);
+  let imageData=qrCanvasCtx.getImageData(0,0,cw,ch);
+  let code=window.jsQR(imageData.data,cw,ch,{inversionAttempts:"dontInvert"});
+  if(!code){
+    code=window.jsQR(imageData.data,cw,ch,{inversionAttempts:"attemptBoth"});
+  }
+  return code&&code.data?String(code.data).trim():"";
 }
 async function scanQrFrame(){
   if(!qrScanRunning)return;
   if(qrDetectBusy){
-    setTimeout(scanQrFrame,200);
+    setTimeout(scanQrFrame,180);
     return;
   }
   qrDetectBusy=true;
   try{
     let video=document.getElementById("qrVideo");
-    if(video.readyState>=2&&qrDetector){
-      let codes=await qrDetector.detect(video);
-      if(codes&&codes.length){
-        let value=String(codes[0].rawValue||"").trim();
+    if(video.readyState>=2){
+      let value=await readQrFromVideo(video);
+      if(value){
         if(qrCodeRecognized(value)){
           await stopQrScanner();
           showQrActionPanel();
           qrDetectBusy=false;
           return;
         }else{
-          document.getElementById("qrStatus").textContent=currentLang()==="en"?"Unknown QR code – please scan the work-time QR code.":currentLang()==="it"?"QR code sconosciuto – scansiona il QR code dell'orario di lavoro.":currentLang()==="fr"?"QR code inconnu – scannez le QR code du temps de travail.":currentLang()==="gsw"?"Frömde QR-Code – bitte de Arbeitsziit-QR-Code scanne.":"Fremder QR-Code erkannt – bitte den Arbeitszeit-QR-Code scannen.";
+          document.getElementById("qrStatus").textContent=qrUnknownMessage();
         }
       }
     }
   }catch(err){
-    document.getElementById("qrStatus").textContent="QR-Erkennung konnte dieses Bild nicht lesen. Bitte erneut ausrichten.";
+    document.getElementById("qrStatus").textContent=currentLang()==="en"?"QR code could not be read. Hold it steady and try again.":
+      currentLang()==="it"?"Impossibile leggere il QR code. Tienilo fermo e riprova.":
+      currentLang()==="fr"?"Le QR code n’a pas pu être lu. Maintenez-le immobile et réessayez.":
+      currentLang()==="gsw"?"QR-Code het nöd chönne gläse werde. Bitte ruhig halte und nomal probiere.":
+      "QR-Code konnte nicht gelesen werden. Bitte ruhig halten und erneut ausrichten.";
   }finally{
     qrDetectBusy=false;
   }
-  if(qrScanRunning)setTimeout(scanQrFrame,250);
+  if(qrScanRunning)setTimeout(scanQrFrame,180);
 }
-
 let adminUnlocked=false;
 
 function requireAdminReason(){
@@ -468,6 +696,28 @@ function validTimeRange(start,end){
   if(!start || !end)return false;
   return mins(end)>=mins(start);
 }
+
+function renderAdminMonthRecord(){
+  if(!adminUnlocked)return;
+  let input=document.getElementById("adminMonthRecord");
+  if(!input.value){
+    let d=new Date();d.setMonth(d.getMonth()-1);
+    input.value=`${d.getFullYear()}-${p(d.getMonth()+1)}`;
+  }
+  let month=input.value,rec=state.monthlyRecords[month],info=document.getElementById("adminMonthRecordInfo");
+  if(rec){
+    document.getElementById("adminMonthWorked").value=fmt(rec.workedMinutes);
+    document.getElementById("adminMonthTarget").value=fmt(rec.targetMinutes);
+    document.getElementById("adminMonthReason").value=rec.reason||"";
+    info.textContent=`Gespeichert: ${fmt(rec.workedMinutes)} Ist / ${fmt(rec.targetMinutes)} Soll · Saldo ${fmt(rec.workedMinutes-rec.targetMinutes,true)}`;
+  }else{
+    document.getElementById("adminMonthWorked").value="";
+    document.getElementById("adminMonthTarget").value=fmt(monthTargetMinutes(month));
+    document.getElementById("adminMonthReason").value="";
+    info.textContent="Noch kein Monatsnachtrag vorhanden. Die Sollzeit wurde aus dem aktuellen Arbeitsmodell vorgeschlagen.";
+  }
+}
+
 function renderAdmin(){
   document.getElementById("adminLoginCard").style.display=adminUnlocked?"none":"block";
   document.getElementById("adminPanel").style.display=adminUnlocked?"block":"none";
@@ -524,6 +774,7 @@ function renderAdmin(){
   box.innerHTML=h;
 
   let logs=state.correctionLog||[];
+  renderAdminMonthRecord();
   document.getElementById("correctionLog").innerHTML=logs.length?logs.slice(0,50).map(x=>{
     let dt=new Date(x.timestamp);
     let when=isNaN(dt)?x.timestamp:dt.toLocaleString("de-CH");
@@ -605,58 +856,52 @@ function shortDate(k){
   return `${p(d.getDate())}.${p(d.getMonth()+1)}`;
 }
 function renderOverview(){
-  let mk=monthKeys(),
-      now=keyOf(),
-      workedMonth=0,
-      targetMonth=0,
-      balanceMonth=0,
-      vac=0,
-      sick=0,
-      rows=[];
+  let input=document.getElementById("overviewMonth");
+  if(input && input.value)overviewMonthKey=input.value;
+  let month=overviewMonthKey||currentMonthKey();
+  if(input)input.value=month;
 
-  mk.forEach(k=>{
-    let a=getAbs(k);
+  document.getElementById("overviewMonthTitle").textContent=monthDisplay(month);
 
-    if(a?.type==="Ferien") vac++;
-    if(a?.type==="Krank") sick++;
+  let rec=state.monthlyRecords[month]||null,
+      workedMonth=0,targetMonth=0,balanceMonth=0,vac=0,sick=0,rows=[],
+      today=localTodayKey(),notice=document.getElementById("monthlyImportNotice");
 
-    // Zukünftige Tage in der Tagesübersicht noch nicht anzeigen.
-    if(k>now) return;
+  let monthAbs=Object.keys(state.absences).filter(k=>k.startsWith(month));
+  vac=monthAbs.filter(k=>getAbs(k)?.type==="Ferien").length;
+  sick=monthAbs.filter(k=>getAbs(k)?.type==="Krank").length;
 
-    let d=state.days[k],
-        w=worked(d),
-        target=targetFor(k),
-        bal=0,
-        status=target>0?tr("Arbeit"):tr("Frei");
+  if(rec){
+    workedMonth=Number(rec.workedMinutes||0);
+    targetMonth=Number(rec.targetMinutes||0);
+    balanceMonth=workedMonth-targetMonth;
+    notice.style.display="block";
+    notice.textContent=`Monatsnachtrag vorhanden: ${fmt(workedMonth)} Ist / ${fmt(targetMonth)} Soll · Saldo ${fmt(balanceMonth,true)}${rec.reason?" · "+rec.reason:""}`;
+    rows.push(`<tr><td>${month}</td><td>Monatsnachtrag</td><td>${fmt(workedMonth)}</td><td>${fmt(targetMonth)}</td><td class="${balanceMonth>=0?"positive":"negative"}">${fmt(balanceMonth,true)}</td></tr>`);
+  }else{
+    notice.style.display="none";
+    monthKeys(month).forEach(k=>{
+      // Vergangene Tage vor Startdatum erzeugen keine Minusstunden.
+      if(k>today || !isAfterTrackingStart(k))return;
 
-    if(a){
-      status=labelType(a.type);
-      bal=a.type==="Ueberstundenabbau" ? -overtimeReduction(a) : 0;
-    }else if(target>0){
-      bal=w-target;
-    }else{
-      target=0;
-      bal=w;
-      if(w>0) status=tr("Zusatzarbeit / Notdienst");
+      let a=getAbs(k),d=state.days[k],w=worked(d),target=targetFor(k),bal=0,status=target>0?tr("Arbeit"):tr("Frei");
+      if(a){
+        status=labelType(a.type);
+        bal=a.type==="Ueberstundenabbau"?-overtimeReduction(a):0;
+      }else if(target>0){
+        bal=w-target;
+      }else{
+        target=0;bal=w;
+        if(w>0)status=tr("Zusatzarbeit / Notdienst");
+      }
+      workedMonth+=w;targetMonth+=target;balanceMonth+=bal;
+      rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td></tr>`);
+    });
+
+    if(!rows.length){
+      rows.push(`<tr><td colspan="5" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Monatsnachtrag.</td></tr>`);
     }
-
-    workedMonth+=w;
-    targetMonth+=target;
-    balanceMonth+=bal;
-
-    // Jeden Kalendertag vom 01. bis heute anzeigen.
-    rows.push(
-      `<tr>
-        <td><b>${shortDate(k)}</b></td>
-        <td>${status}</td>
-        <td>${fmt(w)}</td>
-        <td>${fmt(target)}</td>
-        <td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td>
-      </tr>`
-    );
-  });
-
-  let total=allKeysToToday().reduce((s,k)=>s+dailyBalance(k),0);
+  }
 
   document.getElementById("monthWorked").textContent=fmt(workedMonth);
   document.getElementById("monthTarget").textContent=fmt(targetMonth);
@@ -668,16 +913,15 @@ function renderOverview(){
   document.getElementById("vacDays").textContent=vac;
   document.getElementById("sickDays").textContent=sick;
 
-  let ot=document.getElementById("overtimeTotal");
+  let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();
   ot.textContent=fmt(total,true);
   ot.className=total>=0?"positive":"negative";
 
-  // KEIN reverse(): Reihenfolge bleibt 01.08, 02.08, 03.08 ...
   document.getElementById("dayTable").innerHTML=rows.join("");
 }
 function renderSettings(){
   document.querySelectorAll(".workdayBox").forEach(b=>b.checked=state.settings.workdays.includes(Number(b.value)));
-  document.getElementById("dailyTargetHours").value=(state.settings.targetMinutes/60).toFixed(2).replace(/\.00$/,"");
+  document.getElementById("dailyTargetHours").value=(state.settings.targetMinutes/60).toFixed(2).replace(/\.00$/,"");document.getElementById("trackingStartDate").value=state.settings.trackingStartDate||localTodayKey();
   let days=currentLang()==="en"?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]:
            currentLang()==="it"?["Dom","Lun","Mar","Mer","Gio","Ven","Sab"]:
            currentLang()==="fr"?["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"]:
@@ -697,9 +941,34 @@ function renderSettings(){
 function renderAll(){document.getElementById("name").value=state.name||"";renderSettings();renderToday();renderCalendar();renderAbs();renderOverview();applyLanguage()}
 
 document.getElementById("comeBtn").onclick=stampIn;document.getElementById("pauseStartBtn").onclick=pauseStart;document.getElementById("pauseEndBtn").onclick=pauseEnd;document.getElementById("goBtn").onclick=stampOut;document.getElementById("name").addEventListener("change",e=>{state.name=e.target.value.trim();save()});document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{state.settings.workdays=[...document.querySelectorAll(".workdayBox:checked")].map(x=>Number(x.value));save()}));document.getElementById("dailyTargetHours").addEventListener("change",e=>{let h=Number(e.target.value);if(!h||h<=0||h>16){alert("Bitte eine gültige Sollzeit eingeben.");renderSettings();return}state.settings.targetMinutes=Math.round(h*60);save()});
+
+document.getElementById("trackingStartDate").addEventListener("change",e=>{
+  if(!e.target.value)return;
+  state.settings.trackingStartDate=e.target.value;
+  save();
+});
+
 let today=keyOf();["calFrom","calTo","absenceFrom","absenceTo"].forEach(id=>document.getElementById(id).value=today);document.getElementById("absenceType").addEventListener("change",e=>document.getElementById("hoursBox").style.display=e.target.value==="Ueberstundenabbau"?"block":"none");document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
 document.getElementById("saveAbsence").onclick=()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(isWorkday);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");let h=state.settings.targetMinutes/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}keys.forEach(k=>state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:{type});save();alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)};
 document.getElementById("saveCalendarEntry").onclick=saveCalendarEntry;document.getElementById("deleteCalendarEntry").onclick=deleteCalendarEntry;document.getElementById("clearCalendarSelection").onclick=()=>{calendarPickStart=null;document.getElementById("calFrom").value=today;document.getElementById("calTo").value=today;renderCalendar()};document.getElementById("prevMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()-1);renderCalendar()};document.getElementById("nextMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()+1);renderCalendar()};document.getElementById("calFrom").addEventListener("change",e=>{if(e.target.value){let d=new Date(e.target.value+"T12:00:00");calendarCursor=new Date(d.getFullYear(),d.getMonth(),1)}calendarPickStart=null;renderCalendar()});document.getElementById("calTo").addEventListener("change",()=>{calendarPickStart=null;renderCalendar()});
+
+
+document.getElementById("overviewMonth").value=overviewMonthKey;
+document.getElementById("overviewMonth").addEventListener("change",e=>{
+  if(e.target.value){overviewMonthKey=e.target.value;renderOverview();applyLanguage()}
+});
+document.getElementById("overviewPrevMonth").onclick=()=>{
+  let [y,m]=overviewMonthKey.split("-").map(Number),d=new Date(y,m-2,1);
+  overviewMonthKey=`${d.getFullYear()}-${p(d.getMonth()+1)}`;
+  document.getElementById("overviewMonth").value=overviewMonthKey;
+  renderOverview();applyLanguage();
+};
+document.getElementById("overviewNextMonth").onclick=()=>{
+  let [y,m]=overviewMonthKey.split("-").map(Number),d=new Date(y,m,1);
+  overviewMonthKey=`${d.getFullYear()}-${p(d.getMonth()+1)}`;
+  document.getElementById("overviewMonth").value=overviewMonthKey;
+  renderOverview();applyLanguage();
+};
 
 document.getElementById("openQrScanner").onclick=startQrScanner;
 document.getElementById("closeQrScanner").onclick=stopQrScanner;
@@ -735,11 +1004,11 @@ document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=(e)=>{
 });
 document.getElementById("showVersionBtn").onclick=()=>{
   document.getElementById("mainDropdown").classList.remove("open");
-  let text=currentLang()==="en"?"HTM – Test version v14":
-           currentLang()==="it"?"HTM – Versione test v14":
-           currentLang()==="fr"?"HTM – Version test v14":
-           currentLang()==="gsw"?"Arbeitsziiterfassig – Testversion v14":
-           "HTM – Testversion v14";
+  let text=currentLang()==="en"?"HTM – Test version v16":
+           currentLang()==="it"?"HTM – Versione test v16":
+           currentLang()==="fr"?"HTM – Version test v16":
+           currentLang()==="gsw"?"Arbeitsziiterfassig – Testversion v16":
+           "HTM – Testversion v16";
   alert(text);
 };
 document.addEventListener("click",(e)=>{
@@ -781,6 +1050,40 @@ document.getElementById("addWorkBlock").onclick=()=>{
   document.getElementById("newBlockOut").value="";
   document.getElementById("adminReason").value="";
   renderAdmin();
+};
+
+
+document.getElementById("adminMonthRecord").addEventListener("change",renderAdminMonthRecord);
+document.getElementById("saveMonthlyRecord").onclick=()=>{
+  if(!adminUnlocked)return;
+  let month=document.getElementById("adminMonthRecord").value,
+      workedM=parseHourValue(document.getElementById("adminMonthWorked").value),
+      targetM=parseHourValue(document.getElementById("adminMonthTarget").value),
+      reason=document.getElementById("adminMonthReason").value.trim();
+
+  if(!month)return alert("Bitte einen Monat auswählen.");
+  if(month>=currentMonthKey())return alert("Der Monatsnachtrag ist für abgeschlossene, vergangene Monate vorgesehen.");
+  if(workedM===null||targetM===null)return alert("Bitte Ist- und Sollstunden korrekt eingeben, z. B. 102:30.");
+  if(!reason)return alert("Bitte eine Bemerkung oder einen Grund eintragen.");
+
+  let old=state.monthlyRecords[month];
+  state.monthlyRecords[month]={workedMinutes:workedM,targetMinutes:targetM,reason,updatedAt:new Date().toISOString()};
+  logCorrection(month+"-01","Monatsnachtrag gespeichert",old?`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`:"kein Eintrag",`${fmt(workedM)} Ist / ${fmt(targetM)} Soll`,reason);
+  save();
+  overviewMonthKey=month;
+  document.getElementById("overviewMonth").value=month;
+  renderAdminMonthRecord();
+};
+document.getElementById("deleteMonthlyRecord").onclick=()=>{
+  if(!adminUnlocked)return;
+  let month=document.getElementById("adminMonthRecord").value,old=state.monthlyRecords[month];
+  if(!old)return alert("Für diesen Monat gibt es keinen Monatsnachtrag.");
+  let reason=document.getElementById("adminMonthReason").value.trim()||"Monatsnachtrag gelöscht";
+  if(!confirm("Diesen Monatsnachtrag wirklich löschen?"))return;
+  logCorrection(month+"-01","Monatsnachtrag gelöscht",`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`,"gelöscht",reason);
+  delete state.monthlyRecords[month];
+  save();
+  renderAdminMonthRecord();
 };
 
 document.getElementById("resetBtn").onclick=()=>{if(confirm("Wirklich alle Testdaten löschen?")){localStorage.removeItem(KEY);state=empty();save()}};document.getElementById("exportBtn").onclick=()=>{let rows=[["Name","Datum","Status","Kommen/Gehen","Arbeitszeit","Soll","Saldo"]],keys=[...new Set([...Object.keys(state.days),...Object.keys(state.absences)])].sort();keys.forEach(k=>{let a=getAbs(k),d=state.days[k],w=worked(d),target=targetFor(k),bal=dailyBalance(k),sess=d&&d.sessions?d.sessions.map(x=>`${x.in}-${x.out||""}`).join(" | "):"",status=a?labelType(a.type):(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit");rows.push([state.name,k,status,sess,fmt(w),fmt(target),fmt(bal,true)])});let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(";")).join("\n"),blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="arbeitszeiten.csv";a.click();URL.revokeObjectURL(url)};

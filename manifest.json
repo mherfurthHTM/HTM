@@ -22,5 +22,5 @@
   "id": "./",
   "scope": "./",
   "orientation": "portrait-primary",
-  "description": "HTM Arbeitszeiterfassung mit Stempeln, Pausen, Abwesenheiten, Überstunden und optionalem QR-Code."
+  "description": "HTM Arbeitszeiterfassung mit Monatsauswahl, historischen Monatsnachträgen, Stempeln, Pausen, Abwesenheiten, Überstunden und QR-Code."
 }
