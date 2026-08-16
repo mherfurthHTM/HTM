@@ -9,6 +9,8 @@ Neu in Beta 0.032:
 - sachliche Tages-Tabelle mit Kommen, Gehen, Pause, Arbeitszeit, Soll und Saldo
 - Gesamtübersicht, Dokumentfuss und Seitenzahlen
 - PDF-Vorschau in der App entspricht dem neuen Design
+- Mitarbeiterdaten unter Einstellungen sichtbar und nachträglich bearbeitbar
+- Handynummer und E-Mail als optionale Profilfelder ergänzt
 
 Bisher in Beta 0.030:
 - Individuelles Arbeitsmodell pro Mitarbeiter
@@ -30,7 +32,7 @@ Enthalten:
 - Monats- und Tagesübersichten
 - Historische Arbeitszeiten tageweise nachtragen
 - Feiertage Kanton Solothurn / Bucheggberg
-- Mitarbeiterprofile
+- Mitarbeiterprofile mit bearbeitbaren Stammdaten
 - Adminbereich und Korrekturprotokoll
 - Standort beim Kommen/Gehen optional
 - QR-Code-Stempeln

@@ -204,6 +204,12 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 .pdf-report-footer{margin:20px 28px 18px;padding-top:10px;border-top:2px solid #0b4f91;display:flex;justify-content:space-between;font-size:10px;color:#6b7280}
 .pdf-preview-empty{padding:28px;text-align:center;color:#6b7280}
 @media(max-width:860px){.pdf-preview{padding:10px}.pdf-preview-sheet{min-width:760px}.pdf-report-header{padding-left:20px;padding-right:20px}.pdf-report-body{padding-left:20px;padding-right:20px}}
+
+/* Pull-to-refresh */
+#pullRefreshIndicator{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);transform:translate(-50%,-70px);z-index:9999;background:#fff;color:#1564d5;border:1px solid #cfe0f7;border-radius:999px;padding:9px 14px;font-size:13px;font-weight:800;box-shadow:0 8px 24px rgba(15,23,42,.14);opacity:0;pointer-events:none;transition:transform .18s ease,opacity .18s ease;white-space:nowrap}
+#pullRefreshIndicator.visible{opacity:1}
+#pullRefreshIndicator.ready{color:#137b45;border-color:#bfe5cf}
+#pullRefreshIndicator.refreshing{opacity:1;transform:translate(-50%,0)}
 </style>
 
 <style id="htm-blue-production">
@@ -237,6 +243,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 
 </head>
 <body>
+<div id="pullRefreshIndicator" aria-live="polite">↓ Zum Aktualisieren ziehen</div>
 <div class="wrap">
 
 <div class="topbar">
@@ -430,6 +437,24 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 
 
 <section id="settingsView" class="view">
+  <div class="card" id="employeeDataCard">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <div><h2 style="margin-bottom:4px">Mitarbeiterdaten</h2><div class="small">Deine gespeicherten persönlichen Daten. Änderungen betreffen nur das Profil, nicht die bereits erfassten Arbeitszeiten.</div></div>
+      <span class="version-badge" style="font-size:9px!important;padding:4px 7px!important">Profil</span>
+    </div>
+    <div class="employee-form-grid">
+      <div class="full"><label for="settingsEmployeeName">Name *</label><input id="settingsEmployeeName" type="text" autocomplete="name"></div>
+      <div><label for="settingsEmployeeBirthDate">Geburtsdatum *</label><input id="settingsEmployeeBirthDate" type="date"></div>
+      <div><label for="settingsEmployeePhone">Handynummer</label><input id="settingsEmployeePhone" type="tel" autocomplete="tel" placeholder="z. B. +41 79 123 45 67"></div>
+      <div class="full"><label for="settingsEmployeeEmail">E-Mail</label><input id="settingsEmployeeEmail" type="email" autocomplete="email" placeholder="name@beispiel.ch"></div>
+      <div class="full"><label for="settingsEmployeeStreet">Strasse / Nr. *</label><input id="settingsEmployeeStreet" type="text" autocomplete="street-address"></div>
+      <div><label for="settingsEmployeePostalCode">PLZ *</label><input id="settingsEmployeePostalCode" type="text" inputmode="numeric" autocomplete="postal-code"></div>
+      <div><label for="settingsEmployeeCity">Ort *</label><input id="settingsEmployeeCity" type="text" autocomplete="address-level2"></div>
+    </div>
+    <div id="settingsEmployeeDataError" class="employee-form-error"></div>
+    <button id="saveEmployeeDataBtn" class="primary" style="width:100%;margin-top:14px">Mitarbeiterdaten speichern</button>
+  </div>
+
   <div class="card">
     <h2>Einstellungen</h2>
     <div class="small" style="margin-bottom:12px">Hier legst du pro Mitarbeiter fest, an welchen Tagen gearbeitet wird und wie hoch die Sollzeit an jedem Arbeitstag ist.</div>
@@ -488,7 +513,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
   <div class="card">
     <h2>App-Version</h2>
     <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.032</b></div>
-    <div class="small" style="margin-top:8px">Blaues Design aus Beta 0.029. Neu: individuelle Arbeitsmodelle pro Mitarbeiter mit Arbeitstagen, Sollzeit je Tag und Gültig-ab-Datum. Die Monats-Sollzeit wird automatisch berechnet.</div>
+    <div class="small" style="margin-top:8px">Blaues Design aus Beta 0.029. Neu: Mitarbeiterdaten sind unter Einstellungen sichtbar und jederzeit bearbeitbar. Arbeitsmodelle, Sollzeit je Tag und Monats-Sollzeit bleiben vollständig erhalten.</div>
     <button id="updateAppBtn" class="secondary" style="width:100%;margin-top:12px">App aktualisieren</button>
   </div>
 </section>
@@ -596,6 +621,14 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
         <label for="employeeCity">Ort *</label>
         <input id="employeeCity" type="text" autocomplete="address-level2" placeholder="Solothurn">
       </div>
+      <div>
+        <label for="employeePhone">Handynummer</label>
+        <input id="employeePhone" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67">
+      </div>
+      <div>
+        <label for="employeeEmail">E-Mail</label>
+        <input id="employeeEmail" type="email" autocomplete="email" placeholder="name@beispiel.ch">
+      </div>
     </div>
     <div id="employeeFormError" class="employee-form-error"></div>
     <div class="employee-modal-actions">
@@ -614,7 +647,7 @@ function storageSet(key,value){
   try{if(window.localStorage)window.localStorage.setItem(key,String(value))}catch(e){}
 }
 const APP_KEY="htm_app_data_v1", LEGACY_KEYS=["arbeitszeit_test_v1","arbeitszeit_bern_preview_v1"], DEFAULT_WORKDAYS=[3,4,5], DEFAULT_TARGET=510, ADMIN_PIN="0000", JAN_BACKFILL_START="2026-01-01", JAN_BACKFILL_MIGRATION_KEY="htm_beta_030_jan2026_backfill_v1";
-const empty=()=>({name:"",birthDate:"",address:{street:"",postalCode:"",city:""},days:{},absences:{},monthlyRecords:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de",trackingStartDate:"",holidayRegion:"solothurn",locationAtStamp:false}});
+const empty=()=>({name:"",birthDate:"",phone:"",email:"",address:{street:"",postalCode:"",city:""},days:{},absences:{},monthlyRecords:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de",trackingStartDate:"",holidayRegion:"solothurn",locationAtStamp:false}});
 const emptyApp=()=>({activeProfileId:"",profiles:{}});
 let app=loadApp();
 ensureActiveProfile();
@@ -629,7 +662,9 @@ const CHANGELOG_VERSIONS=[
     "Die PDF verwendet jetzt A4-Hochformat mit klarer HTM-Kopfzeile, Mitarbeiter- und Zeitraumangaben sowie vier übersichtlichen Kennzahlen.",
     "Arbeit, Ferien, Krankheit und Überstundenabbau werden in einer dezenten Legende und einer sachlichen Tages-Tabelle dargestellt.",
     "Gesamtübersicht, Seitenzahlen und ein sauberer Dokumentfuss wurden ergänzt.",
-    "Die PDF-Vorschau in der App entspricht jetzt dem neuen geschäftlichen PDF-Design."
+    "Die PDF-Vorschau in der App entspricht jetzt dem neuen geschäftlichen PDF-Design.",
+    "Das PWA-Update-System wurde korrigiert, damit neue GitHub-Versionen auf dem iPhone zuverlässig geladen werden.",
+    "Mitarbeiterdaten wie Name, Adresse, Handynummer und E-Mail sind unter Einstellungen sichtbar und jederzeit bearbeitbar."
   ]},
   {version:"0.031",items:[
     "Arbeitstage können direkt unter Kalender → Tagesübersicht bearbeitet werden.",
@@ -691,11 +726,17 @@ const V21_TRANSLATIONS={
   fr:{"Mitarbeiter hinzufügen":"Ajouter un employé","Name für den neuen Mitarbeiter:":"Nom du nouvel employé :","📍 Standort testen":"📍 Tester la position","Beim ersten Test fragt das Handy nach der Standortfreigabe.":"Lors du premier test, le téléphone demandera l'autorisation de localisation.","Standort wird geprüft …":"Vérification de la position …","Standort gefunden":"Position trouvée","Genauigkeit":"Précision","Standort funktioniert nur über eine sichere HTTPS-Adresse.":"La localisation fonctionne uniquement via une adresse HTTPS sécurisée.","Dieser Browser stellt keine Standortfunktion bereit.":"Ce navigateur ne fournit pas la géolocalisation.","Standortzugriff wurde abgelehnt. Bitte Standortzugriff für HTM/Safari in den Geräteeinstellungen erlauben.":"L'accès à la position a été refusé. Autorisez la localisation pour HTM/Safari dans les réglages de l'appareil.","Standortabfrage hat zu lange gedauert. Bitte Ortungsdienste prüfen und erneut versuchen.":"La demande de localisation a expiré. Vérifiez les services de localisation et réessayez.","Standort konnte nicht bestimmt werden. Bitte Ortungsdienste und Internetverbindung prüfen.":"Impossible de déterminer la position. Vérifiez les services de localisation et la connexion internet.","Die Zeit wurde gespeichert, aber der Standort konnte nicht ermittelt werden.":"L'heure a été enregistrée, mais la position n'a pas pu être déterminée."},
   gsw:{"Mitarbeiter hinzufügen":"Mitarbeiter derzue tue","Name für den neuen Mitarbeiter:":"Name vom nöie Mitarbeiter:","📍 Standort testen":"📍 Standort teste","Beim ersten Test fragt das Handy nach der Standortfreigabe.":"Bim erschte Test fragt s Handy nach dr Standortfreigab.","Standort wird geprüft …":"Standort wird prüeft …","Standort gefunden":"Standort gfunde","Genauigkeit":"Gnauigkeit","Standort funktioniert nur über eine sichere HTTPS-Adresse.":"Dr Standort funktioniert nume über e sicheri HTTPS-Adresse.","Dieser Browser stellt keine Standortfunktion bereit.":"Dä Browser stellt kei Standortfunktion bereit.","Standortzugriff wurde abgelehnt. Bitte Standortzugriff für HTM/Safari in den Geräteeinstellungen erlauben.":"Dr Standortzugriff isch abglehnt worde. Bitte HTM/Safari i de Gräteeinstellige dr Standort erlaube.","Standortabfrage hat zu lange gedauert. Bitte Ortungsdienste prüfen und erneut versuchen.":"D Standortabfrag het z lang brucht. Bitte Ortigsdienste prüefe und nomol probiere.","Standort konnte nicht bestimmt werden. Bitte Ortungsdienste und Internetverbindung prüfen.":"Dr Standort het nöd chönne bestimmt wärde. Bitte Ortigsdienste und Internet prüefe.","Die Zeit wurde gespeichert, aber der Standort konnte nicht ermittelt werden.":"D Zyt isch gschpeicheret, aber dr Standort het nöd chönne ermittelt wärde."}
 };
+const PROFILE_TRANSLATIONS={
+  en:{"Mitarbeiterdaten":"Employee details","Deine gespeicherten persönlichen Daten. Änderungen betreffen nur das Profil, nicht die bereits erfassten Arbeitszeiten.":"Your saved personal details. Changes affect only the profile, not previously recorded working times.","Geburtsdatum *":"Date of birth *","Handynummer":"Mobile number","E-Mail":"Email","Strasse / Nr. *":"Street / No. *","PLZ *":"Postcode *","Ort *":"City *","Mitarbeiterdaten speichern":"Save employee details","✓ Gespeichert":"✓ Saved"},
+  it:{"Mitarbeiterdaten":"Dati dipendente","Deine gespeicherten persönlichen Daten. Änderungen betreffen nur das Profil, nicht die bereits erfassten Arbeitszeiten.":"I dati personali salvati. Le modifiche riguardano solo il profilo e non le ore di lavoro già registrate.","Geburtsdatum *":"Data di nascita *","Handynummer":"Numero di cellulare","E-Mail":"E-mail","Strasse / Nr. *":"Via / N. *","PLZ *":"NPA *","Ort *":"Località *","Mitarbeiterdaten speichern":"Salva dati dipendente","✓ Gespeichert":"✓ Salvato"},
+  fr:{"Mitarbeiterdaten":"Données employé","Deine gespeicherten persönlichen Daten. Änderungen betreffen nur das Profil, nicht die bereits erfassten Arbeitszeiten.":"Vos données personnelles enregistrées. Les modifications concernent uniquement le profil, pas les heures déjà enregistrées.","Geburtsdatum *":"Date de naissance *","Handynummer":"Numéro de portable","E-Mail":"E-mail","Strasse / Nr. *":"Rue / N° *","PLZ *":"NPA *","Ort *":"Localité *","Mitarbeiterdaten speichern":"Enregistrer les données employé","✓ Gespeichert":"✓ Enregistré"},
+  gsw:{"Mitarbeiterdaten":"Mitarbeiterdate","Deine gespeicherten persönlichen Daten. Änderungen betreffen nur das Profil, nicht die bereits erfassten Arbeitszeiten.":"D gschpeicherete persönliche Date. Änderige beträffe nume s Profil und nid d scho erfasste Arbeitszyte.","Geburtsdatum *":"Geburtsdatum *","Handynummer":"Handynummere","E-Mail":"E-Mail","Strasse / Nr. *":"Strass / Nr. *","PLZ *":"PLZ *","Ort *":"Ort *","Mitarbeiterdaten speichern":"Mitarbeiterdate spichere","✓ Gespeichert":"✓ Gschpeicheret"}
+};
 function currentLang(){return state.settings.language||"de"}
 function uiLocale(){let l=currentLang();return l==="en"?"en-GB":l==="it"?"it-CH":l==="fr"?"fr-CH":"de-CH"}
 function tr(base){
   if(currentLang()==="de") return base;
-  return (V29_TRANSLATIONS[currentLang()]&&V29_TRANSLATIONS[currentLang()][base])||(V21_TRANSLATIONS[currentLang()]&&V21_TRANSLATIONS[currentLang()][base])||(V20_TRANSLATIONS[currentLang()]&&V20_TRANSLATIONS[currentLang()][base])||(EXTRA_TRANSLATIONS[currentLang()]&&EXTRA_TRANSLATIONS[currentLang()][base])||(UI_TRANSLATIONS[currentLang()]&&UI_TRANSLATIONS[currentLang()][base])||base;
+  return (PROFILE_TRANSLATIONS[currentLang()]&&PROFILE_TRANSLATIONS[currentLang()][base])||(V29_TRANSLATIONS[currentLang()]&&V29_TRANSLATIONS[currentLang()][base])||(V21_TRANSLATIONS[currentLang()]&&V21_TRANSLATIONS[currentLang()][base])||(V20_TRANSLATIONS[currentLang()]&&V20_TRANSLATIONS[currentLang()][base])||(EXTRA_TRANSLATIONS[currentLang()]&&EXTRA_TRANSLATIONS[currentLang()][base])||(UI_TRANSLATIONS[currentLang()]&&UI_TRANSLATIONS[currentLang()][base])||base;
 }
 function translateText(base){
   let direct=tr(base);
@@ -748,6 +789,8 @@ function normalizeProfile(m){
   if(!m.settings.holidayRegion)m.settings.holidayRegion="solothurn";
   m.settings.locationAtStamp=!!m.settings.locationAtStamp;
   if(!m.birthDate)m.birthDate="";
+  if(!m.phone)m.phone="";
+  if(!m.email)m.email="";
   if(!m.address||typeof m.address!=="object")m.address={street:"",postalCode:"",city:""};
   else m.address={street:m.address.street||"",postalCode:m.address.postalCode||"",city:m.address.city||""};
   if(!m.monthlyRecords||typeof m.monthlyRecords!=="object")m.monthlyRecords={};
@@ -1435,25 +1478,45 @@ function renderOverview(){
   document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);let plannedTarget=rec?targetMonth:monthTargetMinutes(month);document.getElementById("monthTarget").textContent=fmt(plannedTarget);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=sick;let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
 }
 function renderSettings(){
-  let today=localTodayKey(),models=state.settings.workModels||[],current=workModelFor(today)||models[models.length-1];
-  let valid=document.getElementById("workModelValidFrom");if(valid&&!valid.dataset.touched)valid.value=state.settings.trackingStartDate||today;
+  const setVal=(id,val)=>{let el=document.getElementById(id);if(el)el.value=val||""};
+  setVal("settingsEmployeeName",state.name);
+  setVal("settingsEmployeeBirthDate",state.birthDate);
+  setVal("settingsEmployeePhone",state.phone);
+  setVal("settingsEmployeeEmail",state.email);
+  setVal("settingsEmployeeStreet",state.address?.street);
+  setVal("settingsEmployeePostalCode",state.address?.postalCode);
+  setVal("settingsEmployeeCity",state.address?.city);
+
+  let today=localTodayKey(),models=(state.settings.workModels||[]).slice().sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
+  let valid=document.getElementById("workModelValidFrom");
+  if(valid&&!valid.dataset.touched)valid.value=state.settings.trackingStartDate||today;
+  let selectedDate=(valid&&valid.value)||today;
+  let current=models.find(m=>m.validFrom===selectedDate)||workModelFor(selectedDate)||workModelFor(today)||models[models.length-1];
   document.querySelectorAll(".workdayBox").forEach(b=>{let d=Number(b.value),mins=current?Number(current.dayMinutes?.[d]||0):0;b.checked=mins>0});
   document.querySelectorAll(".dayTargetHours").forEach(inp=>{let d=Number(inp.dataset.day),mins=current?Number(current.dayMinutes?.[d]||0):0;inp.value=((mins||510)/60).toFixed(2).replace(/\.00$/,'');inp.disabled=mins<=0});
   document.getElementById("trackingStartDate").value=state.settings.trackingStartDate||localTodayKey();document.getElementById("holidayRegion").value=state.settings.holidayRegion||"solothurn";document.getElementById("locationAtStamp").checked=!!state.settings.locationAtStamp;
   let names={0:"So",1:"Mo",2:"Di",3:"Mi",4:"Do",5:"Fr",6:"Sa"},week=0,parts=[];
   if(current){for(let d=1;d<=6;d++){let m=Number(current.dayMinutes?.[d]||0);if(m){week+=m;parts.push(`${names[d]} ${fmt(m)}`)}}let m=Number(current.dayMinutes?.[0]||0);if(m){week+=m;parts.push(`${names[0]} ${fmt(m)}`)}}
-  document.getElementById("weekModelText").textContent=`Aktuelles Modell: ${parts.join(" · ")||"keine Arbeitstage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze an freien Tagen zählen als Pluszeit.`;
+  document.getElementById("weekModelText").textContent=`Angezeigtes Modell ab ${selectedDate}: ${parts.join(" · ")||"keine Arbeitstage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze an freien Tagen zählen als Pluszeit.`;
   let hist=document.getElementById("workModelHistory");if(hist){hist.innerHTML=models.length?`<b>Gespeicherte Arbeitsmodelle</b><br>${models.map(m=>{let total=Object.values(m.dayMinutes||{}).reduce((a,v)=>a+Number(v||0),0);return `${m.validFrom}: ${fmt(total)} / Woche`}).join("<br>")}`:"Noch kein Arbeitsmodell gespeichert."}
   let ah=document.getElementById("absenceHours");if(ah&&!ah.dataset.touched){let base=baseTargetFor(localTodayKey())||510;ah.value=(base/60).toFixed(2)}
 }
+function sameDayMinutes(a,b){for(let d=0;d<=6;d++){if(Number((a||{})[d]||0)!==Number((b||{})[d]||0))return false}return true}
 function saveWorkModel(){
-  let valid=document.getElementById("workModelValidFrom").value;if(!valid)return alert("Bitte ein Gültig-ab-Datum auswählen.");
+  let validEl=document.getElementById("workModelValidFrom"),valid=validEl.value;if(!valid)return alert("Bitte ein Gültig-ab-Datum auswählen.");
   let dm={0:0,1:0,2:0,3:0,4:0,5:0,6:0},checked=[...document.querySelectorAll(".workdayBox:checked")];
   if(!checked.length)return alert("Bitte mindestens einen regulären Arbeitstag auswählen.");
   for(let b of checked){let d=Number(b.value),inp=document.querySelector(`.dayTargetHours[data-day="${d}"]`),h=Number(inp.value);if(!h||h<=0||h>16)return alert("Bitte für jeden ausgewählten Arbeitstag eine gültige Sollzeit eingeben.");dm[d]=Math.round(h*60)}
-  state.settings.workModels=(state.settings.workModels||[]).filter(m=>m.validFrom!==valid);state.settings.workModels.push({validFrom:valid,dayMinutes:dm});state.settings.workModels.sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
-  let latest=state.settings.workModels[state.settings.workModels.length-1];state.settings.workdays=Object.keys(latest.dayMinutes).filter(d=>Number(latest.dayMinutes[d])>0).map(Number);let first=state.settings.workdays[0];state.settings.targetMinutes=first===undefined?DEFAULT_TARGET:Number(latest.dayMinutes[first]||DEFAULT_TARGET);
-  save();alert("Arbeitsmodell gespeichert. Die Monats-Sollzeit wird ab "+valid+" automatisch danach berechnet.");
+  let models=(state.settings.workModels||[]).slice().sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
+  let oldIndex=models.findIndex(m=>m.validFrom===valid),redundant=new Set();
+  if(oldIndex>=0){let oldDm=models[oldIndex].dayMinutes||{};for(let i=oldIndex+1;i<models.length;i++){if(sameDayMinutes(models[i].dayMinutes||{},oldDm))redundant.add(models[i].validFrom);else break}}
+  state.settings.workModels=models.filter(m=>m.validFrom!==valid&&!redundant.has(m.validFrom));
+  state.settings.workModels.push({validFrom:valid,dayMinutes:dm});state.settings.workModels.sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
+  let current=workModelFor(localTodayKey())||state.settings.workModels[state.settings.workModels.length-1];state.settings.workdays=Object.keys(current.dayMinutes||{}).filter(d=>Number(current.dayMinutes[d])>0).map(Number);let first=state.settings.workdays[0];state.settings.targetMinutes=first===undefined?DEFAULT_TARGET:Number(current.dayMinutes[first]||DEFAULT_TARGET);
+  validEl.dataset.touched="1";validEl.value=valid;
+  save();
+  validEl=document.getElementById("workModelValidFrom");if(validEl){validEl.dataset.touched="1";validEl.value=valid;renderSettings()}
+  alert("Arbeitsmodell gespeichert. Die Auswahl bleibt sichtbar und die Monats-Sollzeit wird ab "+valid+" automatisch danach berechnet.");
 }
 function fitHeaderEmployeeName(){
   let group=document.querySelector(".clock-center"),nameEl=document.getElementById("activeEmployeeName"),clock=document.getElementById("liveClock");
@@ -1471,6 +1534,26 @@ function fitHeaderEmployeeName(){
   if(nameEl.scrollWidth>available)nameEl.style.textOverflow="ellipsis";
 }
 
+function setSettingsEmployeeDataError(message=""){
+  let el=document.getElementById("settingsEmployeeDataError");if(!el)return;el.textContent=message;el.classList.toggle("show",!!message);
+}
+function saveEmployeeData(){
+  let name=document.getElementById("settingsEmployeeName").value.trim();
+  let birthDate=document.getElementById("settingsEmployeeBirthDate").value;
+  let phone=document.getElementById("settingsEmployeePhone").value.trim();
+  let email=document.getElementById("settingsEmployeeEmail").value.trim();
+  let street=document.getElementById("settingsEmployeeStreet").value.trim();
+  let postalCode=document.getElementById("settingsEmployeePostalCode").value.trim();
+  let city=document.getElementById("settingsEmployeeCity").value.trim();
+  if(!name||!birthDate||!street||!postalCode||!city){setSettingsEmployeeDataError("Bitte alle Pflichtfelder ausfüllen.");return}
+  if(!/^\d{4}$/.test(postalCode)){setSettingsEmployeeDataError("Bitte eine gültige vierstellige Schweizer PLZ eingeben.");return}
+  if(birthDate>localTodayKey()){setSettingsEmployeeDataError("Das Geburtsdatum darf nicht in der Zukunft liegen.");return}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setSettingsEmployeeDataError("Bitte eine gültige E-Mail-Adresse eingeben.");return}
+  state.name=name;state.birthDate=birthDate;state.phone=phone;state.email=email;state.address={street,postalCode,city};
+  setSettingsEmployeeDataError("");save();renderAll();
+  let btn=document.getElementById("saveEmployeeDataBtn");if(btn){let old=btn.textContent;btn.textContent="✓ Gespeichert";setTimeout(()=>{btn.textContent=old},1200)}
+}
+
 function renderProfiles(){let sel=document.getElementById("profileSelect"),ids=Object.keys(app.profiles);sel.innerHTML=ids.map(id=>`<option value="${id}">${app.profiles[id].name||"Ohne Name"}</option>`).join("");sel.value=app.activeProfileId;let nameEl=document.getElementById("activeEmployeeName");if(nameEl)nameEl.textContent=(app.profiles[app.activeProfileId]&&app.profiles[app.activeProfileId].name)||"Ohne Name";requestAnimationFrame(fitHeaderEmployeeName)}
 function renderAll(){renderProfiles();renderSettings();renderToday();renderCalendar();renderAbs();renderOverview();renderHistoricalMonth();updateLiveClock();if(adminUnlocked)renderAdmin();applyLanguage()}
 
@@ -1485,7 +1568,7 @@ document.getElementById("calendarAbsenceAddBtn")?.addEventListener("click",()=>{
 document.getElementById("comeBtn").onclick=stampIn;document.getElementById("pauseStartBtn").onclick=pauseStart;document.getElementById("pauseEndBtn").onclick=pauseEnd;document.getElementById("goBtn").onclick=stampOut;
 document.getElementById("profileSelect").addEventListener("change",e=>{app.profiles[app.activeProfileId]=state;app.activeProfileId=e.target.value;state=app.profiles[app.activeProfileId];storageSet(APP_KEY,JSON.stringify(app));overviewMonthKey=currentMonthKey();document.getElementById("mainDropdown").classList.remove("open");renderAll()});
 function setEmployeeFormError(message=""){let el=document.getElementById("employeeFormError");el.textContent=message;el.classList.toggle("show",!!message)}
-function clearEmployeeForm(){["employeeName","employeeBirthDate","employeeStreet","employeePostalCode","employeeCity"].forEach(id=>document.getElementById(id).value="");setEmployeeFormError("")}
+function clearEmployeeForm(){["employeeName","employeeBirthDate","employeeStreet","employeePostalCode","employeeCity","employeePhone","employeeEmail"].forEach(id=>document.getElementById(id).value="");setEmployeeFormError("")}
 function openEmployeeModal(){
   document.getElementById("mainDropdown").classList.remove("open");
   clearEmployeeForm();
@@ -1499,12 +1582,15 @@ function saveNewEmployee(){
   let street=document.getElementById("employeeStreet").value.trim();
   let postalCode=document.getElementById("employeePostalCode").value.trim();
   let city=document.getElementById("employeeCity").value.trim();
+  let phone=document.getElementById("employeePhone").value.trim();
+  let email=document.getElementById("employeeEmail").value.trim();
   if(!name||!birthDate||!street||!postalCode||!city){setEmployeeFormError("Bitte alle Pflichtfelder ausfüllen.");return}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setEmployeeFormError("Bitte eine gültige E-Mail-Adresse eingeben.");return}
   if(!/^\d{4}$/.test(postalCode)){setEmployeeFormError("Bitte eine gültige vierstellige Schweizer PLZ eingeben.");return}
   let today=localTodayKey();if(birthDate>today){setEmployeeFormError("Das Geburtsdatum darf nicht in der Zukunft liegen.");return}
   app.profiles[app.activeProfileId]=state;
   let id=newProfileId();
-  app.profiles[id]=normalizeProfile({...empty(),name,birthDate,address:{street,postalCode,city},settings:{...empty().settings,language:state.settings.language||"de"}});
+  app.profiles[id]=normalizeProfile({...empty(),name,birthDate,phone,email,address:{street,postalCode,city},settings:{...empty().settings,language:state.settings.language||"de"}});
   app.activeProfileId=id;state=app.profiles[id];
   storageSet(APP_KEY,JSON.stringify(app));overviewMonthKey=currentMonthKey();
   closeEmployeeModal();renderAll();
@@ -1516,8 +1602,9 @@ document.getElementById("saveEmployeeBtn").onclick=saveNewEmployee;
 document.getElementById("employeeModalBackdrop").addEventListener("click",e=>{if(e.target.id==="employeeModalBackdrop")closeEmployeeModal()});
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(document.getElementById("employeeModalBackdrop").classList.contains("open"))closeEmployeeModal();if(document.getElementById("updateModalBackdrop").classList.contains("open"))closeUpdateModal();if(document.getElementById("pdfModalBackdrop").classList.contains("open"))closePdfModal()});
 document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{let d=Number(b.value),inp=document.querySelector(`.dayTargetHours[data-day="${d}"]`);if(inp){inp.disabled=!b.checked;if(b.checked&&(!Number(inp.value)||Number(inp.value)<=0))inp.value="8.5"}}));
-document.getElementById("workModelValidFrom").addEventListener("change",e=>e.target.dataset.touched="1");
+document.getElementById("workModelValidFrom").addEventListener("change",e=>{e.target.dataset.touched="1";renderSettings()});
 document.getElementById("saveWorkModelBtn").onclick=saveWorkModel;
+document.getElementById("saveEmployeeDataBtn").onclick=saveEmployeeData;
 
 document.getElementById("trackingStartDate").addEventListener("change",e=>{
   if(!e.target.value)return;
@@ -1834,7 +1921,46 @@ document.getElementById("exportBtn").onclick=()=>{
   let blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=`Arbeitszeiten_${(state.name||"Profil").replace(/\s+/g,"_")}.csv`;a.click();URL.revokeObjectURL(url);
 };
-document.getElementById("updateAppBtn").onclick=async()=>{try{if("serviceWorker" in navigator){let regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()));}if("caches" in window){let ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}location.reload()};
-window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=29preview2").then(r=>r.update()).catch(()=>{});
+async function forceFreshReload(){
+  try{
+    if("serviceWorker" in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(async r=>{try{await r.update()}catch(e){}}));
+    }
+    if("caches" in window){
+      const ks=await caches.keys();
+      await Promise.all(ks.map(k=>caches.delete(k)));
+    }
+  }catch(e){}
+  const u=new URL(location.href);
+  u.searchParams.set("htmUpdate",Date.now());
+  location.replace(u.toString());
+}
+function setupPullToRefresh(){
+  const indicator=document.getElementById("pullRefreshIndicator");if(!indicator)return;
+  let startY=0,pulling=false,dy=0,triggered=false;
+  window.addEventListener("touchstart",e=>{
+    if(window.scrollY<=1&&e.touches&&e.touches.length===1){startY=e.touches[0].clientY;pulling=true;dy=0;triggered=false}
+  },{passive:true});
+  window.addEventListener("touchmove",e=>{
+    if(!pulling||!e.touches||e.touches.length!==1)return;dy=Math.max(0,e.touches[0].clientY-startY);
+    if(dy<16){indicator.classList.remove("visible","ready");indicator.style.transform="translate(-50%,-70px)";return}
+    indicator.classList.add("visible");indicator.classList.toggle("ready",dy>=85);
+    indicator.textContent=dy>=85?"↑ Loslassen zum Aktualisieren":"↓ Zum Aktualisieren ziehen";
+    indicator.style.transform=`translate(-50%,${Math.min(14,-55+dy*.72)}px)`;
+  },{passive:true});
+  const finish=()=>{
+    if(!pulling)return;pulling=false;
+    if(dy>=85&&!triggered){triggered=true;indicator.classList.remove("ready");indicator.classList.add("refreshing","visible");indicator.textContent="↻ Wird aktualisiert …";forceFreshReload();return}
+    indicator.classList.remove("visible","ready","refreshing");indicator.style.transform="translate(-50%,-70px)";dy=0;
+  };
+  window.addEventListener("touchend",finish,{passive:true});window.addEventListener("touchcancel",finish,{passive:true});
+}
+document.getElementById("updateAppBtn").onclick=forceFreshReload;
+setupPullToRefresh();window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker" in navigator){
+  navigator.serviceWorker.register(`sw.js?v=${APP_VERSION_CODE}`,{updateViaCache:"none"}).then(async r=>{
+    try{await r.update()}catch(e){}
+  }).catch(()=>{});
+}
 </script>
 </body></html>
