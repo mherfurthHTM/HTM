@@ -30,3 +30,8 @@ Aptos wird verwendet, wenn die Schrift auf dem Gerät vorhanden ist. Andernfalls
 Sicherheit Beta 0.029:
 - Admin-Schutz für historische Nachträge
 - Vergangene Stunden können erst nach PIN-Freigabe im Adminbereich geändert werden
+
+Nachtrag Beta 0.029:
+- „Speichern & nächster Tag“ springt zuverlässig auf den nächsten Kalendertag.
+- Von-, Bis- und Pausenzeit werden bei einem leeren Folgetag automatisch übernommen.
+- Bereits gespeicherte Folgetage zeigen weiterhin ihre eigenen gespeicherten Zeiten.
