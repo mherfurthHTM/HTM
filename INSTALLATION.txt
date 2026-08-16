@@ -1,25 +1,33 @@
-HTM Beta 0.024 – GitHub Pages aktualisieren
-==================================
+HTM Beta 0.029 – vollständiges GitHub-Pages-Uploadpaket
 
-1. Diese ZIP-Datei auf dem PC entpacken.
-2. In GitHub dein HTM-Repository öffnen.
-3. Die Dateien im Hauptverzeichnis durch die neuen Beta-0.024-Dateien ersetzen.
-4. Die Ordner icons und qr ebenfalls vollständig hochladen/ersetzen.
-5. Änderungen (Commit) speichern.
-6. GitHub Pages kurz aktualisieren lassen.
-7. Auf dem Handy HTM öffnen. Falls noch eine alte Version angezeigt wird, in HTM unter Einstellungen auf "App aktualisieren" drücken und die App danach neu öffnen.
+WICHTIG VOR DEM UPDATE
+1. In der bestehenden HTM-App zuerst unter Daten eine Datensicherung erstellen.
+2. Die ZIP-Datei auf dem PC entpacken.
+3. NICHT die ZIP-Datei selbst bei GitHub hochladen, sondern den gesamten Inhalt.
 
-Auf GitHub gehören genau diese Elemente:
-- icons/
-- qr/
+DATEIEN / ORDNER IM HAUPTVERZEICHNIS
 - .nojekyll
 - index.html
-- INSTALLATION.txt
 - manifest.json
-- README.txt
 - sw.js
+- INSTALLATION.txt
+- README.txt
+- icons/
+- qr/
 
-NICHT die ZIP-Datei selbst in das Repository hochladen.
+UPLOAD AUF GITHUB
+1. Das bestehende HTM-Repository öffnen.
+2. Die Dateien im Hauptverzeichnis durch die Dateien aus diesem Paket ersetzen.
+3. Die Ordner icons und qr ebenfalls vollständig hochladen/ersetzen.
+4. Commit changes bestätigen.
+5. GitHub Pages kurz Zeit zum Aktualisieren geben.
+6. HTM auf dem iPhone komplett schliessen und wieder öffnen.
+7. Falls noch die alte Oberfläche erscheint: in HTM „App aktualisieren“ drücken oder Safari einmal neu laden.
 
-DATEN:
-HTM Beta 0.024 verwendet weiterhin den bestehenden Speicherbereich htm_app_data_v1. Dadurch bleiben die bereits vorhandenen Profile, Ferien, Abwesenheiten, Stempelungen, Überstunden, Standorte und Nachträge bei einem normalen Update unter derselben GitHub-Pages-Adresse und demselben Browser erhalten. Trotzdem vor einem grösseren Update am besten unter Daten -> Datensicherung erstellen eine JSON-Sicherung anlegen.
+DATEN
+Die App verwendet weiterhin denselben lokalen Speicherschlüssel „htm_app_data_v1“.
+Bei einem normalen Update unter derselben GitHub-Pages-Adresse bleiben vorhandene Profile, Zeiten und Einstellungen erhalten.
+Eine Datensicherung vor dem Update wird trotzdem ausdrücklich empfohlen.
+
+VERSION
+Beta 0.029 – Blue Design
