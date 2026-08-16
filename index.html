@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#156ff5">
 <title>HTM</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <style>
 :root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--amber:#a16207}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
@@ -121,7 +121,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 @media(max-width:600px){.employee-form-grid{grid-template-columns:1fr}.employee-form-grid .full{grid-column:auto}.employee-modal-actions{flex-direction:column-reverse}.employee-modal-actions button{width:100%}}
 
 
-/* Beta 0.029 – Schnellnachtrag, Navigation wie Beta 0.028 */
+/* Beta 0.030 – blaues Design aus Beta 0.029 + flexible Sollzeit-Arbeitsmodelle */
 .history-progress{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0;padding:11px 12px;border-radius:12px;background:#f8fafc;border:1px solid var(--border)}
 .history-progress b{font-size:15px}.history-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.history-save-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px;margin-top:12px}.history-save-next{background:#111827;color:#fff}.history-tip{margin-top:10px;padding:10px 11px;border-radius:12px;background:#eff6ff;color:#1e3a8a;font-size:12px;line-height:1.4}
 @media(max-width:600px){
@@ -132,6 +132,9 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
   #historyDay{font-size:16px;font-weight:700}
 }
 
+
+/* Beta 0.030 Arbeitsmodell – passend zum blauen 0.029 Design */
+.work-model-table input[type="checkbox"]{width:22px;height:22px;accent-color:#1564d5}.work-model-table .dayTargetHours{min-width:95px}.work-model-table td:nth-child(2),.work-model-table th:nth-child(2){text-align:center}.work-model-table td{vertical-align:middle}#workModelHistory{background:#f5f9ff;border-color:#cfe2ff;color:#35516f}#saveWorkModelBtn{background:#1564d5!important}
 </style>
 
 <style id="htm-blue-production">
@@ -160,10 +163,6 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 @media(max-width:370px){.topbar{grid-template-columns:22px minmax(0,1fr) 78px 48px}.active-employee-name{font-size:10px!important}.online-label{display:none}.live-clock{font-size:14px!important}.brand-right h1{font-size:17px!important}.version-badge{font-size:5.5px!important}.tab{font-size:9px!important}.calendar-summary-grid{grid-template-columns:1fr 1fr}}
 </style>
 
-
-<style id="htm-stamp-2x2-fix">
-#stamp>.card>.grid2{grid-template-columns:1fr 1fr!important;}
-</style>
 </head>
 <body>
 <div class="wrap">
@@ -205,7 +204,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
   </div>
   <div class="brand-right">
     <h1 style="margin:0">HTM</h1>
-    <div class="version-badge">Beta 0.029</div>
+    <div class="version-badge">Beta 0.030</div>
   </div>
 </div>
 
@@ -299,9 +298,6 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 <section id="data" class="view">
     <div class="card history-main-card">
       <div class="history-title-row"><div class="history-title-icon">▣</div><div><h2>Alte Monate tageweise nachtragen</h2>
-      <div id="historyAdminLockNotice" class="notice" style="display:none;margin:10px 0 12px">
-        🔒 Stunden für vergangene Tage können nur nach Freigabe im Adminbereich nachgetragen, geändert oder gelöscht werden.
-      </div>
       <div class="small history-subtitle" style="margin-bottom:12px">Erfasse Arbeitszeiten für vergangene Monate manuell – schnell, einfach und zuverlässig.</div></div></div>
       <div class="history-selector-grid"><div><label for="historyMonth">Monat auswählen</label><input id="historyMonth" type="month"></div><div><label for="historyDay">Tag auswählen</label><select id="historyDay"></select></div></div>
       <div class="history-nav">
@@ -349,21 +345,34 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 <section id="settingsView" class="view">
   <div class="card">
     <h2>Einstellungen</h2>
-    <div class="small" style="margin-bottom:12px">Hier werden Arbeitsmodell und Sollzeit festgelegt.</div>
-    <div class="grid3">
-      <label class="stat"><input class="workdayBox" type="checkbox" value="1"> Montag</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="2"> Dienstag</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="3"> Mittwoch</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="4"> Donnerstag</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="5"> Freitag</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="6"> Samstag</label>
-      <label class="stat"><input class="workdayBox" type="checkbox" value="0"> Sonntag</label>
+    <div class="small" style="margin-bottom:12px">Hier legst du pro Mitarbeiter fest, an welchen Tagen gearbeitet wird und wie hoch die Sollzeit an jedem Arbeitstag ist.</div>
+    <div class="notice" style="margin-bottom:12px">Beispiel 60 %: Mittwoch, Donnerstag und Freitag jeweils 8:30 h. Montag und Dienstag bleiben frei. Die Monats-Sollzeit berechnet sich automatisch.</div>
+
+    <div style="margin-bottom:12px">
+      <label for="workModelValidFrom">Arbeitsmodell gültig ab</label>
+      <input id="workModelValidFrom" type="date">
+      <div class="small" style="margin-top:6px">Für den aktuellen Nachtrag kann das Arbeitsmodell ab 01.01.2026 gelten. Bei einer späteren Pensumsänderung wird ein neues Arbeitsmodell mit neuem Datum gespeichert. Frühere Monate bleiben dadurch unverändert.</div>
     </div>
-    <div style="margin-top:12px">
-      <label for="dailyTargetHours">Sollzeit je regulärem Arbeitstag</label>
-      <input id="dailyTargetHours" type="number" min="0.25" max="16" step="0.25" value="8.5">
+
+    <div class="scroll">
+      <table class="work-model-table">
+        <thead><tr><th>Tag</th><th>Arbeitstag</th><th>Sollzeit</th></tr></thead>
+        <tbody>
+          <tr><td>Montag</td><td><input class="workdayBox" type="checkbox" value="1"></td><td><input class="dayTargetHours" data-day="1" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Dienstag</td><td><input class="workdayBox" type="checkbox" value="2"></td><td><input class="dayTargetHours" data-day="2" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Mittwoch</td><td><input class="workdayBox" type="checkbox" value="3"></td><td><input class="dayTargetHours" data-day="3" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Donnerstag</td><td><input class="workdayBox" type="checkbox" value="4"></td><td><input class="dayTargetHours" data-day="4" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Freitag</td><td><input class="workdayBox" type="checkbox" value="5"></td><td><input class="dayTargetHours" data-day="5" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Samstag</td><td><input class="workdayBox" type="checkbox" value="6"></td><td><input class="dayTargetHours" data-day="6" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+          <tr><td>Sonntag</td><td><input class="workdayBox" type="checkbox" value="0"></td><td><input class="dayTargetHours" data-day="0" type="number" min="0" max="16" step="0.25" value="8.5"></td></tr>
+        </tbody>
+      </table>
     </div>
+
+    <button id="saveWorkModelBtn" class="primary" style="width:100%;margin-top:12px">Arbeitsmodell speichern</button>
     <div id="weekModelText" class="small" style="margin-top:8px">Zusätzliche Einsätze an freien Tagen sind weiterhin möglich und werden als Pluszeit gezählt.</div>
+    <div id="workModelHistory" class="notice" style="margin-top:10px"></div>
+
     <div style="margin-top:14px">
       <label for="trackingStartDate">Startdatum der Zeiterfassung</label>
       <input id="trackingStartDate" type="date">
@@ -391,11 +400,9 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 
   <div class="card">
     <h2>App-Version</h2>
-    <div class="stat">
-      <span class="small">Aktuelle Testversion</span>
-      <b>Beta 0.029</b>
-    </div>
-    <div class="small" style="margin-top:8px">Der Schnellnachtrag wurde für die Erfassung vieler unterschiedlicher Arbeitstage am Handy optimiert. Die bewährte Navigation und Kopfzeile aus Beta 0.028 bleiben erhalten. Alle bisherigen Zeitdaten bleiben erhalten.</div><button id="updateAppBtn" class="secondary" style="width:100%;margin-top:12px">App aktualisieren</button>
+    <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.030</b></div>
+    <div class="small" style="margin-top:8px">Blaues Design aus Beta 0.029. Neu: individuelle Arbeitsmodelle pro Mitarbeiter mit Arbeitstagen, Sollzeit je Tag und Gültig-ab-Datum. Die Monats-Sollzeit wird automatisch berechnet.</div>
+    <button id="updateAppBtn" class="secondary" style="width:100%;margin-top:12px">App aktualisieren</button>
   </div>
 </section>
 
@@ -519,15 +526,24 @@ function storageSet(key,value){
   HTM_MEMORY_STORAGE[key]=String(value);
   try{if(window.localStorage)window.localStorage.setItem(key,String(value))}catch(e){}
 }
-const APP_KEY="htm_app_data_v1", LEGACY_KEYS=["arbeitszeit_test_v1","arbeitszeit_bern_preview_v1"], DEFAULT_WORKDAYS=[3,4,5], DEFAULT_TARGET=510, ADMIN_PIN="0000";
+const APP_KEY="htm_app_data_v1", LEGACY_KEYS=["arbeitszeit_test_v1","arbeitszeit_bern_preview_v1"], DEFAULT_WORKDAYS=[3,4,5], DEFAULT_TARGET=510, ADMIN_PIN="0000", JAN_BACKFILL_START="2026-01-01", JAN_BACKFILL_MIGRATION_KEY="htm_beta_030_jan2026_backfill_v1";
 const empty=()=>({name:"",birthDate:"",address:{street:"",postalCode:"",city:""},days:{},absences:{},monthlyRecords:{},correctionLog:[],settings:{workdays:[...DEFAULT_WORKDAYS],targetMinutes:DEFAULT_TARGET,language:"de",trackingStartDate:"",holidayRegion:"solothurn",locationAtStamp:false}});
 const emptyApp=()=>({activeProfileId:"",profiles:{}});
 let app=loadApp();
 ensureActiveProfile();
 let state=app.profiles[app.activeProfileId], calendarCursor=new Date(), calendarPickStart=null, overviewMonthKey=localTodayKey().slice(0,7);
-const APP_VERSION="Beta 0.029";
-const APP_VERSION_CODE="0.029";
+applyJan2026BackfillMigration();
+state=app.profiles[app.activeProfileId];
+const APP_VERSION="Beta 0.030";
+const APP_VERSION_CODE="0.030";
 const CHANGELOG_VERSIONS=[
+  {version:"0.030",items:[
+    "Individuelle Arbeitsmodelle pro Mitarbeiter mit frei wählbaren Arbeitstagen und Sollzeiten je Tag.",
+    "Gültig-ab-Datum schützt vergangene Monats-Sollzeiten bei späteren Pensumsänderungen.",
+    "Die volle Monats-Sollzeit wird automatisch aus dem gültigen Arbeitsmodell und den Feiertagen berechnet.",
+    "Rückwirkende Sollzeit-Berechnung und tageweiser Nachtrag sind ab 01.01.2026 möglich.",
+    "Das blaue Design und die Navigation aus Beta 0.029 bleiben unverändert erhalten."
+  ]},
   {version:"0.029",items:[
     "Neues blaues HTM-Design mit kompakter Aptos-Typografie und überarbeiteter Kopfzeile.",
     "Stempeln, Kalender, Übersicht und Daten wurden für Handy und PC neu gestaltet.",
@@ -625,6 +641,7 @@ function normalizeProfile(m){
   let b=empty();m={...b,...(m||{})};m.settings={...b.settings,...((m||{}).settings||{})};
   if(!Array.isArray(m.settings.workdays))m.settings.workdays=[...DEFAULT_WORKDAYS];
   if(!m.settings.targetMinutes)m.settings.targetMinutes=DEFAULT_TARGET;
+  if(!Array.isArray(m.settings.workModels))m.settings.workModels=[];
   if(!m.settings.language)m.settings.language="de";
   if(!m.settings.holidayRegion)m.settings.holidayRegion="solothurn";
   m.settings.locationAtStamp=!!m.settings.locationAtStamp;
@@ -635,8 +652,40 @@ function normalizeProfile(m){
   if(!Array.isArray(m.correctionLog))m.correctionLog=[];
   if(!m.days||typeof m.days!=="object")m.days={};if(!m.absences||typeof m.absences!=="object")m.absences={};
   if(!m.settings.trackingStartDate){let today=localTodayKey();let existing=[...Object.keys(m.days),...Object.keys(m.absences)].filter(k=>k<=today).sort();m.settings.trackingStartDate=existing.length?existing[0]:today;}
+  if(!m.settings.workModels.length){
+    let dm={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+    m.settings.workdays.forEach(d=>dm[d]=Number(m.settings.targetMinutes||DEFAULT_TARGET));
+    m.settings.workModels=[{validFrom:m.settings.trackingStartDate||localTodayKey(),dayMinutes:dm}];
+  }
+  m.settings.workModels=m.settings.workModels.map(x=>({validFrom:x.validFrom||m.settings.trackingStartDate||localTodayKey(),dayMinutes:{0:0,1:0,2:0,3:0,4:0,5:0,6:0,...(x.dayMinutes||{})}})).sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
   return m;
 }
+function applyJan2026BackfillMigration(){
+  // Einmalige Migration für bereits vorhandene Profile beim Wechsel auf die Januar-Nachtragslogik.
+  // Neu angelegte Mitarbeiter werden danach NICHT automatisch auf Januar zurückdatiert.
+  if(storageGet(JAN_BACKFILL_MIGRATION_KEY)==="1")return;
+  Object.values(app.profiles||{}).forEach(profile=>{
+    if(!profile||!profile.settings)return;
+    let settings=profile.settings;
+    let models=Array.isArray(settings.workModels)?settings.workModels:[];
+    if(!models.length)return;
+    models.sort((a,b)=>(a.validFrom||"").localeCompare(b.validFrom||""));
+    let earliest=models[0];
+    // Das bereits hinterlegte Arbeitsmodell wird als Grundlage für Jan–heute verwendet.
+    // Spätere Modellwechsel bleiben als eigene Gültig-ab-Einträge bestehen.
+    if((earliest.validFrom||"")>JAN_BACKFILL_START){
+      let copy={0:0,1:0,2:0,3:0,4:0,5:0,6:0,...(earliest.dayMinutes||{})};
+      models.unshift({validFrom:JAN_BACKFILL_START,dayMinutes:copy});
+    }
+    if(!settings.trackingStartDate || settings.trackingStartDate>JAN_BACKFILL_START){
+      settings.trackingStartDate=JAN_BACKFILL_START;
+    }
+    settings.workModels=models;
+  });
+  storageSet(APP_KEY,JSON.stringify(app));
+  storageSet(JAN_BACKFILL_MIGRATION_KEY,"1");
+}
+
 function newProfileId(){return "p_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7)}
 function loadApp(){
   try{let raw=JSON.parse(storageGet(APP_KEY)||"null");if(raw&&raw.profiles){Object.keys(raw.profiles).forEach(id=>raw.profiles[id]=normalizeProfile(raw.profiles[id]));return raw}}
@@ -654,7 +703,12 @@ function updateLiveClock(){let el=document.getElementById("liveClock");if(!el)re
 function mins(t){if(!t)return 0;let[h,m]=t.split(":").map(Number);return h*60+m}
 function fmt(m,signed=false){m=Math.round(m);let s=m<0?"-":signed&&m>0?"+":"";m=Math.abs(m);return `${s}${Math.floor(m/60)}:${p(m%60)}`}
 function dayNumber(k){return new Date(k+"T12:00:00").getDay()}
-function isWorkday(k){return state.settings.workdays.includes(dayNumber(k))}
+function workModelFor(k){
+  let models=Array.isArray(state.settings.workModels)?state.settings.workModels:[];
+  let match=null;for(let m of models){if(m.validFrom<=k)match=m;else break}return match;
+}
+function baseTargetFor(k){let model=workModelFor(k);if(!model)return 0;return Number((model.dayMinutes||{})[dayNumber(k)]||0)}
+function isWorkday(k){return baseTargetFor(k)>0}
 function easterSunday(year){let a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),kk=c%4,l=(32+2*e+2*i-h-kk)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,month-1,day,12)}
 function datePlus(base,days){let d=new Date(base);d.setDate(d.getDate()+days);return keyOf(d)}
 function holidayInfo(k){
@@ -665,7 +719,7 @@ function holidayInfo(k){
   if(region!=="bucheggberg"){map[`${y}-08-15`]={name:"Mariä Himmelfahrt",factor:0};map[`${y}-11-01`]={name:"Allerheiligen",factor:0};}
   map[`${y}-12-25`]={name:"Weihnachten",factor:0};return map[k]||null;
 }
-function targetFor(k){if(!isWorkday(k))return 0;let base=Number(state.settings.targetMinutes||DEFAULT_TARGET),h=holidayInfo(k);return h?Math.round(base*h.factor):base}
+function targetFor(k){let base=baseTargetFor(k);if(!base)return 0;let h=holidayInfo(k);return h?Math.round(base*h.factor):base}
 function dateLabel(k){return new Date(k+"T12:00:00").toLocaleDateString(uiLocale(),{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}
 function sessionMinutes(x,day){if(!x||!x.in)return 0;let end=x.out?mins(x.out):(keyOf()===day.date?mins(nowTime()):mins(x.in));return Math.max(0,end-mins(x.in))}
 function historicalManualMinutes(day){if(!day||!day.historicalManual)return null;let h=day.historicalManual;if(!h.from||!h.to)return 0;let total=mins(h.to)-mins(h.from);if(total<0)total+=1440;return Math.max(0,total-Number(h.pauseMinutes||0))}
@@ -673,14 +727,15 @@ function isHistoricalManualDay(k){return !!(state.days[k]&&state.days[k].histori
 function worked(day){let hm=historicalManualMinutes(day);if(hm!==null)return hm;if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>s+sessionMinutes(x,day),0)}
 function creditedWorked(day){let hm=historicalManualMinutes(day);if(hm!==null){let weekend=[0,6].includes(dayNumber(day.date));return hm*((day.historicalManual.notdienst&&weekend)?2:1)}if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>{let m=sessionMinutes(x,day),weekend=dayNumber(day.date)===0||dayNumber(day.date)===6;return s+m*((x.notdienst&&weekend)?2:1)},0)}
 function getAbs(k){return state.absences[k]||null}
-function overtimeReduction(a){return a&&a.type==="Ueberstundenabbau"?Math.round(Number(a.hours||((state.settings.targetMinutes||DEFAULT_TARGET)/60))*60):0}
-function dailyBalance(k){let target=targetFor(k),a=getAbs(k),credit=creditedWorked(state.days[k]);if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a);if(a)return 0;return credit-target}
+function overtimeReduction(a,k=keyOf()){return a&&a.type==="Ueberstundenabbau"?Math.round(Number(a.hours||(baseTargetFor(k)/60)||0)*60):0}
+function dailyBalance(k){let target=targetFor(k),a=getAbs(k),credit=creditedWorked(state.days[k]);if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a,k);if(a)return 0;return credit-target}
 function currentMonthKey(){return localTodayKey().slice(0,7)}
 function monthKeys(monthKey=overviewMonthKey){
   let [y,m]=monthKey.split("-").map(Number),arr=[],last=new Date(y,m,0).getDate();
   for(let i=1;i<=last;i++)arr.push(`${y}-${p(m)}-${p(i)}`);
   return arr;
 }
+function monthTargetMinutes(monthKey){return monthKeys(monthKey).reduce((sum,k)=>sum+targetFor(k),0)}
 function monthTargetMinutes(monthKey){
   return monthKeys(monthKey).reduce((sum,k)=>sum+targetFor(k),0);
 }
@@ -774,7 +829,7 @@ function renderToday(){
   let status;if(a)status=`${tr("Abwesenheit")}: ${labelType(a.type)}`;else if(pau)status=currentLang()==="gsw"?`I dr Pause sit ${pau.start}`:`In Pause seit ${pau.start}`;else if(cur)status=(cur.notdienst?tr("Zusatzarbeit / Notdienst")+" ×2 – ":"")+(currentLang()==="gsw"?`am Schaffe sit ${cur.in}`:`bei der Arbeit seit ${cur.in}`);else if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else status=target===0?(currentLang()==="gsw"?"Planmässig frei – Zuesatzarbeit / Notdienscht cha glych gstämplet wärde":"Planmässig frei – Zusatzarbeit / Notdienst kann trotzdem gestempelt werden"):tr("Nicht eingestempelt");
   document.getElementById("todayStatus").textContent=status;document.getElementById("comeBtn").disabled=!!cur||!!pau||!!a;document.getElementById("pauseStartBtn").disabled=!cur||!!pau||!!a;document.getElementById("pauseEndBtn").disabled=!pau||!!a;document.getElementById("goBtn").disabled=!cur||!!pau||!!a;
   document.getElementById("todayWork").textContent=fmt(w);document.getElementById("todayCredit").textContent=fmt(credit);document.getElementById("todayPause").textContent=fmt(pm);document.getElementById("todayTarget").textContent=fmt(target);
-  let bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a):0):(credit-target),el=document.getElementById("todayDiff");el.textContent=fmt(bal,true);el.className=bal>=0?"positive":"negative";
+  let bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0):(credit-target),el=document.getElementById("todayDiff");el.textContent=fmt(bal,true);el.className=bal>=0?"positive":"negative";
   let h="";if(d&&d.sessions&&d.sessions.length)d.sessions.forEach((ss,i)=>{let links=[];if(ss.inLocation)links.push(locationAnchor(ss.inLocation,"Kommen-Standort"));if(ss.outLocation)links.push(locationAnchor(ss.outLocation,"Gehen-Standort"));let loc=links.length?`<div class="location-note">${links.join(" · ")}</div>`:"";h+=`<div class="entry"><span>Arbeitsblock ${i+1}${ss.notdienst?" · Notfalldienst ×2":""}${loc}</span><b>${ss.in} – ${ss.out||tr("läuft")}</b></div>`});if(d&&d.pauses&&d.pauses.length)d.pauses.forEach((x,i)=>h+=`<div class="entry"><span>Pause ${i+1}</span><b>${x.start} – ${x.end} (${fmt(mins(x.end)-mins(x.start))})</b></div>`);if(d&&d.activePause)h+=`<div class="entry"><span>Pause</span><b>${d.activePause.start} – ${tr("läuft")} (${fmt(pm)})</b></div>`;document.getElementById("sessions").innerHTML=h||'<div class="small">Noch keine Buchungen heute.</div>';
 }
 function dateRangeKeys(from,to){let out=[],d=new Date(from+"T12:00:00"),e=new Date(to+"T12:00:00");while(d<=e){out.push(keyOf(d));d.setDate(d.getDate()+1)}return out}
@@ -806,9 +861,9 @@ function htmCalendarTimeText(k,d,a){
 function renderCalendarDesignExtras(){
   let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),month=`${y}-${p(m+1)}`,today=localTodayKey(),rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,workDays=0,cards=[];
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth}
-  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a):0):(credit-target);workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?labelType(a.type):(historical?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
+  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0):(credit-target);workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?labelType(a.type):(historical?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
   let set=(id,value,cls="")=>{let e=document.getElementById(id);if(e){e.textContent=value;e.className=cls}};
-  let st=document.getElementById("calSummaryTitle");if(st)st.textContent=`Monatsübersicht ${monthDisplay(month)}`;set("calWorkDays",String(workDays));set("calTarget",`${fmt(targetMonth)} h`);set("calWorked",`${fmt(workedMonth)} h`);set("calBalance",`${fmt(balanceMonth,true)} h`,balanceMonth>=0?"positive":"negative");set("calCredit",`${fmt(creditMonth)} h`);
+  let st=document.getElementById("calSummaryTitle");if(st)st.textContent=`Monatsübersicht ${monthDisplay(month)}`;let plannedTarget=rec?targetMonth:monthTargetMinutes(month);set("calWorkDays",String(workDays));set("calTarget",`${fmt(plannedTarget)} h`);set("calWorked",`${fmt(workedMonth)} h`);set("calBalance",`${fmt(balanceMonth,true)} h`,balanceMonth>=0?"positive":"negative");set("calCredit",`${fmt(creditMonth)} h`);
   let list=document.getElementById("calendarDayCards");if(!list)return;cards.sort((a,b)=>b.k.localeCompare(a.k));list.innerHTML=cards.slice(0,14).map(x=>{let dd=x.k.slice(8,10)+"."+x.k.slice(5,7)+".";let sub=x.a?"":`<span class="${x.bal>=0?"positive":"negative"}">${fmt(x.bal,true)} h</span>`;return `<button class="design-day-card ${x.kind}" type="button" data-calendar-card-date="${x.k}"><span class="design-day-date">${htmEsc(x.weekday)}<b>${dd}</b></span><span class="design-day-main"><b><i class="kind-dot ${x.kind}"></i>${htmEsc(x.status)}</b><span class="line2">${htmEsc(x.time)}</span></span><span class="design-day-summary"><b>${htmEsc(x.main)}</b>${sub}</span><span class="design-day-chevron">›</span></button>`}).join("")||'<div class="empty-design-list">Für diesen Monat sind noch keine Einträge vorhanden.</div>';
   list.querySelectorAll("[data-calendar-card-date]").forEach(btn=>btn.onclick=()=>{pickCalendarDate(btn.dataset.calendarCardDate);document.getElementById("calendarEditorCard")?.scrollIntoView({behavior:"smooth",block:"start"})});
 }
@@ -1072,30 +1127,14 @@ function validTimeRange(start,end){
   return mins(end)>=mins(start);
 }
 
-
-function requireAdminForHistory(){
-  if(adminUnlocked)return true;
-  alert("Diese Funktion ist nur im Adminbereich erlaubt. Bitte zuerst über das Menü den Adminbereich mit PIN entsperren.");
-  return false;
-}
-function updateHistoryAdminLock(){
-  let locked=!adminUnlocked;
-  let notice=document.getElementById("historyAdminLockNotice");
-  if(notice)notice.style.display=locked?"block":"none";
-  ["historyMonth","historyDay","historyFrom","historyTo","historyPause","historyNotdienst",
-   "historyPrevDay","historyNextDay","saveHistoricalDay","saveHistoricalDayNext",
-   "deleteHistoricalDay","deleteLegacyMonthRecord"].forEach(id=>{
-      let el=document.getElementById(id);
-      if(el)el.disabled=locked;
-   });
-}
-
 function defaultHistoryMonth(){let d=new Date();d.setMonth(d.getMonth()-1);return `${d.getFullYear()}-${p(d.getMonth()+1)}`}
 function historyDayKey(){return document.getElementById("historyDay")?.value||""}
 function renderHistoricalMonth(){
   let monthEl=document.getElementById("historyMonth"),today=localTodayKey(),current=currentMonthKey();
+  monthEl.min=JAN_BACKFILL_START.slice(0,7);
   monthEl.max=current;
   if(!monthEl.value)monthEl.value=defaultHistoryMonth();
+  if(monthEl.value<JAN_BACKFILL_START.slice(0,7))monthEl.value=JAN_BACKFILL_START.slice(0,7);
   if(monthEl.value>current)monthEl.value=current;
   let month=monthEl.value, dayEl=document.getElementById("historyDay"), prev=dayEl.value;
   let keys=monthKeys(month).filter(k=>k<=today);
@@ -1114,51 +1153,16 @@ function renderHistoricalDayEditor(){let k=historyDayKey();if(!k)return;let hm=s
   document.getElementById("historyFrom").value=hm?.from||"";document.getElementById("historyTo").value=hm?.to||"";document.getElementById("historyPause").value=hm?.pauseMinutes??90;document.getElementById("historyNotdienst").checked=!!hm?.notdienst;
   let info=[dateLabel(k),`Soll ${fmt(targetFor(k))}`];if(hol)info.push(`${tr("Feiertag")}: ${hol.name}`);if(a)info.push(`${tr("Abwesenheit")}: ${labelType(a.type)}`);if(hm)info.push(`gespeichert: ${fmt(worked(state.days[k]))}`);if(rec)info.push("alter Monats-Gesamtnachtrag aktiv");document.getElementById("historyDayInfo").textContent=info.join(" · ");
 }
-function advanceHistoryDay(step=1,template=null){
-  if(!requireAdminForHistory())return false;
-  let k=historyDayKey();if(!k)return false;
-  let d=new Date(k+"T12:00:00");d.setDate(d.getDate()+step);
-  let next=keyOf(d),today=localTodayKey();
-  if(step>0&&next>today){alert("Du bist beim heutigen Tag angekommen.");return false}
-  let month=next.slice(0,7),monthEl=document.getElementById("historyMonth"),dayEl=document.getElementById("historyDay");
-  monthEl.value=month;
-  renderHistoricalMonth();
-  if(![...dayEl.options].some(o=>o.value===next))return false;
-  dayEl.value=next;
-  renderHistoricalDayEditor();
-
-  // Bei einem leeren Folgetag die zuletzt verwendeten Zeiten übernehmen.
-  // Bereits gespeicherte Tage zeigen immer ihre eigenen Werte.
-  if(template && !state.days[next]?.historicalManual){
-    document.getElementById("historyFrom").value=template.from||"";
-    document.getElementById("historyTo").value=template.to||"";
-    document.getElementById("historyPause").value=template.pause ?? 90;
-    document.getElementById("historyNotdienst").checked=false;
-  }
-  return true;
+function advanceHistoryDay(step=1){
+  if(!adminUnlocked)return;let k=historyDayKey();if(!k)return;let d=new Date(k+"T12:00:00");d.setDate(d.getDate()+step);let next=keyOf(d),today=localTodayKey();
+  if(step>0&&next>today){alert("Du bist beim heutigen Tag angekommen.");return}
+  let month=next.slice(0,7),monthEl=document.getElementById("historyMonth"),dayEl=document.getElementById("historyDay");monthEl.value=month;renderHistoricalMonth();if([...dayEl.options].some(o=>o.value===next)){dayEl.value=next;renderHistoricalDayEditor()}
 }
-function saveHistoricalDayEntry(goNext=false){if(!requireAdminForHistory())return;let month=document.getElementById("historyMonth").value,k=historyDayKey(),from=document.getElementById("historyFrom").value,to=document.getElementById("historyTo").value,pause=Number(document.getElementById("historyPause").value||0),nd=!!document.getElementById("historyNotdienst").checked;
+function saveHistoricalDayEntry(goNext=false){let month=document.getElementById("historyMonth").value,k=historyDayKey(),from=document.getElementById("historyFrom").value,to=document.getElementById("historyTo").value,pause=Number(document.getElementById("historyPause").value||0),nd=!!document.getElementById("historyNotdienst").checked;
   if(!month||!k)return alert("Bitte Monat und Tag auswählen.");if(k>localTodayKey())return alert("Zukünftige Tage können nicht nachgetragen werden.");if(state.monthlyRecords[month])return alert("Für diesen Monat ist noch ein alter Monats-Gesamtnachtrag vorhanden. Bitte diesen zuerst löschen.");if(!from||!to)return alert("Bitte Kommen und Gehen eintragen.");let gross=mins(to)-mins(from);if(gross<0)gross+=1440;if(gross<=0)return alert("Die Gehen-Zeit muss nach der Kommen-Zeit liegen.");if(!Number.isFinite(pause)||pause<0||pause>=gross)return alert("Bitte eine gültige Pause in Minuten eingeben.");if(nd&&![0,6].includes(dayNumber(k)))return alert("Notfalldienst ×2 kann nur für Samstag oder Sonntag gewählt werden.");if(getAbs(k))return alert("Für diesen Tag ist eine Abwesenheit eingetragen. Bitte diese zuerst im Kalender löschen oder ändern.");
-  let existing=state.days[k];if(existing&&existing.sessions&&existing.sessions.length&&!existing.historicalManual)return alert("Für diesen Tag sind bereits normale Stempelungen vorhanden. Nutze dafür die Zeitkorrekturen.");
-  let template={from,to,pause:Math.round(pause)};
-  let old=existing?.historicalManual?`${existing.historicalManual.from}–${existing.historicalManual.to}, Pause ${existing.historicalManual.pauseMinutes||0} Min.`:"kein Eintrag";
-  state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};
-  state.days[k].historicalManual={from,to,pauseMinutes:Math.round(pause),notdienst:nd,updatedAt:new Date().toISOString()};
-  logCorrection(k,"Tag nachgetragen",old,`${from}–${to}, Pause ${Math.round(pause)} Min.${nd?", Notfalldienst ×2":""}`,"Tageweiser Schnellnachtrag");
-  save();
-  overviewMonthKey=month;
-  document.getElementById("overviewMonth").value=month;
-
-  if(goNext){
-    // Erst Übersicht aktualisieren, dann sofort zum Folgetag springen.
-    renderOverview();
-    advanceHistoryDay(1,template);
-  }else{
-    renderHistoricalMonth();
-    renderOverview();
-  }
+  let existing=state.days[k];if(existing&&existing.sessions&&existing.sessions.length&&!existing.historicalManual)return alert("Für diesen Tag sind bereits normale Stempelungen vorhanden. Nutze dafür die Zeitkorrekturen.");let old=existing?.historicalManual?`${existing.historicalManual.from}–${existing.historicalManual.to}, Pause ${existing.historicalManual.pauseMinutes||0} Min.`:"kein Eintrag";state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].historicalManual={from,to,pauseMinutes:Math.round(pause),notdienst:nd,updatedAt:new Date().toISOString()};logCorrection(k,"Tag nachgetragen",old,`${from}–${to}, Pause ${Math.round(pause)} Min.${nd?", Notfalldienst ×2":""}`,"Tageweiser Schnellnachtrag");save();overviewMonthKey=month;document.getElementById("overviewMonth").value=month;renderHistoricalMonth();renderOverview();if(goNext)advanceHistoryDay(1);
 }
-function deleteHistoricalDayEntry(){if(!requireAdminForHistory())return;let k=historyDayKey(),d=state.days[k];if(!d?.historicalManual)return alert("Für diesen Tag gibt es keinen tageweisen Nachtrag.");if(!confirm("Diesen tageweisen Nachtrag wirklich löschen?"))return;let old=`${d.historicalManual.from}–${d.historicalManual.to}, Pause ${d.historicalManual.pauseMinutes||0} Min.`;delete d.historicalManual;if((!d.sessions||!d.sessions.length)&&(!d.pauses||!d.pauses.length)&&!d.activePause)delete state.days[k];logCorrection(k,"Tagesnachtrag gelöscht",old,"gelöscht","Tageweiser Nachtrag alter Monat");save();renderHistoricalMonth();renderOverview();
+function deleteHistoricalDayEntry(){let k=historyDayKey(),d=state.days[k];if(!d?.historicalManual)return alert("Für diesen Tag gibt es keinen tageweisen Nachtrag.");if(!confirm("Diesen tageweisen Nachtrag wirklich löschen?"))return;let old=`${d.historicalManual.from}–${d.historicalManual.to}, Pause ${d.historicalManual.pauseMinutes||0} Min.`;delete d.historicalManual;if((!d.sessions||!d.sessions.length)&&(!d.pauses||!d.pauses.length)&&!d.activePause)delete state.days[k];logCorrection(k,"Tagesnachtrag gelöscht",old,"gelöscht","Tageweiser Nachtrag alter Monat");save();renderHistoricalMonth();renderOverview();
 }
 
 function renderAdmin(){
@@ -1302,27 +1306,29 @@ function renderOverview(){
   let input=document.getElementById("overviewMonth");if(input&&input.value)overviewMonthKey=input.value;let month=overviewMonthKey||currentMonthKey();if(input)input.value=month;document.getElementById("overviewMonthTitle").textContent=monthDisplay(month);
   let rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,vac=0,sick=0,rows=[],today=localTodayKey(),notice=document.getElementById("monthlyImportNotice");let monthAbs=Object.keys(state.absences).filter(k=>k.startsWith(month));vac=monthAbs.filter(k=>getAbs(k)?.type==="Ferien").length;sick=monthAbs.filter(k=>getAbs(k)?.type==="Krank").length;
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth;notice.style.display="block";notice.textContent=`Alter Monats-Gesamtnachtrag vorhanden: ${fmt(workedMonth)} Ist / ${fmt(targetMonth)} Soll · Saldo ${fmt(balanceMonth,true)}${rec.reason?" · "+rec.reason:""}`;rows.push(`<tr><td>${month}</td><td>Monatsnachtrag</td><td>${fmt(workedMonth)}</td><td>${fmt(creditMonth)}</td><td>${fmt(targetMonth)}</td><td class="${balanceMonth>=0?"positive":"negative"}">${fmt(balanceMonth,true)}</td><td>–</td></tr>`)}
-  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=0,status=target>0?tr("Arbeit"):tr("Frei");if(a){status=labelType(a.type);bal=a.type==="Ueberstundenabbau"?-overtimeReduction(a):0}else{bal=credit-target;if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical)status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
-  document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);document.getElementById("monthTarget").textContent=fmt(targetMonth);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=sick;let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
+  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=0,status=target>0?tr("Arbeit"):tr("Frei");if(a){status=labelType(a.type);bal=a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0}else{bal=credit-target;if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical)status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
+  document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);let plannedTarget=rec?targetMonth:monthTargetMinutes(month);document.getElementById("monthTarget").textContent=fmt(plannedTarget);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=sick;let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
 }
 function renderSettings(){
-  document.querySelectorAll(".workdayBox").forEach(b=>b.checked=state.settings.workdays.includes(Number(b.value)));
-  document.getElementById("dailyTargetHours").value=(state.settings.targetMinutes/60).toFixed(2).replace(/\.00$/,"");document.getElementById("trackingStartDate").value=state.settings.trackingStartDate||localTodayKey();document.getElementById("holidayRegion").value=state.settings.holidayRegion||"solothurn";document.getElementById("locationAtStamp").checked=!!state.settings.locationAtStamp;
-  let days=currentLang()==="en"?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]:
-           currentLang()==="it"?["Dom","Lun","Mar","Mer","Gio","Ven","Sab"]:
-           currentLang()==="fr"?["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"]:
-           currentLang()==="gsw"?["Su","Mä","Zi","Mi","Du","Fr","Sa"]:
-           ["So","Mo","Di","Mi","Do","Fr","Sa"];
-  let sel=state.settings.workdays.map(x=>days[x]).join(", "),
-      week=state.settings.workdays.length*state.settings.targetMinutes,
-      text=currentLang()==="en"?`Regular: ${sel||"no days"} · Weekly target ${fmt(week)}. Additional work is possible on all 7 days.`:
-           currentLang()==="it"?`Regolare: ${sel||"nessun giorno"} · Obiettivo settimanale ${fmt(week)}. Il lavoro aggiuntivo è possibile tutti i 7 giorni.`:
-           currentLang()==="fr"?`Régulier : ${sel||"aucun jour"} · Objectif hebdomadaire ${fmt(week)}. Le travail supplémentaire est possible les 7 jours.`:
-           currentLang()==="gsw"?`Regulär: ${sel||"kei Täg"} · Wuche-Soll ${fmt(week)}. Zuesatzisätz sy a allne 7 Täg möglich.`:
-           `Regulär: ${sel||"keine Tage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze sind an allen 7 Tagen möglich.`;
-  document.getElementById("weekModelText").textContent=text;
-  let ah=document.getElementById("absenceHours");
-  if(ah&&!ah.dataset.touched)ah.value=(state.settings.targetMinutes/60).toFixed(2);
+  let today=localTodayKey(),models=state.settings.workModels||[],current=workModelFor(today)||models[models.length-1];
+  let valid=document.getElementById("workModelValidFrom");if(valid&&!valid.dataset.touched)valid.value=state.settings.trackingStartDate||today;
+  document.querySelectorAll(".workdayBox").forEach(b=>{let d=Number(b.value),mins=current?Number(current.dayMinutes?.[d]||0):0;b.checked=mins>0});
+  document.querySelectorAll(".dayTargetHours").forEach(inp=>{let d=Number(inp.dataset.day),mins=current?Number(current.dayMinutes?.[d]||0):0;inp.value=((mins||510)/60).toFixed(2).replace(/\.00$/,'');inp.disabled=mins<=0});
+  document.getElementById("trackingStartDate").value=state.settings.trackingStartDate||localTodayKey();document.getElementById("holidayRegion").value=state.settings.holidayRegion||"solothurn";document.getElementById("locationAtStamp").checked=!!state.settings.locationAtStamp;
+  let names={0:"So",1:"Mo",2:"Di",3:"Mi",4:"Do",5:"Fr",6:"Sa"},week=0,parts=[];
+  if(current){for(let d=1;d<=6;d++){let m=Number(current.dayMinutes?.[d]||0);if(m){week+=m;parts.push(`${names[d]} ${fmt(m)}`)}}let m=Number(current.dayMinutes?.[0]||0);if(m){week+=m;parts.push(`${names[0]} ${fmt(m)}`)}}
+  document.getElementById("weekModelText").textContent=`Aktuelles Modell: ${parts.join(" · ")||"keine Arbeitstage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze an freien Tagen zählen als Pluszeit.`;
+  let hist=document.getElementById("workModelHistory");if(hist){hist.innerHTML=models.length?`<b>Gespeicherte Arbeitsmodelle</b><br>${models.map(m=>{let total=Object.values(m.dayMinutes||{}).reduce((a,v)=>a+Number(v||0),0);return `${m.validFrom}: ${fmt(total)} / Woche`}).join("<br>")}`:"Noch kein Arbeitsmodell gespeichert."}
+  let ah=document.getElementById("absenceHours");if(ah&&!ah.dataset.touched){let base=baseTargetFor(localTodayKey())||510;ah.value=(base/60).toFixed(2)}
+}
+function saveWorkModel(){
+  let valid=document.getElementById("workModelValidFrom").value;if(!valid)return alert("Bitte ein Gültig-ab-Datum auswählen.");
+  let dm={0:0,1:0,2:0,3:0,4:0,5:0,6:0},checked=[...document.querySelectorAll(".workdayBox:checked")];
+  if(!checked.length)return alert("Bitte mindestens einen regulären Arbeitstag auswählen.");
+  for(let b of checked){let d=Number(b.value),inp=document.querySelector(`.dayTargetHours[data-day="${d}"]`),h=Number(inp.value);if(!h||h<=0||h>16)return alert("Bitte für jeden ausgewählten Arbeitstag eine gültige Sollzeit eingeben.");dm[d]=Math.round(h*60)}
+  state.settings.workModels=(state.settings.workModels||[]).filter(m=>m.validFrom!==valid);state.settings.workModels.push({validFrom:valid,dayMinutes:dm});state.settings.workModels.sort((a,b)=>a.validFrom.localeCompare(b.validFrom));
+  let latest=state.settings.workModels[state.settings.workModels.length-1];state.settings.workdays=Object.keys(latest.dayMinutes).filter(d=>Number(latest.dayMinutes[d])>0).map(Number);let first=state.settings.workdays[0];state.settings.targetMinutes=first===undefined?DEFAULT_TARGET:Number(latest.dayMinutes[first]||DEFAULT_TARGET);
+  save();alert("Arbeitsmodell gespeichert. Die Monats-Sollzeit wird ab "+valid+" automatisch danach berechnet.");
 }
 function fitHeaderEmployeeName(){
   let group=document.querySelector(".clock-center"),nameEl=document.getElementById("activeEmployeeName"),clock=document.getElementById("liveClock");
@@ -1381,7 +1387,9 @@ document.getElementById("cancelEmployeeModalBtn").onclick=closeEmployeeModal;
 document.getElementById("saveEmployeeBtn").onclick=saveNewEmployee;
 document.getElementById("employeeModalBackdrop").addEventListener("click",e=>{if(e.target.id==="employeeModalBackdrop")closeEmployeeModal()});
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(document.getElementById("employeeModalBackdrop").classList.contains("open"))closeEmployeeModal();if(document.getElementById("updateModalBackdrop").classList.contains("open"))closeUpdateModal();if(document.getElementById("pdfModalBackdrop").classList.contains("open"))closePdfModal()});
-document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{state.settings.workdays=[...document.querySelectorAll(".workdayBox:checked")].map(x=>Number(x.value));save()}));document.getElementById("dailyTargetHours").addEventListener("change",e=>{let h=Number(e.target.value);if(!h||h<=0||h>16){alert("Bitte eine gültige Sollzeit eingeben.");renderSettings();return}state.settings.targetMinutes=Math.round(h*60);save()});
+document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{let d=Number(b.value),inp=document.querySelector(`.dayTargetHours[data-day="${d}"]`);if(inp){inp.disabled=!b.checked;if(b.checked&&(!Number(inp.value)||Number(inp.value)<=0))inp.value="8.5"}}));
+document.getElementById("workModelValidFrom").addEventListener("change",e=>e.target.dataset.touched="1");
+document.getElementById("saveWorkModelBtn").onclick=saveWorkModel;
 
 document.getElementById("trackingStartDate").addEventListener("change",e=>{
   if(!e.target.value)return;
@@ -1393,7 +1401,7 @@ document.getElementById("locationAtStamp").addEventListener("change",e=>{state.s
 document.getElementById("testLocationBtn").onclick=async()=>{let loc=await captureLocation(true);if(loc&&!state.settings.locationAtStamp)setLocationStatus(`${tr("Standort gefunden")} · ${tr("Genauigkeit")} ±${loc.accuracy} m`,"ok")};
 
 let today=keyOf();["calFrom","calTo","absenceFrom","absenceTo"].forEach(id=>document.getElementById(id).value=today);document.getElementById("absenceType").addEventListener("change",e=>document.getElementById("hoursBox").style.display=e.target.value==="Ueberstundenabbau"?"block":"none");document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
-document.getElementById("saveAbsence").onclick=()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(k=>isWorkday(k)&&targetFor(k)>0);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");let h=state.settings.targetMinutes/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}keys.forEach(k=>state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:{type});save();alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)};
+document.getElementById("saveAbsence").onclick=()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(k=>isWorkday(k)&&targetFor(k)>0);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");let h=(baseTargetFor(from)||510)/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}keys.forEach(k=>state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:{type});save();alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)};
 document.getElementById("saveCalendarEntry").onclick=saveCalendarEntry;document.getElementById("deleteCalendarEntry").onclick=deleteCalendarEntry;document.getElementById("clearCalendarSelection").onclick=()=>{calendarPickStart=null;document.getElementById("calFrom").value=today;document.getElementById("calTo").value=today;renderCalendar()};document.getElementById("prevMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()-1);renderCalendar()};document.getElementById("nextMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()+1);renderCalendar()};document.getElementById("calFrom").addEventListener("change",e=>{if(e.target.value){let d=new Date(e.target.value+"T12:00:00");calendarCursor=new Date(d.getFullYear(),d.getMonth(),1)}calendarPickStart=null;renderCalendar()});document.getElementById("calTo").addEventListener("change",()=>{calendarPickStart=null;renderCalendar()});
 
 
@@ -1494,9 +1502,8 @@ document.getElementById("adminLoginBtn").onclick=()=>{
   adminUnlocked=true;
   document.getElementById("adminPin").value="";
   renderAdmin();
-  updateHistoryAdminLock();
 };
-document.getElementById("adminLogoutBtn").onclick=()=>{adminUnlocked=false;renderAdmin();updateHistoryAdminLock()};
+document.getElementById("adminLogoutBtn").onclick=()=>{adminUnlocked=false;renderAdmin()};
 document.getElementById("adminDate").addEventListener("change",renderAdmin);
 document.getElementById("addWorkBlock").onclick=()=>{
   if(!adminUnlocked)return;
@@ -1523,7 +1530,7 @@ document.getElementById("historyNextDay").onclick=()=>advanceHistoryDay(1);
 document.getElementById("saveHistoricalDay").onclick=()=>saveHistoricalDayEntry(false);
 document.getElementById("saveHistoricalDayNext").onclick=()=>saveHistoricalDayEntry(true);
 document.getElementById("deleteHistoricalDay").onclick=deleteHistoricalDayEntry;
-document.getElementById("deleteLegacyMonthRecord").onclick=()=>{if(!requireAdminForHistory())return;let month=document.getElementById("historyMonth").value,old=state.monthlyRecords[month];if(!old)return;if(!confirm("Den alten Monats-Gesamtnachtrag wirklich löschen? Die bisherigen Tagesdaten und Abwesenheiten bleiben erhalten."))return;logCorrection(month+"-01","Monats-Gesamtnachtrag gelöscht",`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`,"gelöscht","Umstellung auf tageweise Nachträge v20");delete state.monthlyRecords[month];save();renderHistoricalMonth();renderOverview();
+document.getElementById("deleteLegacyMonthRecord").onclick=()=>{let month=document.getElementById("historyMonth").value,old=state.monthlyRecords[month];if(!old)return;if(!confirm("Den alten Monats-Gesamtnachtrag wirklich löschen? Die bisherigen Tagesdaten und Abwesenheiten bleiben erhalten."))return;logCorrection(month+"-01","Monats-Gesamtnachtrag gelöscht",`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`,"gelöscht","Umstellung auf tageweise Nachträge v20");delete state.monthlyRecords[month];save();renderHistoricalMonth();renderOverview();
 };
 
 document.getElementById("resetBtn").onclick=()=>{if(!confirm("Aktuelles Profil mit allen Zeitdaten wirklich löschen?"))return;let ids=Object.keys(app.profiles);if(ids.length===1){state=normalizeProfile({...empty(),name:state.name||"Mitarbeiter 1"});app.profiles[app.activeProfileId]=state}else{delete app.profiles[app.activeProfileId];app.activeProfileId=Object.keys(app.profiles)[0];state=app.profiles[app.activeProfileId]}storageSet(APP_KEY,JSON.stringify(app));renderAll()};
@@ -1656,6 +1663,6 @@ document.getElementById("exportBtn").onclick=()=>{
   a.href=url;a.download=`Arbeitszeiten_${(state.name||"Profil").replace(/\s+/g,"_")}.csv`;a.click();URL.revokeObjectURL(url);
 };
 document.getElementById("updateAppBtn").onclick=async()=>{try{if("serviceWorker" in navigator){let regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()));}if("caches" in window){let ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}location.reload()};
-window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateHistoryAdminLock();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=29blue4").then(r=>r.update()).catch(()=>{});
+window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=29preview2").then(r=>r.update()).catch(()=>{});
 </script>
 </body></html>

@@ -1,4 +1,4 @@
-const CACHE="htm-beta-0.029-blue4";
+const CACHE="htm-beta-0.030-blue1";
 const ASSETS=[
   "./",
   "./index.html",
