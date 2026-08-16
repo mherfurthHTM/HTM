@@ -1,6 +1,13 @@
 HTM – Arbeitszeiterfassung
 
-Neu in Beta 0.030:
+Neu in Beta 0.031:
+- Unter Kalender → Tagesübersicht jeden Arbeitstag direkt bearbeiten
+- Kommen, Gehen und Pause nachträglich anpassen
+- Arbeitstage direkt in der Tagesübersicht löschen
+- Abwesenheiten dort ebenfalls bearbeiten oder löschen
+- Ursprüngliche Stempelungen bleiben bei Korrekturen im Änderungsprotokoll nachvollziehbar
+
+Bisher in Beta 0.030:
 - Individuelles Arbeitsmodell pro Mitarbeiter
 - Arbeitstage Montag bis Freitag frei auswählbar
 - Sollzeit je Wochentag einstellbar
@@ -9,7 +16,7 @@ Neu in Beta 0.030:
 - Monats-Sollzeit wird automatisch aus dem hinterlegten Arbeitsmodell berechnet
 - Stempelbuttons bleiben im 2×2-Raster
 
-Beta 0.030 – Blue Design
+Beta 0.031 – Blue Design
 
 Diese Version basiert auf der vollständigen bisherigen HTM-Web-App-Struktur.
 

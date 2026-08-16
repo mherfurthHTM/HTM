@@ -1,4 +1,4 @@
-HTM Beta 0.030 – vollständiges GitHub-Pages-Uploadpaket
+HTM Beta 0.031 – vollständiges GitHub-Pages-Uploadpaket
 
 WICHTIG VOR DEM UPDATE
 1. In der bestehenden HTM-App zuerst unter Daten eine Datensicherung erstellen.
@@ -30,4 +30,4 @@ Bei einem normalen Update unter derselben GitHub-Pages-Adresse bleiben vorhanden
 Eine Datensicherung vor dem Update wird trotzdem ausdrücklich empfohlen.
 
 VERSION
-Beta 0.030 – Blue Design
+Beta 0.031 – Blue Design
