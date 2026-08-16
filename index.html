@@ -299,6 +299,9 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 <section id="data" class="view">
     <div class="card history-main-card">
       <div class="history-title-row"><div class="history-title-icon">▣</div><div><h2>Alte Monate tageweise nachtragen</h2>
+      <div id="historyAdminLockNotice" class="notice" style="display:none;margin:10px 0 12px">
+        🔒 Stunden für vergangene Tage können nur nach Freigabe im Adminbereich nachgetragen, geändert oder gelöscht werden.
+      </div>
       <div class="small history-subtitle" style="margin-bottom:12px">Erfasse Arbeitszeiten für vergangene Monate manuell – schnell, einfach und zuverlässig.</div></div></div>
       <div class="history-selector-grid"><div><label for="historyMonth">Monat auswählen</label><input id="historyMonth" type="month"></div><div><label for="historyDay">Tag auswählen</label><select id="historyDay"></select></div></div>
       <div class="history-nav">
@@ -1069,6 +1072,24 @@ function validTimeRange(start,end){
   return mins(end)>=mins(start);
 }
 
+
+function requireAdminForHistory(){
+  if(adminUnlocked)return true;
+  alert("Diese Funktion ist nur im Adminbereich erlaubt. Bitte zuerst über das Menü den Adminbereich mit PIN entsperren.");
+  return false;
+}
+function updateHistoryAdminLock(){
+  let locked=!adminUnlocked;
+  let notice=document.getElementById("historyAdminLockNotice");
+  if(notice)notice.style.display=locked?"block":"none";
+  ["historyMonth","historyDay","historyFrom","historyTo","historyPause","historyNotdienst",
+   "historyPrevDay","historyNextDay","saveHistoricalDay","saveHistoricalDayNext",
+   "deleteHistoricalDay","deleteLegacyMonthRecord"].forEach(id=>{
+      let el=document.getElementById(id);
+      if(el)el.disabled=locked;
+   });
+}
+
 function defaultHistoryMonth(){let d=new Date();d.setMonth(d.getMonth()-1);return `${d.getFullYear()}-${p(d.getMonth()+1)}`}
 function historyDayKey(){return document.getElementById("historyDay")?.value||""}
 function renderHistoricalMonth(){
@@ -1094,15 +1115,15 @@ function renderHistoricalDayEditor(){let k=historyDayKey();if(!k)return;let hm=s
   let info=[dateLabel(k),`Soll ${fmt(targetFor(k))}`];if(hol)info.push(`${tr("Feiertag")}: ${hol.name}`);if(a)info.push(`${tr("Abwesenheit")}: ${labelType(a.type)}`);if(hm)info.push(`gespeichert: ${fmt(worked(state.days[k]))}`);if(rec)info.push("alter Monats-Gesamtnachtrag aktiv");document.getElementById("historyDayInfo").textContent=info.join(" · ");
 }
 function advanceHistoryDay(step=1){
-  if(!adminUnlocked)return;let k=historyDayKey();if(!k)return;let d=new Date(k+"T12:00:00");d.setDate(d.getDate()+step);let next=keyOf(d),today=localTodayKey();
+  if(!requireAdminForHistory())return;let k=historyDayKey();if(!k)return;let d=new Date(k+"T12:00:00");d.setDate(d.getDate()+step);let next=keyOf(d),today=localTodayKey();
   if(step>0&&next>today){alert("Du bist beim heutigen Tag angekommen.");return}
   let month=next.slice(0,7),monthEl=document.getElementById("historyMonth"),dayEl=document.getElementById("historyDay");monthEl.value=month;renderHistoricalMonth();if([...dayEl.options].some(o=>o.value===next)){dayEl.value=next;renderHistoricalDayEditor()}
 }
-function saveHistoricalDayEntry(goNext=false){let month=document.getElementById("historyMonth").value,k=historyDayKey(),from=document.getElementById("historyFrom").value,to=document.getElementById("historyTo").value,pause=Number(document.getElementById("historyPause").value||0),nd=!!document.getElementById("historyNotdienst").checked;
+function saveHistoricalDayEntry(goNext=false){if(!requireAdminForHistory())return;let month=document.getElementById("historyMonth").value,k=historyDayKey(),from=document.getElementById("historyFrom").value,to=document.getElementById("historyTo").value,pause=Number(document.getElementById("historyPause").value||0),nd=!!document.getElementById("historyNotdienst").checked;
   if(!month||!k)return alert("Bitte Monat und Tag auswählen.");if(k>localTodayKey())return alert("Zukünftige Tage können nicht nachgetragen werden.");if(state.monthlyRecords[month])return alert("Für diesen Monat ist noch ein alter Monats-Gesamtnachtrag vorhanden. Bitte diesen zuerst löschen.");if(!from||!to)return alert("Bitte Kommen und Gehen eintragen.");let gross=mins(to)-mins(from);if(gross<0)gross+=1440;if(gross<=0)return alert("Die Gehen-Zeit muss nach der Kommen-Zeit liegen.");if(!Number.isFinite(pause)||pause<0||pause>=gross)return alert("Bitte eine gültige Pause in Minuten eingeben.");if(nd&&![0,6].includes(dayNumber(k)))return alert("Notfalldienst ×2 kann nur für Samstag oder Sonntag gewählt werden.");if(getAbs(k))return alert("Für diesen Tag ist eine Abwesenheit eingetragen. Bitte diese zuerst im Kalender löschen oder ändern.");
   let existing=state.days[k];if(existing&&existing.sessions&&existing.sessions.length&&!existing.historicalManual)return alert("Für diesen Tag sind bereits normale Stempelungen vorhanden. Nutze dafür die Zeitkorrekturen.");let old=existing?.historicalManual?`${existing.historicalManual.from}–${existing.historicalManual.to}, Pause ${existing.historicalManual.pauseMinutes||0} Min.`:"kein Eintrag";state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].historicalManual={from,to,pauseMinutes:Math.round(pause),notdienst:nd,updatedAt:new Date().toISOString()};logCorrection(k,"Tag nachgetragen",old,`${from}–${to}, Pause ${Math.round(pause)} Min.${nd?", Notfalldienst ×2":""}`,"Tageweiser Schnellnachtrag");save();overviewMonthKey=month;document.getElementById("overviewMonth").value=month;renderHistoricalMonth();renderOverview();if(goNext)advanceHistoryDay(1);
 }
-function deleteHistoricalDayEntry(){let k=historyDayKey(),d=state.days[k];if(!d?.historicalManual)return alert("Für diesen Tag gibt es keinen tageweisen Nachtrag.");if(!confirm("Diesen tageweisen Nachtrag wirklich löschen?"))return;let old=`${d.historicalManual.from}–${d.historicalManual.to}, Pause ${d.historicalManual.pauseMinutes||0} Min.`;delete d.historicalManual;if((!d.sessions||!d.sessions.length)&&(!d.pauses||!d.pauses.length)&&!d.activePause)delete state.days[k];logCorrection(k,"Tagesnachtrag gelöscht",old,"gelöscht","Tageweiser Nachtrag alter Monat");save();renderHistoricalMonth();renderOverview();
+function deleteHistoricalDayEntry(){if(!requireAdminForHistory())return;let k=historyDayKey(),d=state.days[k];if(!d?.historicalManual)return alert("Für diesen Tag gibt es keinen tageweisen Nachtrag.");if(!confirm("Diesen tageweisen Nachtrag wirklich löschen?"))return;let old=`${d.historicalManual.from}–${d.historicalManual.to}, Pause ${d.historicalManual.pauseMinutes||0} Min.`;delete d.historicalManual;if((!d.sessions||!d.sessions.length)&&(!d.pauses||!d.pauses.length)&&!d.activePause)delete state.days[k];logCorrection(k,"Tagesnachtrag gelöscht",old,"gelöscht","Tageweiser Nachtrag alter Monat");save();renderHistoricalMonth();renderOverview();
 }
 
 function renderAdmin(){
@@ -1438,8 +1459,9 @@ document.getElementById("adminLoginBtn").onclick=()=>{
   adminUnlocked=true;
   document.getElementById("adminPin").value="";
   renderAdmin();
+  updateHistoryAdminLock();
 };
-document.getElementById("adminLogoutBtn").onclick=()=>{adminUnlocked=false;renderAdmin()};
+document.getElementById("adminLogoutBtn").onclick=()=>{adminUnlocked=false;renderAdmin();updateHistoryAdminLock()};
 document.getElementById("adminDate").addEventListener("change",renderAdmin);
 document.getElementById("addWorkBlock").onclick=()=>{
   if(!adminUnlocked)return;
@@ -1466,7 +1488,7 @@ document.getElementById("historyNextDay").onclick=()=>advanceHistoryDay(1);
 document.getElementById("saveHistoricalDay").onclick=()=>saveHistoricalDayEntry(false);
 document.getElementById("saveHistoricalDayNext").onclick=()=>saveHistoricalDayEntry(true);
 document.getElementById("deleteHistoricalDay").onclick=deleteHistoricalDayEntry;
-document.getElementById("deleteLegacyMonthRecord").onclick=()=>{let month=document.getElementById("historyMonth").value,old=state.monthlyRecords[month];if(!old)return;if(!confirm("Den alten Monats-Gesamtnachtrag wirklich löschen? Die bisherigen Tagesdaten und Abwesenheiten bleiben erhalten."))return;logCorrection(month+"-01","Monats-Gesamtnachtrag gelöscht",`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`,"gelöscht","Umstellung auf tageweise Nachträge v20");delete state.monthlyRecords[month];save();renderHistoricalMonth();renderOverview();
+document.getElementById("deleteLegacyMonthRecord").onclick=()=>{if(!requireAdminForHistory())return;let month=document.getElementById("historyMonth").value,old=state.monthlyRecords[month];if(!old)return;if(!confirm("Den alten Monats-Gesamtnachtrag wirklich löschen? Die bisherigen Tagesdaten und Abwesenheiten bleiben erhalten."))return;logCorrection(month+"-01","Monats-Gesamtnachtrag gelöscht",`${fmt(old.workedMinutes)} Ist / ${fmt(old.targetMinutes)} Soll`,"gelöscht","Umstellung auf tageweise Nachträge v20");delete state.monthlyRecords[month];save();renderHistoricalMonth();renderOverview();
 };
 
 document.getElementById("resetBtn").onclick=()=>{if(!confirm("Aktuelles Profil mit allen Zeitdaten wirklich löschen?"))return;let ids=Object.keys(app.profiles);if(ids.length===1){state=normalizeProfile({...empty(),name:state.name||"Mitarbeiter 1"});app.profiles[app.activeProfileId]=state}else{delete app.profiles[app.activeProfileId];app.activeProfileId=Object.keys(app.profiles)[0];state=app.profiles[app.activeProfileId]}storageSet(APP_KEY,JSON.stringify(app));renderAll()};
@@ -1599,6 +1621,6 @@ document.getElementById("exportBtn").onclick=()=>{
   a.href=url;a.download=`Arbeitszeiten_${(state.name||"Profil").replace(/\s+/g,"_")}.csv`;a.click();URL.revokeObjectURL(url);
 };
 document.getElementById("updateAppBtn").onclick=async()=>{try{if("serviceWorker" in navigator){let regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()));}if("caches" in window){let ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}location.reload()};
-window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=29blue2").then(r=>r.update()).catch(()=>{});
+window.addEventListener("resize",()=>requestAnimationFrame(fitHeaderEmployeeName));window.addEventListener("orientationchange",()=>setTimeout(fitHeaderEmployeeName,100));maybeShowWhatsNew();renderAll();updateHistoryAdminLock();updateLiveClock();setInterval(updateLiveClock,1000);setInterval(renderToday,60000);if((location.protocol==="https:"||location.protocol==="http:")&&"serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=29blue3").then(r=>r.update()).catch(()=>{});
 </script>
 </body></html>

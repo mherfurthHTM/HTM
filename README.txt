@@ -26,3 +26,7 @@ Design:
 
 Hinweis:
 Aptos wird verwendet, wenn die Schrift auf dem Gerät vorhanden ist. Andernfalls verwendet die App automatisch eine kompatible Systemschrift.
+
+Sicherheit Beta 0.029:
+- Admin-Schutz für historische Nachträge
+- Vergangene Stunden können erst nach PIN-Freigabe im Adminbereich geändert werden
