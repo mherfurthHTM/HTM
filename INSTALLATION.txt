@@ -1,4 +1,4 @@
-HTM Beta 0.031 – vollständiges GitHub-Pages-Uploadpaket
+HTM Beta 0.032 – vollständiges GitHub-Pages-Uploadpaket
 
 WICHTIG VOR DEM UPDATE
 1. In der bestehenden HTM-App zuerst unter Daten eine Datensicherung erstellen.
@@ -20,7 +20,7 @@ UPLOAD AUF GITHUB
 2. Die Dateien im Hauptverzeichnis durch die Dateien aus diesem Paket ersetzen.
 3. Die Ordner icons und qr ebenfalls vollständig hochladen/ersetzen.
 4. Commit changes bestätigen.
-5. GitHub Pages kurz Zeit zum Aktualisieren geben.
+5. Nach dem Upload die GitHub-Pages-Version neu öffnen.
 6. HTM auf dem iPhone komplett schliessen und wieder öffnen.
 7. Falls noch die alte Oberfläche erscheint: in HTM „App aktualisieren“ drücken oder Safari einmal neu laden.
 
@@ -30,4 +30,4 @@ Bei einem normalen Update unter derselben GitHub-Pages-Adresse bleiben vorhanden
 Eine Datensicherung vor dem Update wird trotzdem ausdrücklich empfohlen.
 
 VERSION
-Beta 0.031 – Blue Design
+Beta 0.032 – Blue Design

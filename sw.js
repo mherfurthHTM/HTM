@@ -1,4 +1,4 @@
-const CACHE="htm-beta-0.031-blue2";
+const CACHE="htm-beta-0.032-pdf-corporate";
 const ASSETS=[
   "./",
   "./index.html",
