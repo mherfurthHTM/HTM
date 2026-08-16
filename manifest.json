@@ -22,5 +22,5 @@
   "id": "./",
   "scope": "./",
   "orientation": "portrait-primary",
-  "description": "HTM Arbeitszeiterfassung Beta 0.032 mit bearbeitbaren Mitarbeiterdaten, professionellem PDF-Arbeitszeitauszug, Sollzeit-Arbeitsmodellen, PDF/CSV, QR-Code und Datensicherung."
+  "description": "HTM Arbeitszeiterfassung Beta 0.033 mit eigener Abwesenheitsart „Kind krank“, direkter Uhrzeiteingabe, Pause von/bis, zuverlässigem Tageswechsel beim Nachtragen, professioneller PDF-Übersicht, Mitarbeiterdaten, QR-Code und Datensicherung."
 }

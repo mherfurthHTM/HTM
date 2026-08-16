@@ -1,29 +1,41 @@
 HTM – Arbeitszeiterfassung
 
-Neu in Beta 0.032:
-- PDF-Arbeitszeitauszug vollständig neu gestaltet
-- professionelles A4-Hochformat mit HTM-Kopfzeile
-- Mitarbeiter, Zeitraum und Erstellungsdatum klar zusammengefasst
-- vier Kennzahlen für Arbeitszeit, Zeitgutschrift, Sollzeit und Saldo
-- dezente Legende für Arbeit, Ferien, Krankheit und Überstundenabbau
-- sachliche Tages-Tabelle mit Kommen, Gehen, Pause, Arbeitszeit, Soll und Saldo
-- Gesamtübersicht, Dokumentfuss und Seitenzahlen
-- PDF-Vorschau in der App entspricht dem neuen Design
-- Mitarbeiterdaten unter Einstellungen sichtbar und nachträglich bearbeitbar
-- Handynummer und E-Mail als optionale Profilfelder ergänzt
+Neu in Beta 0.033:
+- Im Kalender unter „Auswahl bearbeiten“ ist „Kind krank“ als eigene Abwesenheitsart verfügbar
+- „Kind krank“ wird im Kalender rot gekennzeichnet, aber als eigener Status gespeichert
+- In der PDF wird „Kind krank“ getrennt von den eigenen Krankheitstagen ausgewiesen
+- Bestehende Daten und Einstellungen aus Beta 0.033 bleiben erhalten
 
-Bisher in Beta 0.030:
+Bisher in Beta 0.033:
+- Uhrzeiten beim manuellen Nachtragen direkt eintippen statt über das Zeitrad scrollen
+- Eingaben wie 700 oder 07:00 werden als 07:00 erkannt
+- Pause wird jetzt mit „Pause von“ und „Pause bis“ erfasst
+- Pausendauer wird automatisch berechnet
+- „Speichern & nächster Tag“ öffnet zuverlässig den folgenden Kalendertag
+- Bei einem leeren Folgetag werden Kommen, Gehen sowie Pause von/bis übernommen
+- Bereits gespeicherte Folgetage behalten ihre eigenen Werte
+- Auch bei der nachträglichen Arbeitstags-Korrektur im Kalender ist die direkte Uhrzeiteingabe verfügbar
+- PDF-Auszug enthält eine deutlich sichtbare Tagesübersicht mit Ferientagen und Krankheitstagen
+- Bestehende Daten aus Beta 0.032 bleiben kompatibel; alte Einträge mit nur gespeicherter Pausendauer werden weiter korrekt berechnet
+
+Bisher in Beta 0.032:
+- professioneller PDF-Arbeitszeitauszug im A4-Hochformat
+- Mitarbeiter, Zeitraum und Erstellungsdatum klar zusammengefasst
+- Kennzahlen für Arbeitszeit, Zeitgutschrift, Sollzeit und Saldo
+- Tages-Tabelle mit Kommen, Gehen, Pause, Arbeitszeit, Soll und Saldo
+- Mitarbeiterdaten unter Einstellungen sichtbar und nachträglich bearbeitbar
+- PWA-Update-System für GitHub Pages / iPhone verbessert
+
+Bisher in Beta 0.030/0.031:
 - Individuelles Arbeitsmodell pro Mitarbeiter
 - Arbeitstage Montag bis Freitag frei auswählbar
 - Sollzeit je Wochentag einstellbar
 - Arbeitsmodelle mit Gültig-ab-Datum
 - Sollzeit-Berechnung rückwirkend ab 01.01.2026 möglich
-- Monats-Sollzeit wird automatisch aus dem hinterlegten Arbeitsmodell berechnet
-- Stempelbuttons bleiben im 2×2-Raster
+- Arbeitstage direkt im Kalender bearbeiten und löschen
+- Abwesenheiten direkt im Kalender bearbeiten und löschen
 
-Beta 0.032 – Blue Design
-
-Diese Version basiert auf der vollständigen bisherigen HTM-Web-App-Struktur.
+Beta 0.033 – Blue Design
 
 Enthalten:
 - Stempeln: Kommen, Pause starten/beenden, Gehen
@@ -40,29 +52,5 @@ Enthalten:
 - JSON-Datensicherung
 - PWA/Web-App mit Manifest und Service Worker
 
-Design:
-- blaues HTM-Design
-- Aptos als bevorzugte Schriftart mit System-Fallback
-- responsive Kopfzeile mit Mitarbeiter, Live-Uhr und HTM
-- kompaktere Stempelbuttons
-
-Hinweis:
-Aptos wird verwendet, wenn die Schrift auf dem Gerät vorhanden ist. Andernfalls verwendet die App automatisch eine kompatible Systemschrift.
-
-Sicherheit (bestehend):
-- Admin-Schutz für historische Nachträge
-- Vergangene Stunden können erst nach PIN-Freigabe im Adminbereich geändert werden
-
-Nachtrag (bestehend):
-- „Speichern & nächster Tag“ springt zuverlässig auf den nächsten Kalendertag.
-- Von-, Bis- und Pausenzeit werden bei einem leeren Folgetag automatisch übernommen.
-- Bereits gespeicherte Folgetage zeigen weiterhin ihre eigenen gespeicherten Zeiten.
-
-Korrektur (bestehend):
-- Manuell nachgetragene normale Arbeitstage werden in Übersicht, Kalender, PDF und CSV als „Arbeit“ angezeigt.
-- „Zusatzarbeit / Notdienst ×2“ erscheint nur, wenn beim Nachtrag Notfalldienst ausdrücklich aktiviert wurde.
-
-Korrektur (bestehend):
-- Die Monats-Sollzeit in Übersicht und Kalender wird jetzt aus dem eingestellten Arbeitsmodell berechnet.
-- Berücksichtigt werden ausgewählte Arbeitstage, Sollzeit je Arbeitstag und die hinterlegten Feiertage.
-- Die Sollzeit wird auch bei alten, tageweise nachgetragenen Monaten vollständig angezeigt.
+DATENERHALT
+Die App verwendet weiterhin denselben lokalen Speicherschlüssel „htm_app_data_v1“. Bei einem Update unter derselben GitHub-Pages-Adresse bleiben vorhandene Profile, Zeiten und Einstellungen erhalten.

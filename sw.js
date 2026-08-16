@@ -1,4 +1,4 @@
-const CACHE="htm-beta-0.032-profile-edit";
+const CACHE="htm-beta-0.033-kind-krank";
 const ASSETS=[
   "./",
   "./index.html",
