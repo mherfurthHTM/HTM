@@ -234,7 +234,19 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 /* Settings/Admin */
 #settingsView .card,#admin .card{border-color:#e5eaf0}#settingsView h2,#admin h2{color:#173a68}.admin-entry{border-color:#e7ebf1!important;background:#fbfcfe!important}.update-modal,.employee-modal,.pdf-modal{border-radius:18px!important}
 
-/* Beta 0.033 – Kind krank im Kalender */
+/* Beta 0.034 – Kind krank im Kalender */
+
+/* Krankheit: Teilzeit + PDF-Nachweis */
+.sick-detail-box{margin-top:10px;padding:12px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff}
+.sick-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sick-hours-box{margin-top:10px}
+.sick-pdf-row{margin-top:10px;padding-top:10px;border-top:1px solid #dbeafe}
+.sick-pdf-info{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.sick-pdf-chip{display:inline-flex;align-items:center;gap:6px;background:#eef5ff;border:1px solid #cfe0ff;color:#1d4ed8;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}
+.sick-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.sick-actions button{padding:6px 8px;font-size:11px}
+@media(max-width:600px){.sick-detail-grid{grid-template-columns:1fr}}
+
 .manual-time-input{font-variant-numeric:tabular-nums;letter-spacing:.5px;font-weight:750}
 .manual-time-hint{font-size:10px;color:#6b7280;margin-top:5px;line-height:1.35}
 .pause-range-title{font-size:11px;font-weight:800;color:#40516a;margin:12px 0 6px}
@@ -294,7 +306,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
   </div>
   <div class="brand-right">
     <h1 style="margin:0">HTM</h1>
-    <div class="version-badge">Beta 0.033</div>
+    <div class="version-badge">Beta 0.034</div>
   </div>
 </div>
 
@@ -357,10 +369,26 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
   <div class="calendar-work-hint">Eine Korrektur überschreibt nur die Berechnung dieses Tages. Ursprüngliche Stempelungen bleiben im Änderungsprotokoll nachvollziehbar. „Tag löschen“ entfernt die Zeiterfassung dieses Tages vollständig.</div>
 </div>
 <button id="calendarAbsenceAddBtn" class="calendar-big-add" type="button">＋ Abwesenheit / Überstundenabbau hinzufügen</button>
-<div class="card calendar-editor-card" id="calendarEditorCard"><h2>Auswahl bearbeiten</h2><div class="grid2"><div><label for="calFrom">Von</label><input id="calFrom" type="date"></div><div><label for="calTo">Bis</label><input id="calTo" type="date"></div></div><div style="margin-top:10px"><label for="calType">Art</label><select id="calType"><option value="Ferien">Ferien / Urlaub</option><option value="Krank">Krankheit</option><option value="KindKrank">Kind krank</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option></select></div><div id="calendarEditInfo" class="small" style="margin-top:9px"></div><div class="grid2" style="margin-top:12px"><button id="saveCalendarEntry" class="secondary">Speichern / ändern</button><button id="deleteCalendarEntry" class="danger">Auswahl löschen</button></div><button id="clearCalendarSelection" class="mutedbtn" style="width:100%;margin-top:10px">Auswahl zurücksetzen</button><div class="small" style="margin-top:9px">Ferien und bezahlte Abwesenheiten werden nur an regulären Arbeitstagen angerechnet. Bereits eingetragene Ferien können hier geändert oder gelöscht werden.</div></div>
+<div class="card calendar-editor-card" id="calendarEditorCard"><h2>Auswahl bearbeiten</h2><div class="grid2"><div><label for="calFrom">Von</label><input id="calFrom" type="date"></div><div><label for="calTo">Bis</label><input id="calTo" type="date"></div></div><div style="margin-top:10px"><label for="calType">Art</label><select id="calType"><option value="Ferien">Ferien / Urlaub</option><option value="Krank">Krankheit</option><option value="KindKrank">Kind krank</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option></select></div>
+<div id="calSickBox" class="sick-detail-box" style="display:none">
+  <div class="sick-detail-grid">
+    <div><label for="calSickMode">Umfang der Krankmeldung</label><select id="calSickMode"><option value="full">Ganzer Tag</option><option value="half">Halber Tag</option><option value="remaining">Restlicher Arbeitstag</option><option value="hours">Stundenweise</option></select></div>
+    <div id="calSickHoursBox" class="sick-hours-box" style="display:none"><label for="calSickHours">Krank in Stunden</label><input id="calSickHours" type="number" min="0.25" max="16" step="0.25" value="4.25"></div>
+  </div>
+  <div class="sick-pdf-row"><label for="calSickPdf">Krankmeldung / Arztzeugnis als PDF (optional)</label><input id="calSickPdf" type="file" accept="application/pdf,.pdf"><div id="calSickPdfInfo" class="sick-pdf-info">Noch keine PDF hinterlegt.</div></div>
+</div>
+<div id="calendarEditInfo" class="small" style="margin-top:9px"></div><div class="grid2" style="margin-top:12px"><button id="saveCalendarEntry" class="secondary">Speichern / ändern</button><button id="deleteCalendarEntry" class="danger">Auswahl löschen</button></div><button id="clearCalendarSelection" class="mutedbtn" style="width:100%;margin-top:10px">Auswahl zurücksetzen</button><div class="small" style="margin-top:9px">Ferien und bezahlte Abwesenheiten werden nur an regulären Arbeitstagen angerechnet. Bei Krankheit sind auch halbe Tage, Stunden oder der restliche Arbeitstag möglich.</div></div>
 
 <div class="card calendar-helper-card"><h2>Abwesenheiten &amp; Überstundenabbau</h2><div class="small">Hier kannst du weitere Abwesenheiten und den Abbau von Überstunden direkt im Kalenderbereich erfassen.</div></div>
-<div class="card calendar-editor-card" id="absenceEditorCard"><h2>Weitere Abwesenheit / Überstundenabbau</h2><div class="grid2"><div><label for="absenceFrom">Von</label><input id="absenceFrom" type="date"></div><div><label for="absenceTo">Bis</label><input id="absenceTo" type="date"></div></div><div style="margin-top:10px"><label for="absenceType">Art</label><select id="absenceType"><option value="Krank">Krankheit</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option><option value="Ueberstundenabbau">Überstundenabbau</option></select></div><div id="hoursBox" style="display:none;margin-top:10px"><label for="absenceHours">Überstundenabbau in Stunden pro Tag</label><input id="absenceHours" type="number" min="0.25" max="16" step="0.25" value="8.5"></div><button id="saveAbsence" class="secondary" style="width:100%;margin-top:12px">Abwesenheit speichern</button><div class="small" style="margin-top:10px">Einträge werden nur an regulären Arbeitstagen angelegt. Überstundenabbau reduziert das Überstundenkonto.</div></div><div class="card"><h2>Gespeicherte Abwesenheiten</h2><div id="absenceList"></div></div></section>
+<div class="card calendar-editor-card" id="absenceEditorCard"><h2>Weitere Abwesenheit / Überstundenabbau</h2><div class="grid2"><div><label for="absenceFrom">Von</label><input id="absenceFrom" type="date"></div><div><label for="absenceTo">Bis</label><input id="absenceTo" type="date"></div></div><div style="margin-top:10px"><label for="absenceType">Art</label><select id="absenceType"><option value="Krank">Krankheit</option><option value="KindKrank">Kind krank</option><option value="Hochzeit">Hochzeit</option><option value="Todesfall">Todesfall / Trauerfall</option><option value="Arzt">Arzt / medizinische Abwesenheit</option><option value="Militaer">Militär / Zivilschutz</option><option value="Sonstige">Sonstige bezahlte Abwesenheit</option><option value="Ueberstundenabbau">Überstundenabbau</option></select></div>
+<div id="absenceSickBox" class="sick-detail-box">
+  <div class="sick-detail-grid">
+    <div><label for="absenceSickMode">Umfang der Krankmeldung</label><select id="absenceSickMode"><option value="full">Ganzer Tag</option><option value="half">Halber Tag</option><option value="remaining">Restlicher Arbeitstag</option><option value="hours">Stundenweise</option></select></div>
+    <div id="absenceSickHoursBox" class="sick-hours-box" style="display:none"><label for="absenceSickHours">Krank in Stunden</label><input id="absenceSickHours" type="number" min="0.25" max="16" step="0.25" value="4.25"></div>
+  </div>
+  <div class="sick-pdf-row"><label for="absenceSickPdf">Krankmeldung / Arztzeugnis als PDF (optional)</label><input id="absenceSickPdf" type="file" accept="application/pdf,.pdf"><div id="absenceSickPdfInfo" class="sick-pdf-info">Noch keine PDF hinterlegt.</div></div>
+</div>
+<div id="hoursBox" style="display:none;margin-top:10px"><label for="absenceHours">Überstundenabbau in Stunden pro Tag</label><input id="absenceHours" type="number" min="0.25" max="16" step="0.25" value="8.5"></div><button id="saveAbsence" class="secondary" style="width:100%;margin-top:12px">Abwesenheit speichern</button><div class="small" style="margin-top:10px">Einträge werden nur an regulären Arbeitstagen angelegt. Bei Krankheit kann auch ein Teil des Tages erfasst und eine PDF-Krankmeldung hinterlegt werden.</div></div><div class="card"><h2>Gespeicherte Abwesenheiten</h2><div id="absenceList"></div></div></section>
 
 <section id="overview" class="view">
   <div class="card">
@@ -528,7 +556,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 
   <div class="card">
     <h2>App-Version</h2>
-    <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.033</b></div>
+    <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.034</b></div>
     <div class="small" style="margin-top:8px">Blaues Design aus Beta 0.029. Neu: Mitarbeiterdaten sind unter Einstellungen sichtbar und jederzeit bearbeitbar. Arbeitsmodelle, Sollzeit je Tag und Monats-Sollzeit bleiben vollständig erhalten.</div>
     <button id="updateAppBtn" class="secondary" style="width:100%;margin-top:12px">App aktualisieren</button>
   </div>
@@ -670,12 +698,14 @@ ensureActiveProfile();
 let state=app.profiles[app.activeProfileId], calendarCursor=new Date(), calendarPickStart=null, overviewMonthKey=localTodayKey().slice(0,7);
 applyJan2026BackfillMigration();
 state=app.profiles[app.activeProfileId];
-const APP_VERSION="Beta 0.033";
-const APP_VERSION_CODE="0.033";
+const APP_VERSION="Beta 0.034";
+const APP_VERSION_CODE="0.034";
 const CHANGELOG_VERSIONS=[
-  {version:"0.033",items:[
+  {version:"0.034",items:[
     "Im Kalender unter Auswahl bearbeiten steht jetzt Kind krank als eigene Abwesenheitsart zur Verfügung.",
-    "Kind krank bleibt in Kalender und PDF klar von eigener Krankheit getrennt und wird als bezahlte Abwesenheit berücksichtigt."
+    "Kind krank bleibt in Kalender und PDF klar von eigener Krankheit getrennt und wird als bezahlte Abwesenheit berücksichtigt.",
+    "Krankheit kann als ganzer Tag, halber Tag, restlicher Arbeitstag oder stundenweise erfasst werden.",
+    "Zu Krankheit und Kind krank kann optional eine PDF-Krankmeldung bzw. ein Arztzeugnis lokal in der App hinterlegt werden."
   ]},
   {version:"0.033",items:[
     "Manuelle Zeiteingaben können jetzt direkt über die Tastatur als Uhrzeit eingegeben werden – ohne Zeitrad/Scrollen.",
@@ -922,8 +952,107 @@ function isCalendarCorrectionDay(k){return !!(state.days[k]?.historicalManual&&s
 function worked(day){let hm=historicalManualMinutes(day);if(hm!==null)return hm;if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>s+sessionMinutes(x,day),0)}
 function creditedWorked(day){let hm=historicalManualMinutes(day);if(hm!==null){let weekend=[0,6].includes(dayNumber(day.date));return hm*((day.historicalManual.notdienst&&weekend)?2:1)}if(!day||!day.sessions)return 0;return day.sessions.reduce((s,x)=>{let m=sessionMinutes(x,day),weekend=dayNumber(day.date)===0||dayNumber(day.date)===6;return s+m*((x.notdienst&&weekend)?2:1)},0)}
 function getAbs(k){return state.absences[k]||null}
+function isSickTypeCode(type){return type==="Krank"||type==="KindKrank"}
+function isPartialSick(a){return !!(a&&isSickTypeCode(a.type)&&["half","hours","remaining"].includes(a.sickMode))}
+function absenceAllowsWork(a){return isPartialSick(a)}
+function sickCreditMinutes(a,k){
+  if(!a||!isSickTypeCode(a.type))return 0;
+  let target=targetFor(k),mode=a.sickMode||"full";
+  if(mode==="half")return Math.round(target/2);
+  if(mode==="hours"||mode==="remaining")return Math.max(0,Math.min(target,Math.round(Number(a.sickMinutes||0))));
+  return target;
+}
+function absenceDayFraction(a,k){
+  if(!a)return 0;
+  if(!isSickTypeCode(a.type))return 1;
+  let target=targetFor(k);if(!target)return 0;
+  return Math.max(0,Math.min(1,sickCreditMinutes(a,k)/target));
+}
+function sickDurationLabel(a,k){
+  if(!a||!isSickTypeCode(a.type))return "";
+  let mode=a.sickMode||"full",minsVal=sickCreditMinutes(a,k);
+  if(mode==="half")return `Halber Tag · ${fmt(minsVal)} h`;
+  if(mode==="hours")return `${fmt(minsVal)} h krank`;
+  if(mode==="remaining")return `Restlicher Arbeitstag · ${fmt(minsVal)} h`;
+  return "Ganzer Tag";
+}
+function absenceStatusLabel(a,k){
+  if(!a)return "";
+  return isSickTypeCode(a.type)?`${labelType(a.type)} · ${sickDurationLabel(a,k)}`:labelType(a.type);
+}
 function overtimeReduction(a,k=keyOf()){return a&&a.type==="Ueberstundenabbau"?Math.round(Number(a.hours||(baseTargetFor(k)/60)||0)*60):0}
-function dailyBalance(k){let target=targetFor(k),a=getAbs(k),credit=creditedWorked(state.days[k]);if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a,k);if(a)return 0;return credit-target}
+function dailyBalance(k){
+  let target=targetFor(k),a=getAbs(k),credit=creditedWorked(state.days[k]);
+  if(a&&a.type==="Ueberstundenabbau")return -overtimeReduction(a,k);
+  if(a&&isPartialSick(a))return credit+sickCreditMinutes(a,k)-target;
+  if(a)return 0;
+  return credit-target;
+}
+
+const HTM_DOC_DB="htm_documents_v1",HTM_DOC_STORE="files";
+function htmDocDb(){
+  return new Promise((resolve,reject)=>{
+    if(!("indexedDB" in window))return reject(new Error("IndexedDB nicht verfügbar"));
+    let req=indexedDB.open(HTM_DOC_DB,1);
+    req.onupgradeneeded=()=>{let db=req.result;if(!db.objectStoreNames.contains(HTM_DOC_STORE))db.createObjectStore(HTM_DOC_STORE,{keyPath:"id"})};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error("Dokumentenspeicher konnte nicht geöffnet werden"));
+  });
+}
+async function storeSickPdf(file){
+  if(!file)return null;
+  if(!(file.type==="application/pdf"||/\.pdf$/i.test(file.name||"")))throw new Error("Bitte eine PDF-Datei auswählen.");
+  const max=15*1024*1024;if(file.size>max)throw new Error("Die PDF ist grösser als 15 MB.");
+  let id=`sick_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`,db=await htmDocDb();
+  await new Promise((resolve,reject)=>{let tx=db.transaction(HTM_DOC_STORE,"readwrite");tx.objectStore(HTM_DOC_STORE).put({id,name:file.name||"Krankmeldung.pdf",type:"application/pdf",size:file.size,createdAt:new Date().toISOString(),blob:file});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close();
+  return {documentId:id,documentName:file.name||"Krankmeldung.pdf",documentSize:file.size};
+}
+async function getSickPdf(id){
+  if(!id)return null;let db=await htmDocDb();
+  let rec=await new Promise((resolve,reject)=>{let tx=db.transaction(HTM_DOC_STORE,"readonly"),req=tx.objectStore(HTM_DOC_STORE).get(id);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)});
+  db.close();return rec;
+}
+async function deleteStoredSickPdf(id){
+  if(!id)return;try{let db=await htmDocDb();await new Promise((resolve,reject)=>{let tx=db.transaction(HTM_DOC_STORE,"readwrite");tx.objectStore(HTM_DOC_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}catch(e){}
+}
+async function cleanupSickPdfIfUnused(id){
+  if(!id)return;if(Object.values(state.absences||{}).some(a=>a&&a.documentId===id))return;await deleteStoredSickPdf(id);
+}
+function pdfInfoText(a){
+  if(!a||!a.documentId)return "Noch keine PDF hinterlegt.";
+  let kb=Math.max(1,Math.round(Number(a.documentSize||0)/1024));
+  return `PDF hinterlegt: ${a.documentName||"Krankmeldung.pdf"}${a.documentSize?` · ${kb} KB`:""}`;
+}
+async function openSickPdfForKey(k){
+  let a=getAbs(k);if(!a||!a.documentId)return alert("Für diesen Eintrag ist keine PDF hinterlegt.");
+  let tab=null;try{tab=window.open("about:blank","_blank")}catch(e){}
+  try{let rec=await getSickPdf(a.documentId);if(!rec||!rec.blob){if(tab)tab.close();return alert("Die hinterlegte PDF ist auf diesem Gerät nicht mehr verfügbar.")}let url=URL.createObjectURL(rec.blob);if(tab)tab.location.href=url;else window.location.href=url;setTimeout(()=>URL.revokeObjectURL(url),120000)}catch(e){if(tab)tab.close();alert("Die PDF konnte nicht geöffnet werden.")}
+}
+async function removeSickPdfForKey(k){
+  let a=getAbs(k);if(!a||!a.documentId)return;let id=a.documentId;if(!confirm("Hinterlegte PDF wirklich entfernen?"))return;delete a.documentId;delete a.documentName;delete a.documentSize;save();await cleanupSickPdfIfUnused(id);
+}
+function syncSickBox(prefix,type){
+  let sick=isSickTypeCode(type),box=document.getElementById(prefix+"SickBox");if(box)box.style.display=sick?"block":"none";
+  let ot=document.getElementById("hoursBox");if(prefix==="absence"&&ot)ot.style.display=type==="Ueberstundenabbau"?"block":"none";
+  updateSickModeUi(prefix);
+}
+function updateSickModeUi(prefix){
+  let mode=document.getElementById(prefix+"SickMode")?.value||"full",hours=document.getElementById(prefix+"SickHoursBox");if(hours)hours.style.display=mode==="hours"?"block":"none";
+}
+function loadSickEditor(prefix,k){
+  let a=k?getAbs(k):null,mode=a&&isSickTypeCode(a.type)?(a.sickMode||"full"):"full",sel=document.getElementById(prefix+"SickMode");if(sel)sel.value=mode;
+  let hours=document.getElementById(prefix+"SickHours");if(hours&&a&&["hours","remaining"].includes(mode))hours.value=(sickCreditMinutes(a,k)/60).toFixed(2).replace(/\.00$/,"");
+  let info=document.getElementById(prefix+"SickPdfInfo");if(info)info.textContent=pdfInfoText(a);
+  let input=document.getElementById(prefix+"SickPdf");if(input)input.value="";
+  updateSickModeUi(prefix);
+}
+function sickEntryForDay(type,mode,k,hoursValue,pdfMeta,existing){
+  let entry={type,sickMode:mode||"full"};
+  if(mode==="hours"){let h=Number(hoursValue);if(!h||h<=0||h>16)throw new Error("Bitte eine gültige Krankheitsdauer in Stunden eingeben.");entry.sickMinutes=Math.round(h*60)}
+  else if(mode==="remaining"){entry.sickMinutes=Math.max(0,targetFor(k)-creditedWorked(state.days[k]));if(entry.sickMinutes<=0)throw new Error(`Am ${dateLabel(k)} ist keine restliche Sollzeit mehr offen.`)}
+  if(pdfMeta)Object.assign(entry,pdfMeta);
+  else if(existing&&existing.documentId){entry.documentId=existing.documentId;entry.documentName=existing.documentName;entry.documentSize=existing.documentSize}
+  return entry;
+}
 function currentMonthKey(){return localTodayKey().slice(0,7)}
 function monthKeys(monthKey=overviewMonthKey){
   let [y,m]=monthKey.split("-").map(Number),arr=[],last=new Date(y,m,0).getDate();
@@ -1009,7 +1138,7 @@ async function captureLocation(force=false){
   return loc;
 }
 function warnLocationFailure(){if(state.settings.locationAtStamp&&lastLocationError)alert(`${tr("Die Zeit wurde gespeichert, aber der Standort konnte nicht ermittelt werden.")}\n\n${lastLocationError}`)}
-async function stampIn(){let k=keyOf();if(getAbs(k)){alert("Für heute ist bereits eine Abwesenheit eingetragen. Lösche oder ändere sie zuerst im Kalender.");return}if(currentSession()||activePause())return;let weekend=[0,6].includes(dayNumber(k)),notdienst=!!document.getElementById("notdienstMode").checked;if(notdienst&&!weekend){alert("Die ×2-Regel für Notfalldienst ist nur am Samstag und Sonntag aktiv.");notdienst=false;document.getElementById("notdienstMode").checked=false}let loc=await captureLocation();state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].sessions.push({in:nowTime(),out:null,notdienst,inLocation:loc});save();if(!loc)warnLocationFailure()}
+async function stampIn(){let k=keyOf(),abs=getAbs(k);if(abs&&!absenceAllowsWork(abs)){alert("Für heute ist bereits eine ganztägige Abwesenheit eingetragen. Lösche oder ändere sie zuerst im Kalender.");return}if(currentSession()||activePause())return;let weekend=[0,6].includes(dayNumber(k)),notdienst=!!document.getElementById("notdienstMode").checked;if(notdienst&&!weekend){alert("Die ×2-Regel für Notfalldienst ist nur am Samstag und Sonntag aktiv.");notdienst=false;document.getElementById("notdienstMode").checked=false}let loc=await captureLocation();state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].sessions.push({in:nowTime(),out:null,notdienst,inLocation:loc});save();if(!loc)warnLocationFailure()}
 function pauseStart(){let k=keyOf(),d=state.days[k],ss=currentSession();if(!d||!ss||activePause())return;ss.out=nowTime();d.pauses||=[];d.activePause={start:nowTime(),notdienst:!!ss.notdienst};save()}
 function pauseEnd(){let k=keyOf(),d=state.days[k];if(!d||!d.activePause||currentSession())return;let end=nowTime(),nd=!!d.activePause.notdienst;d.pauses||=[];d.pauses.push({start:d.activePause.start,end});d.activePause=null;d.sessions||=[];d.sessions.push({in:end,out:null,notdienst:nd});save()}
 async function stampOut(){if(activePause())return;let ss=currentSession();if(!ss)return;ss.out=nowTime();ss.outLocation=await captureLocation();let hasLoc=!!ss.outLocation;save();if(!hasLoc)warnLocationFailure()}
@@ -1043,13 +1172,13 @@ function renderCalendar(){
   }
   cal.innerHTML=h;cal.querySelectorAll("[data-date]").forEach(b=>b.onclick=()=>pickCalendarDate(b.dataset.date));renderCalendarEditInfo();renderCalendarDesignExtras();
 }
-function pickCalendarDate(k){document.getElementById("calendarEditorCard")?.classList.add("open");let cf=document.getElementById("calFrom"),ct=document.getElementById("calTo");if(!calendarPickStart){calendarPickStart=k;cf.value=k;ct.value=k;let a=getAbs(k);if(a&&a.type!=="Ueberstundenabbau")document.getElementById("calType").value=a.type}else{let a=calendarPickStart,b=k;if(b<a){let t=a;a=b;b=t}cf.value=a;ct.value=b;calendarPickStart=null}renderCalendar()}
+function pickCalendarDate(k){document.getElementById("calendarEditorCard")?.classList.add("open");let cf=document.getElementById("calFrom"),ct=document.getElementById("calTo");if(!calendarPickStart){calendarPickStart=k;cf.value=k;ct.value=k;let a=getAbs(k);if(a&&a.type!=="Ueberstundenabbau")document.getElementById("calType").value=a.type;syncSickBox("cal",document.getElementById("calType").value);loadSickEditor("cal",k)}else{let a=calendarPickStart,b=k;if(b<a){let t=a;a=b;b=t}cf.value=a;ct.value=b;calendarPickStart=null}renderCalendar()}
 
 function htmEsc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
 let calendarWorkEditDate="";
 function htmCalendarKind(a,w){if(a?.type==="Ferien")return "vac";if(a?.type==="Krank"||a?.type==="KindKrank")return "sick";if(a?.type==="Ueberstundenabbau")return "overtime";if(w>0)return "work";return "other"}
 function htmCalendarTimeText(k,d,a){
-  if(a)return a.type==="Ueberstundenabbau"?`${fmt(overtimeReduction(a))} h Abbau`:"Ganzer Tag";
+  if(a){if(a.type==="Ueberstundenabbau")return `${fmt(overtimeReduction(a))} h Abbau`;if(isSickTypeCode(a.type))return sickDurationLabel(a,k);return "Ganzer Tag"}
   if(!d)return "";
   if(d.historicalManual){let hm=d.historicalManual;return `${hm.from||"--:--"} - ${hm.to||"--:--"} · Pause: ${fmt(Number(hm.pauseMinutes||0))} h`}
   let ss=(d.sessions||[]).filter(x=>x.in);if(!ss.length)return "";let first=ss[0]?.in||"--:--",last=[...ss].reverse().find(x=>x.out)?.out||tr("läuft"),pm=pauseMinutes(d);return `${first} - ${last} · Pause: ${fmt(pm)} h`;
@@ -1057,7 +1186,7 @@ function htmCalendarTimeText(k,d,a){
 function renderCalendarDesignExtras(){
   let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),month=`${y}-${p(m+1)}`,today=localTodayKey(),rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,workDays=0,cards=[];
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth}
-  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0):(credit-target);workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?labelType(a.type):(historical&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="KindKrank"?labelType(a.type):a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
+  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=dailyBalance(k);workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?absenceStatusLabel(a,k):(historical&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="KindKrank"?labelType(a.type):a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
   let set=(id,value,cls="")=>{let e=document.getElementById(id);if(e){e.textContent=value;e.className=cls}};
   let st=document.getElementById("calSummaryTitle");if(st)st.textContent=`Monatsübersicht ${monthDisplay(month)}`;let plannedTarget=rec?targetMonth:monthTargetMinutes(month);set("calWorkDays",String(workDays));set("calTarget",`${fmt(plannedTarget)} h`);set("calWorked",`${fmt(workedMonth)} h`);set("calBalance",`${fmt(balanceMonth,true)} h`,balanceMonth>=0?"positive":"negative");set("calCredit",`${fmt(creditMonth)} h`);
   let list=document.getElementById("calendarDayCards");if(!list)return;cards.sort((a,b)=>b.k.localeCompare(a.k));
@@ -1089,15 +1218,25 @@ function saveCalendarWorkDayEdit(){
   let d=state.days[k]||{date:k,sessions:[],pauses:[],activePause:null},old=oldVals?`${oldVals.from}–${oldVals.to}, Pause ${Math.round(oldVals.pause||0)} Min.${oldVals.notdienst?", Notfalldienst ×2":""}`:"kein Eintrag";state.days[k]=d;d.historicalManual={from,to,pauseMinutes:pause,pauseFrom:pauseResult.from||"",pauseTo:pauseResult.to||"",notdienst:nd,updatedAt:new Date().toISOString(),source:"calendarCorrection"};logCorrection(k,"Arbeitszeit korrigiert",old,`${from}–${to}, Pause ${pause} Min.${nd?", Notfalldienst ×2":""}`,"Kalender Tagesübersicht");save();calendarWorkEditDate=k;openCalendarWorkEditor(k);alert("Arbeitszeit gespeichert.")
 }
 function deleteCalendarWorkDayByKey(k){let d=state.days[k];if(!d)return alert("Für diesen Tag ist keine Arbeitszeit gespeichert.");if(calendarDayHasOpenBooking(k))return alert("Dieser Arbeitstag läuft noch. Bitte zuerst die laufende Buchung beenden.");let vals=calendarWorkSourceValues(k),old=vals?`${vals.from}–${vals.to}, Pause ${Math.round(vals.pause||0)} Min.${vals.notdienst?", Notfalldienst ×2":""}`:`${fmt(worked(d))} h`;if(!confirm(`${dateLabel(k)} wirklich vollständig löschen?\n\nDie Arbeitszeit dieses Tages wird entfernt.`))return;delete state.days[k];logCorrection(k,"Arbeitstag gelöscht",old,"gelöscht","Kalender Tagesübersicht");if(calendarWorkEditDate===k)closeCalendarWorkEditor();save();renderCalendar();renderOverview()}
-function deleteCalendarAbsenceByKey(k){let a=getAbs(k);if(!a)return alert("Für diesen Tag ist keine Abwesenheit gespeichert.");if(!confirm(`${dateLabel(k)} – ${labelType(a.type)} wirklich löschen?`))return;delete state.absences[k];logCorrection(k,"Abwesenheit gelöscht",labelType(a.type),"gelöscht","Kalender Tagesübersicht");save();renderCalendar();renderOverview()}
+async function deleteCalendarAbsenceByKey(k){let a=getAbs(k);if(!a)return alert("Für diesen Tag ist keine Abwesenheit gespeichert.");if(!confirm(`${dateLabel(k)} – ${absenceStatusLabel(a,k)} wirklich löschen?`))return;let id=a.documentId;delete state.absences[k];logCorrection(k,"Abwesenheit gelöscht",absenceStatusLabel(a,k),"gelöscht","Kalender Tagesübersicht");save();await cleanupSickPdfIfUnused(id);renderCalendar();renderOverview()}
 function renderCalendarEditInfo(){let keys=selectedCalendarRange(),existing=keys.filter(k=>getAbs(k));let el=document.getElementById("calendarEditInfo");if(!keys.length)el.textContent="Noch keine Auswahl.";else if(existing.length)el.textContent=`Ausgewählt: ${dateLabel(keys[0])}${keys.length>1?" bis "+dateLabel(keys[keys.length-1]):""}. Davon ${existing.length} Tag(e) bereits eingetragen.`;else el.textContent=`Ausgewählt: ${dateLabel(keys[0])}${keys.length>1?" bis "+dateLabel(keys[keys.length-1]):""}. Noch kein Eintrag vorhanden.`}
-function saveCalendarEntry(){let keys=selectedCalendarRange(),type=document.getElementById("calType").value;if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");let eligible=keys.filter(k=>isWorkday(k)&&targetFor(k)>0);if(!eligible.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag. An freien Tagen bitte einfach stempeln, wenn Zusatzarbeit oder Notdienst anfällt.");let conflict=eligible.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");eligible.forEach(k=>state.absences[k]={type});save();alert(eligible.length===1?"Eintrag gespeichert / geändert.":`${eligible.length} Arbeitstage gespeichert / geändert.`)}
-function deleteCalendarEntry(){let keys=selectedCalendarRange();if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");let existing=keys.filter(k=>getAbs(k));if(!existing.length)return alert("In der Auswahl gibt es keinen Abwesenheitseintrag zum Löschen.");if(!confirm(existing.length===1?"Diesen Eintrag wirklich löschen?":`${existing.length} Einträge wirklich löschen?`))return;existing.forEach(k=>delete state.absences[k]);save();alert(existing.length===1?"Eintrag gelöscht.":`${existing.length} Einträge gelöscht.`)}
-function renderAbs(){let keys=Object.keys(state.absences).sort().reverse(),el=document.getElementById("absenceList");el.innerHTML=keys.length?keys.map(k=>{let a=state.absences[k];return `<div class="entry"><div><b>${dateLabel(k)}</b><div class="small">${labelType(a.type)}${a.type==="Ueberstundenabbau"?` · ${a.hours} h`:""}</div></div><div><button class="mini secondary" onclick="editAbs('${k}')">Bearbeiten</button> <button class="mini mutedbtn" onclick="removeAbs('${k}')">Löschen</button></div></div>`}).join(""):'<div class="small">Noch keine Abwesenheiten gespeichert.</div>'}
-window.removeAbs=function(k){
+async function saveCalendarEntry(){
+  let keys=selectedCalendarRange(),type=document.getElementById("calType").value;if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");
+  let eligible=keys.filter(k=>isWorkday(k)&&targetFor(k)>0);if(!eligible.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag. An freien Tagen bitte einfach stempeln, wenn Zusatzarbeit oder Notdienst anfällt.");
+  let sick=isSickTypeCode(type),mode=sick?(document.getElementById("calSickMode").value||"full"):"full";
+  let conflict=eligible.find(k=>state.days[k]&&worked(state.days[k])>0&&!(sick&&mode!=="full"));if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden. Wähle bei Krankheit Halber Tag, Restlicher Arbeitstag oder Stundenweise.");
+  let pdfMeta=null,file=document.getElementById("calSickPdf")?.files?.[0]||null;
+  try{if(sick&&file)pdfMeta=await storeSickPdf(file);let oldIds=new Set();
+    eligible.forEach(k=>{let old=getAbs(k);if(old?.documentId)oldIds.add(old.documentId);if(sick)state.absences[k]=sickEntryForDay(type,mode,k,document.getElementById("calSickHours").value,pdfMeta,old);else state.absences[k]={type}});
+    save();for(let id of oldIds)await cleanupSickPdfIfUnused(id);loadSickEditor("cal",eligible[0]);alert(eligible.length===1?"Eintrag gespeichert / geändert.":`${eligible.length} Arbeitstage gespeichert / geändert.`);
+  }catch(e){if(pdfMeta?.documentId)await cleanupSickPdfIfUnused(pdfMeta.documentId);alert(e.message||"Eintrag konnte nicht gespeichert werden.")}
+}
+async function deleteCalendarEntry(){let keys=selectedCalendarRange();if(!keys.length)return alert("Bitte einen Tag oder Zeitraum wählen.");let existing=keys.filter(k=>getAbs(k));if(!existing.length)return alert("In der Auswahl gibt es keinen Abwesenheitseintrag zum Löschen.");if(!confirm(existing.length===1?"Diesen Eintrag wirklich löschen?":`${existing.length} Einträge wirklich löschen?`))return;let ids=new Set(existing.map(k=>getAbs(k)?.documentId).filter(Boolean));existing.forEach(k=>delete state.absences[k]);save();for(let id of ids)await cleanupSickPdfIfUnused(id);alert(existing.length===1?"Eintrag gelöscht.":`${existing.length} Einträge gelöscht.`)}
+function renderAbs(){let keys=Object.keys(state.absences).sort().reverse(),el=document.getElementById("absenceList");el.innerHTML=keys.length?keys.map(k=>{let a=state.absences[k],detail=a.type==="Ueberstundenabbau"?` · ${a.hours} h`:isSickTypeCode(a.type)?` · ${sickDurationLabel(a,k)}`:"",pdf=a.documentId?`<div class="sick-actions"><span class="sick-pdf-chip">📎 ${htmEsc(a.documentName||"Krankmeldung.pdf")}</span><button class="mini secondary" onclick="openSickPdfForKey('${k}')">PDF öffnen</button><button class="mini mutedbtn" onclick="removeSickPdfForKey('${k}')">PDF entfernen</button></div>`:"";return `<div class="entry"><div><b>${dateLabel(k)}</b><div class="small">${labelType(a.type)}${detail}</div>${pdf}</div><div><button class="mini secondary" onclick="editAbs('${k}')">Bearbeiten</button> <button class="mini mutedbtn" onclick="removeAbs('${k}')">Löschen</button></div></div>`}).join(""):'<div class="small">Noch keine Abwesenheiten gespeichert.</div>'}
+window.openSickPdfForKey=openSickPdfForKey;window.removeSickPdfForKey=removeSickPdfForKey;
+window.removeAbs=async function(k){
   if(confirm("Eintrag wirklich löschen?")){
-    delete state.absences[k];
-    save();
+    let id=getAbs(k)?.documentId;delete state.absences[k];save();await cleanupSickPdfIfUnused(id);
   }
 };
 window.editAbs=function(k){
@@ -1105,6 +1244,7 @@ window.editAbs=function(k){
   document.getElementById("calFrom").value=k;
   document.getElementById("calTo").value=k;
   if(a&&a.type!=="Ueberstundenabbau") document.getElementById("calType").value=a.type;
+  syncSickBox("cal",document.getElementById("calType").value);loadSickEditor("cal",k);
   let d=new Date(k+"T12:00:00");
   calendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
   activateView("calendarView");
@@ -1125,13 +1265,13 @@ function qrCodeRecognized(code){
   return code==="AZ:STEMPELN";
 }
 function updateQrActionButtons(){
-  let a=getAbs(keyOf()),cur=currentSession(),pau=activePause();
-  document.getElementById("qrComeBtn").disabled=!!a||!!cur||!!pau;
-  document.getElementById("qrPauseStartBtn").disabled=!!a||!cur||!!pau;
-  document.getElementById("qrPauseEndBtn").disabled=!!a||!pau||!!cur;
-  document.getElementById("qrGoBtn").disabled=!!a||!cur||!!pau;
+  let a=getAbs(keyOf()),cur=currentSession(),pau=activePause(),blocked=!!a&&!absenceAllowsWork(a);
+  document.getElementById("qrComeBtn").disabled=blocked||!!cur||!!pau;
+  document.getElementById("qrPauseStartBtn").disabled=blocked||!cur||!!pau;
+  document.getElementById("qrPauseEndBtn").disabled=blocked||!pau||!!cur;
+  document.getElementById("qrGoBtn").disabled=blocked||!cur||!!pau;
   let hint=document.getElementById("qrActionHint");
-  if(a)hint.textContent=currentLang()==="en"?"An absence is entered for today.":currentLang()==="it"?"Per oggi è registrata un'assenza.":currentLang()==="fr"?"Une absence est enregistrée pour aujourd’hui.":currentLang()==="gsw"?"Für hüt isch e Abwäseheit iitreit.":"Für heute ist eine Abwesenheit eingetragen.";
+  if(blocked)hint.textContent=currentLang()==="en"?"A full-day absence is entered for today.":currentLang()==="it"?"Per oggi è registrata un'assenza per l'intera giornata.":currentLang()==="fr"?"Une absence pour toute la journée est enregistrée aujourd’hui.":currentLang()==="gsw"?"Für hüt isch e ganztägigi Abwäseheit iitreit.":"Für heute ist eine ganztägige Abwesenheit eingetragen.";
   else if(pau)hint.textContent=currentLang()==="en"?"You are currently on break.":currentLang()==="it"?"Sei attualmente in pausa.":currentLang()==="fr"?"Vous êtes actuellement en pause.":currentLang()==="gsw"?"Du bisch grad i dr Pause.":"Du bist aktuell in der Pause.";
   else if(cur)hint.textContent=currentLang()==="en"?"You are currently clocked in.":currentLang()==="it"?"Sei attualmente al lavoro.":currentLang()==="fr"?"Vous êtes actuellement pointé.":currentLang()==="gsw"?"Du bisch grad iigstämpflet.":"Du bist aktuell eingestempelt.";
   else hint.textContent=tr("Wähle die gewünschte Aktion.");
@@ -1146,7 +1286,7 @@ function hideQrActionPanel(){
 }
 function performQrChoice(action){
   let a=getAbs(keyOf());
-  if(a)return false;
+  if(a&&!absenceAllowsWork(a))return false;
   if(action==="kommen")stampIn();
   else if(action==="pause_start")pauseStart();
   else if(action==="pause_ende")pauseEnd();
@@ -1394,7 +1534,7 @@ function saveHistoricalDayEntry(goNext=false){
   document.getElementById("historyFrom").value=from;document.getElementById("historyTo").value=to;
   let fallback=(existingHm&&!existingHm.pauseFrom&&!existingHm.pauseTo)?Number(existingHm.pauseMinutes||0):0,pauseResult=manualPauseMinutes(document.getElementById("historyPauseFrom").value,document.getElementById("historyPauseTo").value,fallback);if(!pauseResult.ok)return alert(pauseResult.message);
   if(pauseResult.from)document.getElementById("historyPauseFrom").value=pauseResult.from;if(pauseResult.to)document.getElementById("historyPauseTo").value=pauseResult.to;
-  let pause=Math.round(pauseResult.minutes),gross=mins(to)-mins(from);if(gross<0)gross+=1440;if(gross<=0)return alert("Die Gehen-Zeit muss nach der Kommen-Zeit liegen.");if(pause>=gross)return alert("Die Pause muss kürzer als die gesamte Anwesenheitszeit sein.");if(nd&&![0,6].includes(dayNumber(k)))return alert("Notfalldienst ×2 kann nur für Samstag oder Sonntag gewählt werden.");if(getAbs(k))return alert("Für diesen Tag ist eine Abwesenheit eingetragen. Bitte diese zuerst im Kalender löschen oder ändern.");
+  let pause=Math.round(pauseResult.minutes),gross=mins(to)-mins(from);if(gross<0)gross+=1440;if(gross<=0)return alert("Die Gehen-Zeit muss nach der Kommen-Zeit liegen.");if(pause>=gross)return alert("Die Pause muss kürzer als die gesamte Anwesenheitszeit sein.");if(nd&&![0,6].includes(dayNumber(k)))return alert("Notfalldienst ×2 kann nur für Samstag oder Sonntag gewählt werden.");let abs=getAbs(k);if(abs&&!absenceAllowsWork(abs))return alert("Für diesen Tag ist eine ganztägige Abwesenheit eingetragen. Bitte diese zuerst im Kalender löschen oder ändern.");
   if(existing&&existing.sessions&&existing.sessions.length&&!existing.historicalManual)return alert("Für diesen Tag sind bereits normale Stempelungen vorhanden. Nutze dafür die Zeitkorrekturen.");let old=existingHm?`${existingHm.from}–${existingHm.to}, Pause ${existingHm.pauseMinutes||0} Min.`:"kein Eintrag";state.days[k]||={date:k,sessions:[],pauses:[],activePause:null};state.days[k].historicalManual={from,to,pauseMinutes:pause,pauseFrom:pauseResult.from||"",pauseTo:pauseResult.to||"",notdienst:nd,updatedAt:new Date().toISOString()};logCorrection(k,"Tag nachgetragen",old,`${from}–${to}, Pause ${pause} Min.${nd?", Notfalldienst ×2":""}`,"Tageweiser Schnellnachtrag");
   let carry={from,to,pauseFrom:pauseResult.from||"",pauseTo:pauseResult.to||""};save();overviewMonthKey=month;document.getElementById("overviewMonth").value=month;renderOverview();
   if(goNext){advanceHistoryDay(1,carry,k)}else renderHistoricalMonth();
@@ -1543,10 +1683,10 @@ function shortDate(k){
 }
 function renderOverview(){
   let input=document.getElementById("overviewMonth");if(input&&input.value)overviewMonthKey=input.value;let month=overviewMonthKey||currentMonthKey();if(input)input.value=month;document.getElementById("overviewMonthTitle").textContent=monthDisplay(month);
-  let rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,vac=0,sick=0,rows=[],today=localTodayKey(),notice=document.getElementById("monthlyImportNotice");let monthAbs=Object.keys(state.absences).filter(k=>k.startsWith(month));vac=monthAbs.filter(k=>getAbs(k)?.type==="Ferien").length;sick=monthAbs.filter(k=>getAbs(k)?.type==="Krank").length;
+  let rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,vac=0,sick=0,rows=[],today=localTodayKey(),notice=document.getElementById("monthlyImportNotice");let monthAbs=Object.keys(state.absences).filter(k=>k.startsWith(month));vac=monthAbs.filter(k=>getAbs(k)?.type==="Ferien").length;sick=monthAbs.filter(k=>getAbs(k)?.type==="Krank").reduce((sum,k)=>sum+absenceDayFraction(getAbs(k),k),0);
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth;notice.style.display="block";notice.textContent=`Alter Monats-Gesamtnachtrag vorhanden: ${fmt(workedMonth)} Ist / ${fmt(targetMonth)} Soll · Saldo ${fmt(balanceMonth,true)}${rec.reason?" · "+rec.reason:""}`;rows.push(`<tr><td>${month}</td><td>Monatsnachtrag</td><td>${fmt(workedMonth)}</td><td>${fmt(creditMonth)}</td><td>${fmt(targetMonth)}</td><td class="${balanceMonth>=0?"positive":"negative"}">${fmt(balanceMonth,true)}</td><td>–</td></tr>`)}
-  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=0,status=target>0?tr("Arbeit"):tr("Frei");if(a){status=labelType(a.type);bal=a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0}else{bal=credit-target;if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical&&!isCalendarCorrectionDay(k))status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
-  document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);let plannedTarget=rec?targetMonth:monthTargetMinutes(month);document.getElementById("monthTarget").textContent=fmt(plannedTarget);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=sick;let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
+  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=dailyBalance(k),status=target>0?tr("Arbeit"):tr("Frei");if(a){status=absenceStatusLabel(a,k)}else{if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical&&!isCalendarCorrectionDay(k))status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
+  document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);let plannedTarget=rec?targetMonth:monthTargetMinutes(month);document.getElementById("monthTarget").textContent=fmt(plannedTarget);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=Number.isInteger(sick)?sick:sick.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
 }
 function renderSettings(){
   const setVal=(id,val)=>{let el=document.getElementById(id);if(el)el.value=val||""};
@@ -1686,8 +1826,14 @@ document.getElementById("holidayRegion").addEventListener("change",e=>{state.set
 document.getElementById("locationAtStamp").addEventListener("change",e=>{state.settings.locationAtStamp=e.target.checked;save();if(!e.target.checked)setLocationStatus(tr("Beim ersten Test fragt das Handy nach der Standortfreigabe."))});
 document.getElementById("testLocationBtn").onclick=async()=>{let loc=await captureLocation(true);if(loc&&!state.settings.locationAtStamp)setLocationStatus(`${tr("Standort gefunden")} · ${tr("Genauigkeit")} ±${loc.accuracy} m`,"ok")};
 
-let today=keyOf();["calFrom","calTo","absenceFrom","absenceTo"].forEach(id=>document.getElementById(id).value=today);document.getElementById("absenceType").addEventListener("change",e=>document.getElementById("hoursBox").style.display=e.target.value==="Ueberstundenabbau"?"block":"none");document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
-document.getElementById("saveAbsence").onclick=()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(k=>isWorkday(k)&&targetFor(k)>0);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0);if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden.");let h=(baseTargetFor(from)||510)/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}keys.forEach(k=>state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:{type});save();alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)};
+let today=keyOf();["calFrom","calTo","absenceFrom","absenceTo"].forEach(id=>document.getElementById(id).value=today);
+document.getElementById("calType").addEventListener("change",e=>syncSickBox("cal",e.target.value));
+document.getElementById("absenceType").addEventListener("change",e=>syncSickBox("absence",e.target.value));
+document.getElementById("calSickMode").addEventListener("change",()=>updateSickModeUi("cal"));
+document.getElementById("absenceSickMode").addEventListener("change",()=>updateSickModeUi("absence"));
+document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
+syncSickBox("cal",document.getElementById("calType").value);syncSickBox("absence",document.getElementById("absenceType").value);loadSickEditor("cal",today);loadSickEditor("absence",today);
+document.getElementById("saveAbsence").onclick=async()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(k=>isWorkday(k)&&targetFor(k)>0);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let sick=isSickTypeCode(type),mode=sick?(document.getElementById("absenceSickMode").value||"full"):"full";let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0&&!(sick&&mode!=="full"));if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden. Wähle bei Krankheit Halber Tag, Restlicher Arbeitstag oder Stundenweise.");let h=(baseTargetFor(from)||510)/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}let pdfMeta=null,file=document.getElementById("absenceSickPdf")?.files?.[0]||null;try{if(sick&&file)pdfMeta=await storeSickPdf(file);let oldIds=new Set();keys.forEach(k=>{let old=getAbs(k);if(old?.documentId)oldIds.add(old.documentId);state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:sick?sickEntryForDay(type,mode,k,document.getElementById("absenceSickHours").value,pdfMeta,old):{type}});save();for(let id of oldIds)await cleanupSickPdfIfUnused(id);loadSickEditor("absence",keys[0]);alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)}catch(e){if(pdfMeta?.documentId)await cleanupSickPdfIfUnused(pdfMeta.documentId);alert(e.message||"Abwesenheit konnte nicht gespeichert werden.")}};
 document.getElementById("saveCalendarEntry").onclick=saveCalendarEntry;document.getElementById("deleteCalendarEntry").onclick=deleteCalendarEntry;document.getElementById("clearCalendarSelection").onclick=()=>{calendarPickStart=null;document.getElementById("calFrom").value=today;document.getElementById("calTo").value=today;renderCalendar()};document.getElementById("prevMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()-1);renderCalendar()};document.getElementById("nextMonth").onclick=()=>{calendarCursor.setMonth(calendarCursor.getMonth()+1);renderCalendar()};document.getElementById("calFrom").addEventListener("change",e=>{if(e.target.value){let d=new Date(e.target.value+"T12:00:00");calendarCursor=new Date(d.getFullYear(),d.getMonth(),1)}calendarPickStart=null;renderCalendar()});document.getElementById("calTo").addEventListener("change",()=>{calendarPickStart=null;renderCalendar()});
 
 
@@ -1848,9 +1994,9 @@ function pdfRowData(){
         return txt;
       }).filter(Boolean).join(" | ");
     }
-    let status=a?labelType(a.type):(d&&d.historicalManual&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":(hol?`Feiertag: ${hol.name}`:(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit")));
+    let status=a?absenceStatusLabel(a,k):(d&&d.historicalManual&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":(hol?`Feiertag: ${hol.name}`:(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit")));
     let weekday=new Date(k+"T12:00:00").toLocaleDateString("de-CH",{weekday:"short"}).replace(".","");
-    return {k,weekday,status,from,to,pause:pm,sess,w,credit,target,bal,loc};
+    return {k,weekday,status,from,to,pause:pm,sess,w,credit,target,bal,loc,absenceType:a?.type||"",absenceFraction:a?absenceDayFraction(a,k):0};
   });
 }
 function buildWorktimePdf(){
@@ -1865,7 +2011,7 @@ function buildWorktimePdf(){
   let created=new Date().toLocaleString("de-CH");
   let totalWorked=rows.reduce((s,r)=>s+r.w,0),totalCredit=rows.reduce((s,r)=>s+r.credit,0),totalTarget=rows.reduce((s,r)=>s+r.target,0),totalBalance=rows.reduce((s,r)=>s+r.bal,0);
   let counts={work:0,vac:0,sick:0,childSick:0,ot:0,other:0};
-  rows.forEach(r=>{let s=String(r.status||"");if(/Ferien/i.test(s))counts.vac++;else if(/Kind krank|Child sick leave|Figlio malato|Enfant malade|Chind chrank/i.test(s))counts.childSick++;else if(/Krankheit|Sick leave|Malattia|Maladie|Chrankheit/i.test(s))counts.sick++;else if(/Überstundenabbau/i.test(s))counts.ot++;else if(/Arbeit|Tagesnachtrag|Notdienst/i.test(s))counts.work++;else counts.other++});
+  rows.forEach(r=>{let s=String(r.status||"");if(r.absenceType==="Ferien")counts.vac++;else if(r.absenceType==="KindKrank")counts.childSick+=r.absenceFraction||1;else if(r.absenceType==="Krank")counts.sick+=r.absenceFraction||1;else if(/Überstundenabbau/i.test(s))counts.ot++;else if(/Arbeit|Tagesnachtrag|Notdienst/i.test(s))counts.work++;else counts.other++});
   let y=8;
 
   function txt(value,x,yy,size=8,style="normal",color=dark,opts){doc.setFont("helvetica",style);doc.setFontSize(size);doc.setTextColor(...color);doc.text(cleanPdfText(value),x,yy,opts)}
@@ -1898,7 +2044,7 @@ function buildWorktimePdf(){
   function dot(x,yy,color){doc.setFillColor(...color);doc.circle(x,yy,1.4,"F")}
   function drawAbsenceSummary(){
     txt("TAGESÜBERSICHT",M,y,7,"bold",dark);y+=3;let w=CW/5,items=[["Ferientage",counts.vac,green],["Krankheitstage",counts.sick,red],["Kind krank",counts.childSick,red],["Überstundenabbau",counts.ot,orange],["Arbeitstage",counts.work,blue]];
-    items.forEach((it,i)=>{let x=M+i*w;doc.setFillColor(248,251,255);doc.setDrawColor(...line);doc.rect(x,y,w,16,"FD");doc.setDrawColor(...it[2]);doc.setLineWidth(1);doc.line(x+3,y+3,x+w-3,y+3);txt(it[0].toUpperCase(),x+3,y+8,5.8,"bold",muted);txt(`${it[1]} Tag${it[1]===1?"":"e"}`,x+3,y+13.5,9.5,"bold",dark)});doc.setLineWidth(.2);y+=22;
+    items.forEach((it,i)=>{let x=M+i*w;doc.setFillColor(248,251,255);doc.setDrawColor(...line);doc.rect(x,y,w,16,"FD");doc.setDrawColor(...it[2]);doc.setLineWidth(1);doc.line(x+3,y+3,x+w-3,y+3);txt(it[0].toUpperCase(),x+3,y+8,5.8,"bold",muted);let n=Number.isInteger(it[1])?String(it[1]):it[1].toFixed(2).replace(/0+$/,"").replace(/\.$/,"").replace(".",",");txt(`${n} Tag${it[1]===1?"":"e"}`,x+3,y+13.5,9.5,"bold",dark)});doc.setLineWidth(.2);y+=22;
   }
   function drawLegend(){
     txt("LEGENDE",M,y,7,"bold",dark);let x=M+24;let items=[[`Arbeit`,blue],[`Ferien`,green],[`Krank`,red],[`Kind krank`,red],[`Überstundenabbau`,orange]];
@@ -1940,14 +2086,15 @@ function renderPdfHtmlPreview(){
   let period=rows.length?`${dateLabel(rows[0].k)} bis ${dateLabel(rows[rows.length-1].k)}`:"Keine Einträge";
   let totalWorked=rows.reduce((s,r)=>s+r.w,0),totalCredit=rows.reduce((s,r)=>s+r.credit,0),totalTarget=rows.reduce((s,r)=>s+r.target,0),totalBalance=rows.reduce((s,r)=>s+r.bal,0);
   let counts={work:0,vac:0,sick:0,childSick:0,ot:0};
-  function statusClass(s){s=String(s||"");if(/Ferien/i.test(s)){counts.vac++;return"vac"}if(/Kind krank|Child sick leave|Figlio malato|Enfant malade|Chind chrank/i.test(s)){counts.childSick++;return"sick"}if(/Krankheit|Sick leave|Malattia|Maladie|Chrankheit/i.test(s)){counts.sick++;return"sick"}if(/Überstundenabbau/i.test(s)){counts.ot++;return"ot"}if(/Arbeit|Tagesnachtrag|Notdienst/i.test(s)){counts.work++;return"work"}return"other"}
-  let prepared=rows.map(r=>({...r,statusCls:statusClass(r.status)}));
+  function statusClass(r){let s=String(r.status||"");if(r.absenceType==="Ferien"){counts.vac++;return"vac"}if(r.absenceType==="KindKrank"){counts.childSick+=r.absenceFraction||1;return"sick"}if(r.absenceType==="Krank"){counts.sick+=r.absenceFraction||1;return"sick"}if(/Überstundenabbau/i.test(s)){counts.ot++;return"ot"}if(/Arbeit|Tagesnachtrag|Notdienst/i.test(s)){counts.work++;return"work"}return"other"}
+  let prepared=rows.map(r=>({...r,statusCls:statusClass(r)}));
   let body=prepared.length?prepared.map(r=>`<tr><td>${escapeHtml(dateLabel(r.k))}</td><td>${escapeHtml(r.weekday)}</td><td><span class="pdf-report-status"><i class="pdf-report-dot ${r.statusCls}"></i>${escapeHtml(r.status)}</span>${r.loc?`<span class="pdf-report-location">Standort: ${escapeHtml(r.loc)}</span>`:""}</td><td>${escapeHtml(r.from||"-")}</td><td>${escapeHtml(r.to||"-")}</td><td>${escapeHtml(r.pause?fmt(r.pause):"-")}</td><td>${escapeHtml(fmt(r.w))}</td><td>${escapeHtml(fmt(r.target))}</td><td><b class="${r.bal<0?'neg':r.bal>0?'pos':''}">${escapeHtml(fmt(r.bal,true))}</b></td></tr>`).join(""):`<tr><td colspan="9" class="pdf-preview-empty">Noch keine Arbeitszeiten vorhanden.</td></tr>`;
-  preview.innerHTML=`<div class="pdf-preview-sheet"><div class="pdf-report-topline"></div><div class="pdf-report-header"><div class="pdf-report-logo">HTM<small>ZEITERFASSUNG</small></div><div class="pdf-report-vline"></div><div><div class="pdf-report-title">Arbeitszeitauszug</div><div class="pdf-report-subtitle">Monatsübersicht und Tagesdetails</div></div><div class="pdf-report-version"><b>HTM Zeiterfassung</b>${escapeHtml(APP_VERSION)}</div></div><div class="pdf-report-rule"></div><div class="pdf-report-body"><div class="pdf-report-meta"><div><div class="pdf-report-meta-label">Mitarbeiter</div><div class="pdf-report-meta-value">${escapeHtml(state.name||"Mitarbeiter")}</div></div><div><div class="pdf-report-meta-label">Zeitraum</div><div class="pdf-report-meta-value">${escapeHtml(period)}</div></div><div><div class="pdf-report-meta-label">Erstellt am</div><div class="pdf-report-meta-value">${escapeHtml(new Date().toLocaleString("de-CH"))}</div></div></div><div class="pdf-report-kpis"><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Arbeitszeit (Ist)</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalWorked))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Zeitgutschrift</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalCredit))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Sollzeit</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalTarget))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Saldo</div><div class="pdf-report-kpi-value ${totalBalance<0?'negative':totalBalance>0?'positive':''}">${escapeHtml(fmt(totalBalance,true))}</div></div></div><div class="pdf-report-absence-summary"><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Ferientage</div><div class="pdf-report-absence-value">${counts.vac} Tag${counts.vac===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Krankheitstage</div><div class="pdf-report-absence-value">${counts.sick} Tag${counts.sick===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Kind krank</div><div class="pdf-report-absence-value">${counts.childSick} Tag${counts.childSick===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Überstundenabbau</div><div class="pdf-report-absence-value">${counts.ot} Tag${counts.ot===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Arbeitstage</div><div class="pdf-report-absence-value">${counts.work} Tag${counts.work===1?"":"e"}</div></div></div><div class="pdf-report-legend"><span class="pdf-report-legend-title">Legende</span><span><i class="pdf-report-dot work"></i>Arbeit</span><span><i class="pdf-report-dot vac"></i>Ferien</span><span><i class="pdf-report-dot sick"></i>Krank</span><span><i class="pdf-report-dot sick"></i>Kind krank</span><span><i class="pdf-report-dot ot"></i>Überstundenabbau</span></div><div class="pdf-report-table-wrap"><table class="pdf-report-table"><thead><tr><th>Datum</th><th>Tag</th><th>Status</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Arbeitszeit</th><th>Soll</th><th>Saldo</th></tr></thead><tbody>${body}</tbody></table></div><div class="pdf-report-total"><div><div class="pdf-report-total-label">Gesamtübersicht</div><div class="pdf-report-total-title">${escapeHtml(period)}</div></div><div><div class="pdf-report-total-label">Arbeitszeit</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalWorked))}</div></div><div><div class="pdf-report-total-label">Zeitgutschrift</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalCredit))}</div></div><div><div class="pdf-report-total-label">Sollzeit</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalTarget))}</div></div><div><div class="pdf-report-total-label">Saldo</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalBalance,true))}</div></div></div><div class="pdf-report-note">Ferien, Krankheit, Kind krank und bezahlte Abwesenheiten werden gemäss hinterlegtem Arbeitsmodell berücksichtigt. Korrigierte Arbeitstage erscheinen weiterhin als normale Arbeitstage.</div></div><div class="pdf-report-footer"><span>HTM Zeiterfassung – Arbeitszeitauszug</span><span>Seite 1</span></div></div>`;
+  preview.innerHTML=`<div class="pdf-preview-sheet"><div class="pdf-report-topline"></div><div class="pdf-report-header"><div class="pdf-report-logo">HTM<small>ZEITERFASSUNG</small></div><div class="pdf-report-vline"></div><div><div class="pdf-report-title">Arbeitszeitauszug</div><div class="pdf-report-subtitle">Monatsübersicht und Tagesdetails</div></div><div class="pdf-report-version"><b>HTM Zeiterfassung</b>${escapeHtml(APP_VERSION)}</div></div><div class="pdf-report-rule"></div><div class="pdf-report-body"><div class="pdf-report-meta"><div><div class="pdf-report-meta-label">Mitarbeiter</div><div class="pdf-report-meta-value">${escapeHtml(state.name||"Mitarbeiter")}</div></div><div><div class="pdf-report-meta-label">Zeitraum</div><div class="pdf-report-meta-value">${escapeHtml(period)}</div></div><div><div class="pdf-report-meta-label">Erstellt am</div><div class="pdf-report-meta-value">${escapeHtml(new Date().toLocaleString("de-CH"))}</div></div></div><div class="pdf-report-kpis"><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Arbeitszeit (Ist)</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalWorked))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Zeitgutschrift</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalCredit))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Sollzeit</div><div class="pdf-report-kpi-value">${escapeHtml(fmt(totalTarget))}</div></div><div class="pdf-report-kpi"><div class="pdf-report-kpi-label">Saldo</div><div class="pdf-report-kpi-value ${totalBalance<0?'negative':totalBalance>0?'positive':''}">${escapeHtml(fmt(totalBalance,true))}</div></div></div><div class="pdf-report-absence-summary"><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Ferientage</div><div class="pdf-report-absence-value">${counts.vac} Tag${counts.vac===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Krankheitstage</div><div class="pdf-report-absence-value">${formatDayCount(counts.sick)} Tag${counts.sick===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Kind krank</div><div class="pdf-report-absence-value">${formatDayCount(counts.childSick)} Tag${counts.childSick===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Überstundenabbau</div><div class="pdf-report-absence-value">${counts.ot} Tag${counts.ot===1?"":"e"}</div></div><div class="pdf-report-absence-item"><div class="pdf-report-absence-label">Arbeitstage</div><div class="pdf-report-absence-value">${counts.work} Tag${counts.work===1?"":"e"}</div></div></div><div class="pdf-report-legend"><span class="pdf-report-legend-title">Legende</span><span><i class="pdf-report-dot work"></i>Arbeit</span><span><i class="pdf-report-dot vac"></i>Ferien</span><span><i class="pdf-report-dot sick"></i>Krank</span><span><i class="pdf-report-dot sick"></i>Kind krank</span><span><i class="pdf-report-dot ot"></i>Überstundenabbau</span></div><div class="pdf-report-table-wrap"><table class="pdf-report-table"><thead><tr><th>Datum</th><th>Tag</th><th>Status</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Arbeitszeit</th><th>Soll</th><th>Saldo</th></tr></thead><tbody>${body}</tbody></table></div><div class="pdf-report-total"><div><div class="pdf-report-total-label">Gesamtübersicht</div><div class="pdf-report-total-title">${escapeHtml(period)}</div></div><div><div class="pdf-report-total-label">Arbeitszeit</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalWorked))}</div></div><div><div class="pdf-report-total-label">Zeitgutschrift</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalCredit))}</div></div><div><div class="pdf-report-total-label">Sollzeit</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalTarget))}</div></div><div><div class="pdf-report-total-label">Saldo</div><div class="pdf-report-total-value">${escapeHtml(fmt(totalBalance,true))}</div></div></div><div class="pdf-report-note">Ferien, Krankheit, Kind krank und bezahlte Abwesenheiten werden gemäss hinterlegtem Arbeitsmodell berücksichtigt. Korrigierte Arbeitstage erscheinen weiterhin als normale Arbeitstage.</div></div><div class="pdf-report-footer"><span>HTM Zeiterfassung – Arbeitszeitauszug</span><span>Seite 1</span></div></div>`;
 }
 function closePdfModal(){
   document.getElementById("pdfModalBackdrop").classList.remove("open");
 }
+function formatDayCount(n){n=Number(n||0);return Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,"").replace(/\.$/,"").replace(".",",")}
 function showPdfPreview(){
   try{
     let result=buildWorktimePdf();
@@ -1990,7 +2137,7 @@ document.getElementById("exportBtn").onclick=()=>{
         return txt;
       }).filter(Boolean).join(" | ");
     }
-    let status=a?labelType(a.type):(d&&d.historicalManual&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":(hol?`Feiertag: ${hol.name}`:(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit")));
+    let status=a?absenceStatusLabel(a,k):(d&&d.historicalManual&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":(hol?`Feiertag: ${hol.name}`:(target===0&&w>0?"Zusatzarbeit / Notdienst":"Arbeit")));
     rows.push([state.name,k,status,sess,fmt(w),fmt(credit),fmt(target),fmt(bal,true),loc]);
   });
   let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(";")).join("\n");

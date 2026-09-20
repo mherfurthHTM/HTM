@@ -1,0 +1,12 @@
+HTM Beta 0.034 – Erweiterung Krankmeldung
+
+Neu:
+- Krankheit und Kind krank können als ganzer Tag, halber Tag, restlicher Arbeitstag oder stundenweise erfasst werden.
+- Teil-Krankheit kann zusammen mit bereits vorhandener Arbeitszeit am selben Tag verwendet werden.
+- Bei „Restlicher Arbeitstag“ wird die noch offene Sollzeit automatisch als Krankheit angerechnet.
+- Optional kann pro Krankmeldung / Arztzeugnis eine PDF-Datei hinterlegt werden.
+- Hinterlegte PDFs können geöffnet oder wieder entfernt werden.
+- Krankheitstage werden bei Teil-Krankheit anteilig gezählt.
+
+Hinweis zur PDF-Speicherung:
+Die PDF-Dateien werden lokal im Browser-/App-Speicher (IndexedDB) des Geräts gespeichert. Die normale JSON-Datensicherung enthält nur die Verknüpfungsdaten, nicht die PDF-Datei selbst. PDFs werden daher nicht automatisch auf andere Geräte übertragen.

@@ -1,4 +1,4 @@
-const CACHE="htm-beta-0.033-kind-krank";
+const CACHE="htm-beta-0.034-sick-pdf-partial-v1";
 const ASSETS=[
   "./",
   "./index.html",
