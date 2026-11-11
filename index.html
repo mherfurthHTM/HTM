@@ -160,6 +160,9 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input,se
 /* Arbeitsmodell – passend zum blauen HTM-Design */
 .work-model-table input[type="checkbox"]{width:22px;height:22px;accent-color:#1564d5}.work-model-table .dayTargetHours{min-width:95px}.work-model-table td:nth-child(2),.work-model-table th:nth-child(2){text-align:center}.work-model-table td{vertical-align:middle}#workModelHistory{background:#f5f9ff;border-color:#cfe2ff;color:#35516f}#saveWorkModelBtn{background:#1564d5!important}
 
+.week-override-table td{vertical-align:middle}.week-override-table input[type="checkbox"]{width:22px;height:22px;accent-color:#1564d5}.week-override-table .weekOverrideHours{min-width:106px}.week-override-table td:nth-child(2),.week-override-table th:nth-child(2){text-align:center}.week-override-table input:disabled{background:#f3f4f6;color:#8a95a4}
+#weekOverrideHistory button{padding:7px 10px;margin:5px 5px 0 0;font-size:12px}
+@media(max-width:480px){#weekExceptionCard .grid2{grid-template-columns:1fr}}
 /* Beta 0.032 – professioneller Arbeitszeitauszug */
 .pdf-preview{width:100%;flex:1;min-height:440px;border:1px solid #d8dee8;border-radius:12px;background:#eef2f7;overflow:auto;padding:18px;-webkit-overflow-scrolling:touch}
 .pdf-preview-sheet{min-width:780px;max-width:900px;margin:0 auto;background:#fff;color:#111827;border:1px solid #d7dce5;box-shadow:0 10px 28px rgba(15,23,42,.09);overflow:hidden;border-radius:2px}
@@ -544,6 +547,37 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
     <div id="locationStatus" class="location-status">Beim ersten Test fragt das Handy nach der Standortfreigabe.</div>
   </div>
 
+
+  <div class="card" id="weekExceptionCard">
+    <h2>Wochenplan – einmalige Abweichung</h2>
+    <div class="small" style="margin-bottom:12px">Für einzelne Wochen kannst du andere Arbeitstage und auch halbe Tage hinterlegen. Der normale Wochenplan bleibt für alle anderen Wochen unverändert.</div>
+    <label for="weekStartDate">Woche auswählen (beliebigen Tag dieser Woche wählen)</label>
+    <input id="weekStartDate" type="date">
+    <div id="weekDateRange" class="small" style="margin:8px 0 12px"></div>
+    <div class="scroll">
+      <table class="week-override-table">
+        <thead><tr><th>Tag</th><th>Arbeitstag</th><th>Sollstunden</th></tr></thead>
+        <tbody>
+          <tr><td>Montag</td><td><input class="weekOverrideDay" data-day="1" type="checkbox" aria-label="Montag arbeitet"></td><td><input class="weekOverrideHours" data-day="1" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Montag" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Dienstag</td><td><input class="weekOverrideDay" data-day="2" type="checkbox" aria-label="Dienstag arbeitet"></td><td><input class="weekOverrideHours" data-day="2" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Dienstag" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Mittwoch</td><td><input class="weekOverrideDay" data-day="3" type="checkbox" aria-label="Mittwoch arbeitet"></td><td><input class="weekOverrideHours" data-day="3" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Mittwoch" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Donnerstag</td><td><input class="weekOverrideDay" data-day="4" type="checkbox" aria-label="Donnerstag arbeitet"></td><td><input class="weekOverrideHours" data-day="4" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Donnerstag" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Freitag</td><td><input class="weekOverrideDay" data-day="5" type="checkbox" aria-label="Freitag arbeitet"></td><td><input class="weekOverrideHours" data-day="5" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Freitag" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Samstag</td><td><input class="weekOverrideDay" data-day="6" type="checkbox" aria-label="Samstag arbeitet"></td><td><input class="weekOverrideHours" data-day="6" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Samstag" placeholder="z. B. 4.25"></td></tr>
+          <tr><td>Sonntag</td><td><input class="weekOverrideDay" data-day="0" type="checkbox" aria-label="Sonntag arbeitet"></td><td><input class="weekOverrideHours" data-day="0" type="text" inputmode="decimal" value="8.5" aria-label="Sollstunden Sonntag" placeholder="z. B. 4.25"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="small" style="margin-top:8px">Beispiel Halbtag: 4.25 = 4 Stunden 15 Minuten. Du kannst auch 4:15 oder 4,25 eingeben. Nicht angekreuzte Tage sind frei.</div>
+    <div id="weekTotalPreview" class="notice" style="margin-top:12px"></div>
+    <div class="grid2" style="margin-top:12px">
+      <button id="saveWeekOverrideBtn" class="primary" type="button">Diese Woche speichern</button>
+      <button id="clearWeekOverrideBtn" class="mutedbtn" type="button">Ausnahme entfernen</button>
+    </div>
+    <div class="small" style="margin-top:8px">Die Sollzeit muss mit der tatsächlichen Vereinbarung übereinstimmen. Weniger geleistete Arbeitszeit allein bedeutet nicht automatisch weniger Sollstunden.</div>
+    <div id="weekOverrideHistory" class="small" style="margin-top:14px"></div>
+  </div>
+
   <div class="card">
     <h2>Test-QR-Code</h2>
     <div class="small">Nur ein QR-Code für alle Buchungen. Nach dem Scannen wählst du Kommen, Pause starten, Pause beenden oder Gehen.</div>
@@ -556,8 +590,8 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 
   <div class="card">
     <h2>App-Version</h2>
-    <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.034</b></div>
-    <div class="small" style="margin-top:8px">Blaues Design aus Beta 0.029. Neu: Mitarbeiterdaten sind unter Einstellungen sichtbar und jederzeit bearbeitbar. Arbeitsmodelle, Sollzeit je Tag und Monats-Sollzeit bleiben vollständig erhalten.</div>
+    <div class="stat"><span class="small">Aktuelle Testversion</span><b>Beta 0.035</b></div>
+    <div class="small" style="margin-top:8px">Neu: Wochen-Ausnahmen mit halben Tagen. Das dauerhafte Arbeitsmodell bleibt unverändert; individuelle Wochen wirken nur auf die ausgewählte Woche.</div>
     <button id="updateAppBtn" class="secondary" style="width:100%;margin-top:12px">App aktualisieren</button>
   </div>
 </section>
@@ -698,9 +732,15 @@ ensureActiveProfile();
 let state=app.profiles[app.activeProfileId], calendarCursor=new Date(), calendarPickStart=null, overviewMonthKey=localTodayKey().slice(0,7);
 applyJan2026BackfillMigration();
 state=app.profiles[app.activeProfileId];
-const APP_VERSION="Beta 0.034";
-const APP_VERSION_CODE="0.034";
+const APP_VERSION="Beta 0.035";
+const APP_VERSION_CODE="0.035";
 const CHANGELOG_VERSIONS=[
+  {version:"0.035",items:[
+    "Einmalige Wochenpläne: Arbeitstage und Sollstunden für jede einzelne Woche abweichend festlegen.",
+    "Halbe Tage und wechselnde Einsätze ändern nicht mehr das dauerhafte Arbeitsmodell.",
+    "Wochen-Ausnahmen können bearbeitet, zurückgesetzt und auch rückwirkend erfasst werden.",
+    "Monats-Sollzeit, Stundenkonto, Kalender und PDF berücksichtigen die Wochenplanung."
+  ]},
   {version:"0.034",items:[
     "Im Kalender unter Auswahl bearbeiten steht jetzt Kind krank als eigene Abwesenheitsart zur Verfügung.",
     "Kind krank bleibt in Kalender und PDF klar von eigener Krankheit getrennt und wird als bezahlte Abwesenheit berücksichtigt.",
@@ -842,6 +882,7 @@ function normalizeProfile(m){
   if(!Array.isArray(m.settings.workdays))m.settings.workdays=[...DEFAULT_WORKDAYS];
   if(!m.settings.targetMinutes)m.settings.targetMinutes=DEFAULT_TARGET;
   if(!Array.isArray(m.settings.workModels))m.settings.workModels=[];
+  if(!m.settings.weekOverrides||typeof m.settings.weekOverrides!=="object"||Array.isArray(m.settings.weekOverrides))m.settings.weekOverrides={};
   if(!m.settings.language)m.settings.language="de";
   if(!m.settings.holidayRegion)m.settings.holidayRegion="solothurn";
   m.settings.locationAtStamp=!!m.settings.locationAtStamp;
@@ -931,7 +972,16 @@ function workModelFor(k){
   let models=Array.isArray(state.settings.workModels)?state.settings.workModels:[];
   let match=null;for(let m of models){if(m.validFrom<=k)match=m;else break}return match;
 }
-function baseTargetFor(k){let model=workModelFor(k);if(!model)return 0;return Number((model.dayMinutes||{})[dayNumber(k)]||0)}
+function weekStartKey(k){return datePlus(k,-((dayNumber(k)+6)%7))}
+function modelBaseTargetFor(k){let model=workModelFor(k);if(!model)return 0;return Number((model.dayMinutes||{})[dayNumber(k)]||0)}
+function baseTargetFor(k){
+  let exception=state.settings.weekOverrides?.[weekStartKey(k)];
+  if(exception&&exception.dayMinutes&&typeof exception.dayMinutes==="object"){
+    let val=Number(exception.dayMinutes[dayNumber(k)]||0);
+    return Number.isFinite(val)&&val>=0?Math.min(960,Math.round(val)):0;
+  }
+  return modelBaseTargetFor(k);
+}
 function isWorkday(k){return baseTargetFor(k)>0}
 function easterSunday(year){let a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),kk=c%4,l=(32+2*e+2*i-h-kk)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,month-1,day,12)}
 function datePlus(base,days){let d=new Date(base);d.setDate(d.getDate()+days);return keyOf(d)}
@@ -1711,6 +1761,74 @@ function renderSettings(){
   document.getElementById("weekModelText").textContent=`Angezeigtes Modell ab ${selectedDate}: ${parts.join(" · ")||"keine Arbeitstage"} · Wochen-Soll ${fmt(week)}. Zusatzeinsätze an freien Tagen zählen als Pluszeit.`;
   let hist=document.getElementById("workModelHistory");if(hist){hist.innerHTML=models.length?`<b>Gespeicherte Arbeitsmodelle</b><br>${models.map(m=>{let total=Object.values(m.dayMinutes||{}).reduce((a,v)=>a+Number(v||0),0);return `${m.validFrom}: ${fmt(total)} / Woche`}).join("<br>")}`:"Noch kein Arbeitsmodell gespeichert."}
   let ah=document.getElementById("absenceHours");if(ah&&!ah.dataset.touched){let base=baseTargetFor(localTodayKey())||510;ah.value=(base/60).toFixed(2)}
+  renderWeekEditor();
+}
+
+function weekDates(monday){return [1,2,3,4,5,6,0].map((d,i)=>({day:d,key:datePlus(monday,i)}))}
+function renderWeekEditor(){
+  let dateInput=document.getElementById("weekStartDate");
+  if(!dateInput)return;
+  let monday=weekStartKey(dateInput.value||localTodayKey());
+  dateInput.value=monday;
+  let sunday=datePlus(monday,6),exception=state.settings.weekOverrides?.[monday]||null;
+  document.getElementById("weekDateRange").textContent=`${dateLabel(monday)} bis ${dateLabel(sunday)} · ${exception?"Gespeicherte Ausnahme":"Reguläres Arbeitsmodell"}`;
+  weekDates(monday).forEach(({day,key})=>{
+    let val=exception?Number(exception.dayMinutes?.[day]||0):modelBaseTargetFor(key);
+    let box=document.querySelector(`.weekOverrideDay[data-day="${day}"]`);
+    let input=document.querySelector(`.weekOverrideHours[data-day="${day}"]`);
+    box.checked=val>0;
+    input.value=val>0?String(Number((val/60).toFixed(2))):"8.5";
+    input.disabled=val<=0;
+  });
+  let saved=Object.keys(state.settings.weekOverrides||{}).sort().reverse();
+  let container=document.getElementById("weekOverrideHistory");
+  container.innerHTML=saved.length?`<b>Gespeicherte Wochen-Ausnahmen</b><div>${saved.map(k=>`<button type="button" class="secondary mini" data-week-date="${htmEsc(k)}">${htmEsc(k)}</button>`).join("")}</div>`:"Noch keine Wochen-Ausnahmen gespeichert.";
+  container.querySelectorAll("[data-week-date]").forEach(button=>button.onclick=()=>{dateInput.value=button.dataset.weekDate;renderWeekEditor()});
+  updateWeekEditorSummary();
+}
+function weekEditorMinutes(){
+  let dm={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  for(let day of [1,2,3,4,5,6,0]){
+    let checked=document.querySelector(`.weekOverrideDay[data-day="${day}"]`).checked;
+    if(!checked)continue;
+    let input=document.querySelector(`.weekOverrideHours[data-day="${day}"]`);
+    let minutes=parseHourValue(input.value);
+    if(minutes===null||minutes<=0||minutes>960)throw new Error("Bitte bei jedem gewählten Arbeitstag eine gültige Sollzeit zwischen 0 und 16 Stunden eingeben.");
+    dm[day]=minutes;
+  }
+  return dm;
+}
+function updateWeekEditorSummary(){
+  let start=document.getElementById("weekStartDate").value;
+  if(!start)return;
+  let monday=weekStartKey(start),standard=0,selected=0;
+  try{
+    let values=weekEditorMinutes();
+    weekDates(monday).forEach(({day,key})=>{
+      let holiday=holidayInfo(key),factor=holiday?holiday.factor:1;
+      standard+=Math.round(modelBaseTargetFor(key)*factor);
+      selected+=Math.round(values[day]*factor);
+    });
+    document.getElementById("weekTotalPreview").textContent=`Reguläre Woche: ${fmt(standard)} h Soll · Ausgewählte Woche: ${fmt(selected)} h Soll (Feiertage berücksichtigt). Diese Planung gilt ausschliesslich für die ausgewählte Woche.`;
+  }catch(err){document.getElementById("weekTotalPreview").textContent=err.message}
+}
+function saveWeekOverride(){
+  let dateInput=document.getElementById("weekStartDate"),monday=weekStartKey(dateInput.value||localTodayKey()),dm;
+  try{dm=weekEditorMinutes()}catch(err){return alert(err.message)}
+  let isStandard=weekDates(monday).every(({day,key})=>Number(dm[day]||0)===modelBaseTargetFor(key));
+  if(!state.settings.weekOverrides)state.settings.weekOverrides={};
+  if(isStandard)delete state.settings.weekOverrides[monday];
+  else state.settings.weekOverrides[monday]={dayMinutes:dm};
+  dateInput.value=monday;
+  save();
+  alert(isStandard?"Der reguläre Wochenplan gilt wieder für diese Woche.":"Wochenplan gespeichert. Andere Wochen bleiben unverändert.");
+}
+function clearWeekOverride(){
+  let dateInput=document.getElementById("weekStartDate"),monday=weekStartKey(dateInput.value||localTodayKey());
+  if(!state.settings.weekOverrides?.[monday])return alert("Für diese Woche ist keine Ausnahme gespeichert.");
+  delete state.settings.weekOverrides[monday];
+  dateInput.value=monday;save();
+  alert("Die Ausnahme wurde entfernt. Für diese Woche gilt wieder das reguläre Arbeitsmodell.");
 }
 function sameDayMinutes(a,b){for(let d=0;d<=6;d++){if(Number((a||{})[d]||0)!==Number((b||{})[d]||0))return false}return true}
 function saveWorkModel(){
@@ -1815,6 +1933,16 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(document.g
 document.querySelectorAll(".workdayBox").forEach(b=>b.addEventListener("change",()=>{let d=Number(b.value),inp=document.querySelector(`.dayTargetHours[data-day="${d}"]`);if(inp){inp.disabled=!b.checked;if(b.checked&&(!Number(inp.value)||Number(inp.value)<=0))inp.value="8.5"}}));
 document.getElementById("workModelValidFrom").addEventListener("change",e=>{e.target.dataset.touched="1";renderSettings()});
 document.getElementById("saveWorkModelBtn").onclick=saveWorkModel;
+document.getElementById("weekStartDate").addEventListener("change",renderWeekEditor);
+document.querySelectorAll(".weekOverrideDay").forEach(box=>box.addEventListener("change",()=>{
+  let input=document.querySelector(`.weekOverrideHours[data-day="${box.dataset.day}"]`);
+  input.disabled=!box.checked;
+  if(box.checked&&!parseHourValue(input.value))input.value="8.5";
+  updateWeekEditorSummary();
+}));
+document.querySelectorAll(".weekOverrideHours").forEach(input=>input.addEventListener("input",updateWeekEditorSummary));
+document.getElementById("saveWeekOverrideBtn").onclick=saveWeekOverride;
+document.getElementById("clearWeekOverrideBtn").onclick=clearWeekOverride;
 document.getElementById("saveEmployeeDataBtn").onclick=saveEmployeeData;
 
 document.getElementById("trackingStartDate").addEventListener("change",e=>{
