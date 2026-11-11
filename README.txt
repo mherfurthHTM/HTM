@@ -1,5 +1,15 @@
 HTM – Arbeitszeiterfassung
 
+Neu in Beta 0.035:
+- Wochenweise abweichende Arbeitstage und Sollstunden einstellen (auch Halbtage, z. B. 4.25 Stunden)
+- Wochen-Ausnahmen gelten nur von Montag bis Sonntag; das normale Arbeitsmodell bleibt unverändert
+- Bereits gespeicherte Wochen-Ausnahmen nachträglich bearbeiten oder entfernen
+- Die Berechnung von Monats-Sollstunden, Tagesdifferenzen, Gesamtsaldo und PDF nutzt die gespeicherten Wochen-Ausnahmen
+- Bestehende Stempelzeiten bleiben unverändert, Daten weiterhin unter "htm_app_data_v1"
+
+Neu in Beta 0.034:
+- Krankheit und Kind krank mit Teilzeitoptionen und optionalem Arztzeugnis als PDF
+
 Neu in Beta 0.033:
 - Im Kalender unter „Auswahl bearbeiten“ ist „Kind krank“ als eigene Abwesenheitsart verfügbar
 - „Kind krank“ wird im Kalender rot gekennzeichnet, aber als eigener Status gespeichert
