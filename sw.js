@@ -1,4 +1,4 @@
-const CACHE="htm-beta-0.035-week-exceptions-v1";
+const CACHE="htm-beta-0.036-sick-hhmm-v1";
 const ASSETS=[
   "./",
   "./index.html",
