@@ -376,7 +376,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 <div id="calSickBox" class="sick-detail-box" style="display:none">
   <div class="sick-detail-grid">
     <div><label for="calSickMode">Umfang der Krankmeldung</label><select id="calSickMode"><option value="full">Ganzer Tag</option><option value="half">Halber Tag</option><option value="remaining">Restlicher Arbeitstag</option><option value="hours">Stundenweise</option></select></div>
-    <div id="calSickHoursBox" class="sick-hours-box" style="display:none"><label for="calSickHours">Krank in Stunden</label><input id="calSickHours" type="number" min="0.25" max="16" step="0.25" value="4.25"></div>
+    <div id="calSickHoursBox" class="sick-hours-box" style="display:none"><label for="calSickHours">Abwesenheit (Std:Min)</label><input id="calSickHours" class="manual-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="2:15" value="2:00" autocomplete="off"><div class="manual-time-hint">Zum Beispiel 2:15 oder 215 für 2 Stunden 15 Minuten.</div></div>
   </div>
   <div class="sick-pdf-row"><label for="calSickPdf">Krankmeldung / Arztzeugnis als PDF (optional)</label><input id="calSickPdf" type="file" accept="application/pdf,.pdf"><div id="calSickPdfInfo" class="sick-pdf-info">Noch keine PDF hinterlegt.</div></div>
 </div>
@@ -387,7 +387,7 @@ html{background:#f0f3f8}body{font-family:"Aptos","Aptos Display","Segoe UI",Aria
 <div id="absenceSickBox" class="sick-detail-box">
   <div class="sick-detail-grid">
     <div><label for="absenceSickMode">Umfang der Krankmeldung</label><select id="absenceSickMode"><option value="full">Ganzer Tag</option><option value="half">Halber Tag</option><option value="remaining">Restlicher Arbeitstag</option><option value="hours">Stundenweise</option></select></div>
-    <div id="absenceSickHoursBox" class="sick-hours-box" style="display:none"><label for="absenceSickHours">Krank in Stunden</label><input id="absenceSickHours" type="number" min="0.25" max="16" step="0.25" value="4.25"></div>
+    <div id="absenceSickHoursBox" class="sick-hours-box" style="display:none"><label for="absenceSickHours">Abwesenheit (Std:Min)</label><input id="absenceSickHours" class="manual-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="2:15" value="2:00" autocomplete="off"><div class="manual-time-hint">Zum Beispiel 2:15 oder 215 für 2 Stunden 15 Minuten.</div></div>
   </div>
   <div class="sick-pdf-row"><label for="absenceSickPdf">Krankmeldung / Arztzeugnis als PDF (optional)</label><input id="absenceSickPdf" type="file" accept="application/pdf,.pdf"><div id="absenceSickPdfInfo" class="sick-pdf-info">Noch keine PDF hinterlegt.</div></div>
 </div>
@@ -732,9 +732,15 @@ ensureActiveProfile();
 let state=app.profiles[app.activeProfileId], calendarCursor=new Date(), calendarPickStart=null, overviewMonthKey=localTodayKey().slice(0,7);
 applyJan2026BackfillMigration();
 state=app.profiles[app.activeProfileId];
-const APP_VERSION="Beta 0.035";
-const APP_VERSION_CODE="0.035";
+const APP_VERSION="Beta 0.036";
+const APP_VERSION_CODE="0.036";
 const CHANGELOG_VERSIONS=[
+  {version:"0.036",items:[
+    "Teilweise Krankheit und Kind krank als Stunden und Minuten erfassen – zum Beispiel 2:15, 3:05 oder 4:00.",
+    "Das Stundenfeld nimmt auch 215 für 2:15 entgegen; die Erfassung ist minutengenau.",
+    "Die Tagesübersicht berücksichtigt Teil-Abwesenheiten korrekt im Stundensaldo und bei der Zeitgutschrift.",
+    "An Tagen mit teilweiser Krankmeldung bleibt das Ein- und Ausstempeln möglich."
+  ]},
   {version:"0.035",items:[
     "Einmalige Wochenpläne: Arbeitstage und Sollstunden für jede einzelne Woche abweichend festlegen.",
     "Halbe Tage und wechselnde Einsätze ändern nicht mehr das dauerhafte Arbeitsmodell.",
@@ -1005,6 +1011,17 @@ function getAbs(k){return state.absences[k]||null}
 function isSickTypeCode(type){return type==="Krank"||type==="KindKrank"}
 function isPartialSick(a){return !!(a&&isSickTypeCode(a.type)&&["half","hours","remaining"].includes(a.sickMode))}
 function absenceAllowsWork(a){return isPartialSick(a)}
+function parseSickDurationMinutes(value){
+  const raw=String(value??"").trim().replace(/\s+/g,"");
+  let hours,minutes;
+  if(/^\d{1,2}:\d{1,2}$/.test(raw))[hours,minutes]=raw.split(":").map(Number);
+  else if(/^\d{3,4}$/.test(raw)){hours=Number(raw.slice(0,-2));minutes=Number(raw.slice(-2))}
+  else if(/^\d{1,2}$/.test(raw)){hours=Number(raw);minutes=0}
+  else return null;
+  if(!Number.isInteger(hours)||!Number.isInteger(minutes)||hours<0||minutes<0||minutes>59)return null;
+  const total=hours*60+minutes;
+  return total>0&&total<=960?total:null;
+}
 function sickCreditMinutes(a,k){
   if(!a||!isSickTypeCode(a.type))return 0;
   let target=targetFor(k),mode=a.sickMode||"full";
@@ -1090,14 +1107,14 @@ function updateSickModeUi(prefix){
 }
 function loadSickEditor(prefix,k){
   let a=k?getAbs(k):null,mode=a&&isSickTypeCode(a.type)?(a.sickMode||"full"):"full",sel=document.getElementById(prefix+"SickMode");if(sel)sel.value=mode;
-  let hours=document.getElementById(prefix+"SickHours");if(hours&&a&&["hours","remaining"].includes(mode))hours.value=(sickCreditMinutes(a,k)/60).toFixed(2).replace(/\.00$/,"");
+  let hours=document.getElementById(prefix+"SickHours");if(hours)hours.value=a&&["hours","remaining"].includes(mode)?fmt(sickCreditMinutes(a,k)):"2:00";
   let info=document.getElementById(prefix+"SickPdfInfo");if(info)info.textContent=pdfInfoText(a);
   let input=document.getElementById(prefix+"SickPdf");if(input)input.value="";
   updateSickModeUi(prefix);
 }
 function sickEntryForDay(type,mode,k,hoursValue,pdfMeta,existing){
   let entry={type,sickMode:mode||"full"};
-  if(mode==="hours"){let h=Number(hoursValue);if(!h||h<=0||h>16)throw new Error("Bitte eine gültige Krankheitsdauer in Stunden eingeben.");entry.sickMinutes=Math.round(h*60)}
+  if(mode==="hours"){let minutes=parseSickDurationMinutes(hoursValue);if(minutes===null)throw new Error("Bitte die Abwesenheit als Stunden:Minuten eingeben, z. B. 2:15.");if(minutes>targetFor(k))throw new Error(`Am ${dateLabel(k)} darf die Abwesenheit höchstens ${fmt(targetFor(k))} betragen.`);entry.sickMinutes=minutes}
   else if(mode==="remaining"){entry.sickMinutes=Math.max(0,targetFor(k)-creditedWorked(state.days[k]));if(entry.sickMinutes<=0)throw new Error(`Am ${dateLabel(k)} ist keine restliche Sollzeit mehr offen.`)}
   if(pdfMeta)Object.assign(entry,pdfMeta);
   else if(existing&&existing.documentId){entry.documentId=existing.documentId;entry.documentName=existing.documentName;entry.documentSize=existing.documentSize}
@@ -1201,9 +1218,9 @@ function renderToday(){
   document.getElementById("todayDate").textContent=dateLabel(k);
   let hn=document.getElementById("holidayToday");if(hol){hn.style.display="block";hn.textContent=`${tr("Feiertag")}: ${hol.name}${hol.factor===.5?" · ab 12:00 Uhr":""}`}else hn.style.display="none";
   let status;if(a)status=`${tr("Abwesenheit")}: ${labelType(a.type)}`;else if(pau)status=currentLang()==="gsw"?`I dr Pause sit ${pau.start}`:`In Pause seit ${pau.start}`;else if(cur)status=(cur.notdienst?tr("Zusatzarbeit / Notdienst")+" ×2 – ":"")+(currentLang()==="gsw"?`am Schaffe sit ${cur.in}`:`bei der Arbeit seit ${cur.in}`);else if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else status=target===0?(currentLang()==="gsw"?"Planmässig frei – Zuesatzarbeit / Notdienscht cha glych gstämplet wärde":"Planmässig frei – Zusatzarbeit / Notdienst kann trotzdem gestempelt werden"):tr("Nicht eingestempelt");
-  document.getElementById("todayStatus").textContent=status;document.getElementById("comeBtn").disabled=!!cur||!!pau||!!a;document.getElementById("pauseStartBtn").disabled=!cur||!!pau||!!a;document.getElementById("pauseEndBtn").disabled=!pau||!!a;document.getElementById("goBtn").disabled=!cur||!!pau||!!a;
-  document.getElementById("todayWork").textContent=fmt(w);document.getElementById("todayCredit").textContent=fmt(credit);document.getElementById("todayPause").textContent=fmt(pm);document.getElementById("todayTarget").textContent=fmt(target);
-  let bal=a?(a.type==="Ueberstundenabbau"?-overtimeReduction(a,k):0):(credit-target),el=document.getElementById("todayDiff");el.textContent=fmt(bal,true);el.className=bal>=0?"positive":"negative";
+  let absenceBlocksStamp=!!a&&!absenceAllowsWork(a);document.getElementById("todayStatus").textContent=status;document.getElementById("comeBtn").disabled=!!cur||!!pau||absenceBlocksStamp;document.getElementById("pauseStartBtn").disabled=!cur||!!pau||absenceBlocksStamp;document.getElementById("pauseEndBtn").disabled=!pau||absenceBlocksStamp;document.getElementById("goBtn").disabled=!cur||!!pau||absenceBlocksStamp;
+  document.getElementById("todayWork").textContent=fmt(w);document.getElementById("todayCredit").textContent=fmt(credit+(isPartialSick(a)?sickCreditMinutes(a,k):0));document.getElementById("todayPause").textContent=fmt(pm);document.getElementById("todayTarget").textContent=fmt(target);
+  let bal=dailyBalance(k),el=document.getElementById("todayDiff");el.textContent=fmt(bal,true);el.className=bal>=0?"positive":"negative";
   let h="";if(d&&d.sessions&&d.sessions.length)d.sessions.forEach((ss,i)=>{let links=[];if(ss.inLocation)links.push(locationAnchor(ss.inLocation,"Kommen-Standort"));if(ss.outLocation)links.push(locationAnchor(ss.outLocation,"Gehen-Standort"));let loc=links.length?`<div class="location-note">${links.join(" · ")}</div>`:"";h+=`<div class="entry"><span>Arbeitsblock ${i+1}${ss.notdienst?" · Notfalldienst ×2":""}${loc}</span><b>${ss.in} – ${ss.out||tr("läuft")}</b></div>`});if(d&&d.pauses&&d.pauses.length)d.pauses.forEach((x,i)=>h+=`<div class="entry"><span>Pause ${i+1}</span><b>${x.start} – ${x.end} (${fmt(mins(x.end)-mins(x.start))})</b></div>`);if(d&&d.activePause)h+=`<div class="entry"><span>Pause</span><b>${d.activePause.start} – ${tr("läuft")} (${fmt(pm)})</b></div>`;document.getElementById("sessions").innerHTML=h||'<div class="small">Noch keine Buchungen heute.</div>';
 }
 function dateRangeKeys(from,to){let out=[],d=new Date(from+"T12:00:00"),e=new Date(to+"T12:00:00");while(d<=e){out.push(keyOf(d));d.setDate(d.getDate()+1)}return out}
@@ -1236,7 +1253,7 @@ function htmCalendarTimeText(k,d,a){
 function renderCalendarDesignExtras(){
   let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),month=`${y}-${p(m+1)}`,today=localTodayKey(),rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,workDays=0,cards=[];
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth}
-  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=dailyBalance(k);workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?absenceStatusLabel(a,k):(historical&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="KindKrank"?labelType(a.type):a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
+  else monthKeys(month).forEach(k=>{let a=getAbs(k),d=state.days[k],historical=isHistoricalManualDay(k),hasData=!!a||!!d;if(k>today&&!hasData)return;if(!isAfterTrackingStart(k)&&!historical&&!a)return;let w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=dailyBalance(k);workedMonth+=w;creditMonth+=credit+(isPartialSick(a)?sickCreditMinutes(a,k):0);targetMonth+=target;balanceMonth+=bal;if(w>0)workDays++;if(hasData&&(w>0||a||historical)){let date=new Date(k+"T12:00:00"),status=a?absenceStatusLabel(a,k):(historical&&!isCalendarCorrectionDay(k)?"Tagesnachtrag":tr("Arbeit"));cards.push({k,kind:htmCalendarKind(a,w),weekday:date.toLocaleDateString(uiLocale(),{weekday:"short"}),status,time:htmCalendarTimeText(k,d,a),main:a?(a.type==="Ferien"?"Ferien":a.type==="Krank"?"Krank":a.type==="KindKrank"?labelType(a.type):a.type==="Ueberstundenabbau"?"ÜST-Abbau":labelType(a.type)):`${fmt(w)} h`,bal,a})}});
   let set=(id,value,cls="")=>{let e=document.getElementById(id);if(e){e.textContent=value;e.className=cls}};
   let st=document.getElementById("calSummaryTitle");if(st)st.textContent=`Monatsübersicht ${monthDisplay(month)}`;let plannedTarget=rec?targetMonth:monthTargetMinutes(month);set("calWorkDays",String(workDays));set("calTarget",`${fmt(plannedTarget)} h`);set("calWorked",`${fmt(workedMonth)} h`);set("calBalance",`${fmt(balanceMonth,true)} h`,balanceMonth>=0?"positive":"negative");set("calCredit",`${fmt(creditMonth)} h`);
   let list=document.getElementById("calendarDayCards");if(!list)return;cards.sort((a,b)=>b.k.localeCompare(a.k));
@@ -1735,7 +1752,7 @@ function renderOverview(){
   let input=document.getElementById("overviewMonth");if(input&&input.value)overviewMonthKey=input.value;let month=overviewMonthKey||currentMonthKey();if(input)input.value=month;document.getElementById("overviewMonthTitle").textContent=monthDisplay(month);
   let rec=state.monthlyRecords[month]||null,workedMonth=0,creditMonth=0,targetMonth=0,balanceMonth=0,vac=0,sick=0,rows=[],today=localTodayKey(),notice=document.getElementById("monthlyImportNotice");let monthAbs=Object.keys(state.absences).filter(k=>k.startsWith(month));vac=monthAbs.filter(k=>getAbs(k)?.type==="Ferien").length;sick=monthAbs.filter(k=>getAbs(k)?.type==="Krank").reduce((sum,k)=>sum+absenceDayFraction(getAbs(k),k),0);
   if(rec){workedMonth=Number(rec.workedMinutes||0);creditMonth=workedMonth;targetMonth=Number(rec.targetMinutes||0);balanceMonth=workedMonth-targetMonth;notice.style.display="block";notice.textContent=`Alter Monats-Gesamtnachtrag vorhanden: ${fmt(workedMonth)} Ist / ${fmt(targetMonth)} Soll · Saldo ${fmt(balanceMonth,true)}${rec.reason?" · "+rec.reason:""}`;rows.push(`<tr><td>${month}</td><td>Monatsnachtrag</td><td>${fmt(workedMonth)}</td><td>${fmt(creditMonth)}</td><td>${fmt(targetMonth)}</td><td class="${balanceMonth>=0?"positive":"negative"}">${fmt(balanceMonth,true)}</td><td>–</td></tr>`)}
-  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=dailyBalance(k),status=target>0?tr("Arbeit"):tr("Frei");if(a){status=absenceStatusLabel(a,k)}else{if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical&&!isCalendarCorrectionDay(k))status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit;targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
+  else{notice.style.display="none";monthKeys(month).forEach(k=>{let historical=isHistoricalManualDay(k),afterStart=isAfterTrackingStart(k);if(k>today||(!afterStart&&!historical&&!getAbs(k)))return;let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),hol=holidayInfo(k),bal=dailyBalance(k),status=target>0?tr("Arbeit"):tr("Frei");if(a){status=absenceStatusLabel(a,k)}else{if(hol)status=`${tr("Feiertag")}: ${hol.name}`;else if(target===0&&w>0)status=tr("Zusatzarbeit / Notdienst");if(d&&((d.sessions&&d.sessions.some(x=>x.notdienst))||(d.historicalManual&&d.historicalManual.notdienst)))status=tr("Zusatzarbeit / Notdienst")+" ×2";if(historical&&!isCalendarCorrectionDay(k))status=(status===tr("Arbeit")?"Tagesnachtrag":status+" · Tagesnachtrag")}workedMonth+=w;creditMonth+=credit+(isPartialSick(a)?sickCreditMinutes(a,k):0);targetMonth+=target;balanceMonth+=bal;let maps=dayLocationLinks(d)||"–";rows.push(`<tr><td><b>${shortDate(k)}</b></td><td>${status}</td><td>${fmt(w)}</td><td>${fmt(credit)}</td><td>${fmt(target)}</td><td class="${bal>=0?"positive":"negative"}">${fmt(bal,true)}</td><td>${maps}</td></tr>`)});if(!rows.length)rows.push(`<tr><td colspan="7" class="small">Für diesen Monat gibt es noch keine laufende Erfassung oder keinen Nachtrag.</td></tr>`)}
   document.getElementById("monthWorked").textContent=fmt(workedMonth);document.getElementById("monthCredit").textContent=fmt(creditMonth);let plannedTarget=rec?targetMonth:monthTargetMinutes(month);document.getElementById("monthTarget").textContent=fmt(plannedTarget);let mb=document.getElementById("monthBalance");mb.textContent=fmt(balanceMonth,true);mb.className=balanceMonth>=0?"positive":"negative";document.getElementById("vacDays").textContent=vac;document.getElementById("sickDays").textContent=Number.isInteger(sick)?sick:sick.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");let ot=document.getElementById("overtimeTotal"),total=totalOvertimeBalance();ot.textContent=fmt(total,true);ot.className=total>=0?"positive":"negative";document.getElementById("dayTable").innerHTML=rows.join("");
 }
 function renderSettings(){
@@ -1959,6 +1976,7 @@ document.getElementById("calType").addEventListener("change",e=>syncSickBox("cal
 document.getElementById("absenceType").addEventListener("change",e=>syncSickBox("absence",e.target.value));
 document.getElementById("calSickMode").addEventListener("change",()=>updateSickModeUi("cal"));
 document.getElementById("absenceSickMode").addEventListener("change",()=>updateSickModeUi("absence"));
+["calSickHours","absenceSickHours"].forEach(id=>document.getElementById(id).addEventListener("blur",e=>{let val=parseSickDurationMinutes(e.target.value);if(val!==null)e.target.value=fmt(val)}));
 document.getElementById("absenceHours").addEventListener("input",e=>e.target.dataset.touched="1");
 syncSickBox("cal",document.getElementById("calType").value);syncSickBox("absence",document.getElementById("absenceType").value);loadSickEditor("cal",today);loadSickEditor("absence",today);
 document.getElementById("saveAbsence").onclick=async()=>{let from=document.getElementById("absenceFrom").value,to=document.getElementById("absenceTo").value||from,type=document.getElementById("absenceType").value;if(!from)return alert("Bitte Startdatum wählen.");if(to<from){let t=from;from=to;to=t}let keys=dateRangeKeys(from,to).filter(k=>isWorkday(k)&&targetFor(k)>0);if(!keys.length)return alert("Im gewählten Zeitraum liegt kein regulärer Arbeitstag.");let sick=isSickTypeCode(type),mode=sick?(document.getElementById("absenceSickMode").value||"full"):"full";let conflict=keys.find(k=>state.days[k]&&worked(state.days[k])>0&&!(sick&&mode!=="full"));if(conflict)return alert("Am "+dateLabel(conflict)+" sind bereits Arbeitszeiten vorhanden. Wähle bei Krankheit Halber Tag, Restlicher Arbeitstag oder Stundenweise.");let h=(baseTargetFor(from)||510)/60;if(type==="Ueberstundenabbau"){h=Number(document.getElementById("absenceHours").value);if(!h||h<=0||h>16)return alert("Bitte eine gültige Stundenanzahl eingeben.")}let pdfMeta=null,file=document.getElementById("absenceSickPdf")?.files?.[0]||null;try{if(sick&&file)pdfMeta=await storeSickPdf(file);let oldIds=new Set();keys.forEach(k=>{let old=getAbs(k);if(old?.documentId)oldIds.add(old.documentId);state.absences[k]=type==="Ueberstundenabbau"?{type,hours:h}:sick?sickEntryForDay(type,mode,k,document.getElementById("absenceSickHours").value,pdfMeta,old):{type}});save();for(let id of oldIds)await cleanupSickPdfIfUnused(id);loadSickEditor("absence",keys[0]);alert(keys.length===1?"Abwesenheit gespeichert.":`${keys.length} Arbeitstage gespeichert.`)}catch(e){if(pdfMeta?.documentId)await cleanupSickPdfIfUnused(pdfMeta.documentId);alert(e.message||"Abwesenheit konnte nicht gespeichert werden.")}};
@@ -2105,7 +2123,7 @@ function cleanPdfText(value){
 function pdfRowData(){
   let keys=[...new Set([...Object.keys(state.days),...Object.keys(state.absences)])].sort();
   return keys.map(k=>{
-    let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d),target=targetFor(k),bal=dailyBalance(k),hol=holidayInfo(k),pm=d&&d.historicalManual?Number(d.historicalManual.pauseMinutes||0):pauseMinutes(d);
+    let a=getAbs(k),d=state.days[k],w=worked(d),credit=creditedWorked(d)+(isPartialSick(a)?sickCreditMinutes(a,k):0),target=targetFor(k),bal=dailyBalance(k),hol=holidayInfo(k),pm=d&&d.historicalManual?Number(d.historicalManual.pauseMinutes||0):pauseMinutes(d);
     let from="",to="";
     if(d&&d.historicalManual){from=d.historicalManual.from||"";to=d.historicalManual.to||""}
     else if(d&&Array.isArray(d.sessions)&&d.sessions.length){
